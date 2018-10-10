@@ -66,8 +66,10 @@ public class NexHelper {
 			String login = respond[2];
 			String password = respond[3];
 			String proxy = respond[4];
+			String world = respond[5];
+			String script = respond[6];
 			System.out.println(respond);
-			AccountLauncher.launchClient("./osbot.jar", "BDK", "wavh", "Lifeosbotbook123", login, password, "305", proxy, null);
+			AccountLauncher.launchClient("./osbot.jar", script, "wavh", "Lifeosbotbook123", login, password, world, proxy, null);
 		}else {
 			System.out.println("No Account available atm. Try again in 5 minutes");
 		}
