@@ -3,15 +3,24 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.URL;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class NexHelper {
+	Stack<String> messageQueue;
+	long lastLog = 0;
+	private String respond = "none";
 	public static void main(String[] args) {
 		new NexHelper();
 	}
 	
 	public NexHelper() {
+		messageQueue = new Stack<String>();
+		//messageQueue.push("account_request");
+		
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Enter IP");
 		String ip = sc.nextLine();
@@ -23,31 +32,68 @@ public class NexHelper {
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-			out.println("computer:0");
-			if(in.readLine().equals("connected:1")) {
-				System.out.println("NexHelper has been initialized towards Nexus");
-			}else {
-				System.out.println("Connection Towards Nexus failed");
-			}
+			initializeContactToSocket(out, in);
 
 			String nextRequest;
 			
 			while (true) {				
-				System.out.println("Ready to take new instructions...(account_request to start new client)");
-				nextRequest = sc.nextLine();
-				switch(nextRequest) {
-				case "account_request":
-					newAccountRequest(out, in);
-					break;
-				default:
-					out.println(nextRequest + ":0");
-					System.out.println(in.readLine());
-					break;
+				System.out.println("Ready to take new instructions...last respond:" + respond);
+				if(!messageQueue.isEmpty()) {
+					nextRequest = messageQueue.pop();
+					switch(nextRequest) {
+					case "account_request":
+						newAccountRequest(out, in);
+						break;
+					default:
+						log(out,in);
+						break;
+					}
+				}else {
+					log(out,in);
+					Thread.sleep(1000);
 				}
 			}
 		}catch (Exception e) {
-			
+			System.out.println(e.getMessage());
 		}
+	}
+
+	private void log(PrintWriter out, BufferedReader in) throws InterruptedException, IOException {
+		if(System.currentTimeMillis() - lastLog > 5000) { //only log every 5 sec
+		out.println("log:0");
+		respond = in.readLine();
+		//standard message is 'logged:fine'
+		//if respond is anything else than logged:fine we can assume it is a new instruction
+		if(!respond.equals("logged:fine")) {
+			System.out.println("we got a new instructionToQueue:" + respond);
+			messageQueue.push(respond);
+		}
+		lastLog = System.currentTimeMillis();
+		}
+		
+	}
+
+	private void initializeContactToSocket(PrintWriter out, BufferedReader in) throws IOException {
+		out.println("computer:1:" + getIP() + ":william_home_computer_test_1");
+		if(in.readLine().equals("connected:1")) {
+			System.out.println("NexHelper has been initialized towards Nexus");
+		}else {
+			System.out.println("Connection Towards Nexus failed");
+		}
+	}
+	
+	public String getIP() {
+		URL url;
+		try {
+			url = new URL("http://checkip.amazonaws.com/");
+			BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+			return br.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "not_found";
+
 	}
 
 	/*
