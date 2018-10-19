@@ -51,10 +51,11 @@ public class NexHelper {
 						 */
 						if (parsed[1].equals("0")) {
 							newAccountRequest(out, in);
+							break;
 						} else if (parsed[1].equals("1")) {
+							System.out.println("lets start?");
 							startAccount(parsed);
 						}
-						break;
 					default:
 						log(out, in);
 						break;
