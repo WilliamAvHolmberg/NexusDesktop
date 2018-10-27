@@ -32,17 +32,17 @@ public final class AccountLauncher {
 			String botPass, String world, String proxy, String params) {
 		System.out.println("Starting");
 		ProcessBuilder linuxBuilder = new ProcessBuilder("/bin/bash", "-c",
-				"java -jar " + path + " -Xmx750m -allow norandoms" + proxy + " -login " + clientUser + ":" + clientPass
+				"java -jar " + path + " -Xmx750m -allow norandoms " + proxy + " -login " + clientUser + ":" + clientPass
 						+ " -bot " + botUser + ":" + botPass + ":1234" + " -world " + world + " -script " + script + ":"
 						+ params);
 
 		ProcessBuilder windowsBuilder = new ProcessBuilder("cmd.exe", "/c",
-				"java -jar " + path + " -Xmx750m -allow norandoms" + proxy + " -login " + clientUser + ":" + clientPass
+				"java -jar " + path + " -Xmx750m -allow norandoms " + proxy + " -login " + clientUser + ":" + clientPass
 						+ " -bot " + botUser + ":" + botPass + ":1234" + " -world " + world + " -script " + script + ":"
 						+ params);
 		windowsBuilder.inheritIO();
 		ProcessBuilder macBuilder = new ProcessBuilder("osascript", "-e",
-				"tell application \"Terminal\" to do script \"java -jar " + path + " -Xmx750m -allow norandoms" + proxy + " -login " + clientUser + ":" + clientPass
+				"tell application \"Terminal\" to do script \"java -jar " + path + " -Xmx750m -allow norandoms " + proxy + " -login " + clientUser + ":" + clientPass
 				+ " -bot " + botUser + ":" + botPass + ":1234" + " -world " + world + " -script " + script + ":"
 				+ params +  "\"");
 
