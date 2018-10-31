@@ -38,7 +38,6 @@ public class NexHelper {
 			String nextRequest;
 
 			while (true) {
-				System.out.println("Ready to take new instructions...last respond:" + respond);
 				if (!messageQueue.isEmpty()) {
 					nextRequest = messageQueue.pop();
 					String[] parsed = nextRequest.split(":");
@@ -87,7 +86,7 @@ public class NexHelper {
 	}
 
 	private void initializeContactToSocket(PrintWriter out, BufferedReader in) throws IOException {
-		out.println("computer:1:" + getIP() + ":adam_computer");
+		out.println("computer:1:" + getIP() + ":HOME_COMPUTER");
 		if (in.readLine().equals("connected:1")) {
 			System.out.println("NexHelper has been initialized towards Nexus");
 		} else {
@@ -127,11 +126,15 @@ public class NexHelper {
 	private void startAccount(String[] respond) {
 		String login = respond[2];
 		String password = respond[3];
-		String proxy = respond[4];
-		String world = respond[5];
-		String script = respond[6];
-		System.out.println(respond);
+		String proxyIP = respond[4];
+		String proxyPort = respond[5];
+		String proxyUsername = respond[6];
+		String proxyPassword = respond[7];
+		String world = respond[8];
+		String script = respond[9];
+		String proxy = "-proxy " + proxyIP + ":" + proxyPort + ":" + proxyUsername + ":" + proxyPassword;
+		String params = password + "_";
 		AccountLauncher.launchClient("./osbot.jar", script, "wavh", "Lifeosbotbook123", login, password, world, proxy,
-				null);
+				params);
 	}
 }
