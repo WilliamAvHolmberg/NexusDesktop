@@ -23,7 +23,7 @@ public class NexHelper {
 		// messageQueue.push("account_request");
 
 		Scanner sc = new Scanner(System.in);
-		System.out.println("Enter IP");
+		System.out.println("Enter leee IP");
 		String ip = sc.nextLine();
 		System.out.println("Enter Port");
 		int port = sc.nextInt();

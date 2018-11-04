@@ -32,7 +32,7 @@ public final class AccountLauncher {
 			String botPass, String world, String proxy, String params) {
 		System.out.println("Starting");
 		ProcessBuilder linuxBuilder = new ProcessBuilder("/bin/bash", "-c",
-				"java -jar " + path + " -Xmx750m -allow norandoms " + proxy + " -login " + clientUser + ":" + clientPass
+				"java -jar " + "." + path + " -Xmx750m -allow norandoms " + proxy + " -login " + clientUser + ":" + clientPass
 						+ " -bot " + botUser + ":" + botPass + ":1234" + " -world " + world + " -script " + script + ":"
 						+ params);
 
@@ -47,7 +47,9 @@ public final class AccountLauncher {
 				+ params +  "\"");
 
 		try {
+			System.out.println(AccountLauncher.getOperatingSystemType());
 			switch (AccountLauncher.getOperatingSystemType()) {
+			
 			case Windows:
 				int i = 1;
 				System.out.println("Start windows");
@@ -60,7 +62,9 @@ public final class AccountLauncher {
 
 				break;
 			case Linux:
+				System.out.println("lets go linux");
 				Process p3 = linuxBuilder.start();
+				setOutputStream(p3);
 				break;
 			}
 		} catch (IOException e1) {
