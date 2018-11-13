@@ -23,10 +23,12 @@ public class NexHelper {
 		// messageQueue.push("account_request");
 
 		Scanner sc = new Scanner(System.in);
-		System.out.println("Enter leee IP");
-		String ip = sc.nextLine();
-		System.out.println("Enter Port");
-		int port = sc.nextInt();
+		//System.out.println("Enter leee IP");
+		//String ip = sc.nextLine();
+		//System.out.println("Enter Port");
+		String ip = "0.0.0.0";
+		int port = 43594;
+		//int port = sc.nextInt();
 
 		try {
 			Socket socket = new Socket(ip, port);
@@ -54,6 +56,7 @@ public class NexHelper {
 						} else if (parsed[1].equals("1")) {
 							System.out.println("lets start?");
 							startAccount(parsed);
+							break;
 						}
 					default:
 						log(out, in);
