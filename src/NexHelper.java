@@ -15,6 +15,7 @@ import org.medusa.*;
 import com.anti_captcha.*;
 
 
+
 public class NexHelper {
 	Stack<String> messageQueue;
 	long lastLog = 0;
@@ -27,11 +28,21 @@ public class NexHelper {
 	}
 
 	public NexHelper() throws MalformedURLException, InterruptedException {
-		//CreateAccount ca = new CreateAccount("williamavholmk@gmail.com", "SlrWillmz", "ugot00wned2", "", "");
-		//ca.createAccount();
+		//CreateAccount ca = new CreateAccount();
+		//ca.createAccount("MonkTomte","MonkWilo@gmail.com",  "ugot00wned2", new Proxy("CejurP","Rz7Kpw", "185.201.255.99", "8000"));
 		messageQueue = new Stack<String>();
 		// messageQueue.push("account_request");
+		URL whatismyip;
+		try {
+			whatismyip = new URL("http://checkip.amazonaws.com");
+			BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
 
+			String ip = in.readLine(); // you get the IP as a String
+			System.out.println(ip);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Scanner sc = new Scanner(System.in);
 		//System.out.println("Enter leee IP");
 		//String ip = sc.nextLine();
@@ -73,6 +84,9 @@ public class NexHelper {
 					nextRequest = messageQueue.pop();
 					String[] parsed = nextRequest.split(":");
 					switch (parsed[0]) {
+					case "create_account":
+						createAccount(parsed);
+						break;
 					case "account_request":
 						/*
 						 * Argument 0 == respond Argument 1 == 0 equals that we shall ask database for a
@@ -154,7 +168,18 @@ public class NexHelper {
 			System.out.println("No Account available atm. Try again in 5 minutes");
 		}
 	}
+	private void createAccount(String[] respond) throws MalformedURLException, InterruptedException {
+		String username = respond[1];
+		String login = respond[2];
+		String password = respond[3];
+		String proxyIP = respond[4];
+		String proxyPort = respond[5];
+		String proxyUsername = respond[6];
+		String proxyPassword = respond[7];
+		CreateAccount ca = new CreateAccount();
+		ca.createAccount(username, login, password, new Proxy(proxyUsername, proxyPassword, proxyIP, proxyPort));
 
+	}
 	private void startAccount(String[] respond) {
 		String login = respond[2];
 		String password = respond[3];

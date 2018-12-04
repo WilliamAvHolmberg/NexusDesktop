@@ -55,19 +55,9 @@ public class CreateAccount {
 
 	// Session Stuff
 	public static SessionStorage st = new SessionStorage();
-	private String email;
-	private String username;
-	private String password;
-	private String ip;
-	private String port;
 
-	public CreateAccount(String email, String username, String password, String ip, String port) {
-		this.email = email;
-		this.username = username;
-		this.password = password;
-		this.ip = ip;
-		this.port = port;
-		st.logger = true;
+
+	public CreateAccount() {
 
 		// Prints text to logger
 		Logger.log("Welcome to Medusa's Account Creator (v" + CreateAccount.version + "-" + CreateAccount.v + ")");
@@ -93,12 +83,12 @@ public class CreateAccount {
 			Logger.log("-----------------------");
 			Logger.log("Failed to solve captcha");
 		} else {
-			createPost(api.getTaskSolution().getGRecaptchaResponse(), username, email, password);
+			createPost(api.getTaskSolution().getGRecaptchaResponse(), username, email, password, proxy);
 		}
 	}
 
 	// Create Account without proxy
-	public void createPost(String string, String username, String email, String password) {
+	public void createPost(String string, String username, String email, String password, Proxy proxy) {
 		HttpClient httpclient = HttpClients.createDefault();
 		try {
 
@@ -140,9 +130,13 @@ public class CreateAccount {
 					Logger.log("-----------------------");
 					Logger.log(email + ":" + password + ":" + username);
 					if (getResponseString.contains("Account Created") || getResponseString.length() < 2) {
-						// start script ScriptLaunch.launchScript(st.scriptNameID, st.osbotUsername,
-						// st.osbotPassword, email, password);
-
+						// start script 
+						String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port+ ":" + proxy.username + ":" + proxy.password;
+						AccountLauncher.launchClient("./osbot.jar", "NEX", "wavh", "Lifeosbotbook123", email, password, "301", parsedProxy,
+								password + "_");
+					}else {
+						Logger.log("somerthing failed");
+						Logger.log(getResponseString);
 					}
 				} finally {
 					instream.close();
@@ -182,19 +176,6 @@ public class CreateAccount {
 		}
 	}
 
-	public class Proxy {
-		public String username;
-		public String password;
-		public String host;
-		public String port;
-
-		public Proxy(String username, String password, String host, String port) {
-			this.username = username;
-			this.password = password;
-			this.host = host;
-			this.port = port;
-		}
-	}
 
 	public class ProxyAuth extends Authenticator {
 		private PasswordAuthentication auth;
