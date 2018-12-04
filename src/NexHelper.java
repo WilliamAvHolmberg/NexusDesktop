@@ -1,5 +1,7 @@
 
+import java.awt.GraphicsEnvironment;
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -9,16 +11,24 @@ import java.net.URL;
 import java.util.Scanner;
 import java.util.Stack;
 
+import org.medusa.*;
+import com.anti_captcha.*;
+
+
 public class NexHelper {
 	Stack<String> messageQueue;
 	long lastLog = 0;
 	private String respond = "none";
+	private String computerName;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException, InterruptedException {
+
 		new NexHelper();
 	}
 
-	public NexHelper() {
+	public NexHelper() throws MalformedURLException, InterruptedException {
+		//CreateAccount ca = new CreateAccount("williamavholmk@gmail.com", "SlrWillmz", "ugot00wned2", "", "");
+		//ca.createAccount();
 		messageQueue = new Stack<String>();
 		// messageQueue.push("account_request");
 
@@ -26,10 +36,29 @@ public class NexHelper {
 		//System.out.println("Enter leee IP");
 		//String ip = sc.nextLine();
 		//System.out.println("Enter Port");
-		String ip = "0.0.0.0";
+		String ip = "oxnetserver.ddns.net";
+		//String ip = "nexus.no-ip.org";
 		int port = 43594;
-		//int port = sc.nextInt();
-
+		System.out.println("Please choose which user you want to use:");
+		System.out.println("1:William");
+		System.out.println("2:Brandon");
+		int nameOption = sc.nextInt();
+		switch (nameOption) {
+		case 1:
+			computerName = "William";
+			break;
+		case 2:
+			computerName = "Brandon";
+			break;
+		case 3:
+			computerName = "Suicide";
+			break;
+		default:
+			System.out.println("Something went wrong");
+			System.exit(1);
+			break;
+		}
+		System.out.println("We are gonna connect with user:" + computerName);
 		try {
 			Socket socket = new Socket(ip, port);
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -46,9 +75,9 @@ public class NexHelper {
 					switch (parsed[0]) {
 					case "account_request":
 						/*
-						 * Argument 0 == respond
-						 * Argument 1 == 0 equals that we shall ask database for a new account
-						 * Argument 1 == 1 equals that we shall use provided details to start a new client
+						 * Argument 0 == respond Argument 1 == 0 equals that we shall ask database for a
+						 * new account Argument 1 == 1 equals that we shall use provided details to
+						 * start a new client
 						 */
 						if (parsed[1].equals("0")) {
 							newAccountRequest(out, in);
@@ -89,7 +118,7 @@ public class NexHelper {
 	}
 
 	private void initializeContactToSocket(PrintWriter out, BufferedReader in) throws IOException {
-		out.println("computer:1:" + getIP() + ":HOME_COMPUTER");
+		out.println("computer:1:" + getIP() + ":" + computerName);
 		if (in.readLine().equals("connected:1")) {
 			System.out.println("NexHelper has been initialized towards Nexus");
 		} else {
@@ -139,5 +168,6 @@ public class NexHelper {
 		String params = password + "_";
 		AccountLauncher.launchClient("./osbot.jar", script, "wavh", "Lifeosbotbook123", login, password, world, proxy,
 				params);
+
 	}
 }

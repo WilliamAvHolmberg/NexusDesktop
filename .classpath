@@ -2,5 +2,14 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="src/libs/commons-codec-1.9.jar"/>
+	<classpathentry kind="lib" path="src/libs/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="src/libs/fluent-hc-4.5.2.jar"/>
+	<classpathentry kind="lib" path="src/libs/httpclient-4.5.2.jar"/>
+	<classpathentry kind="lib" path="src/libs/httpclient-cache-4.5.2.jar"/>
+	<classpathentry kind="lib" path="src/libs/httpclient-osgi-4.5.2.jar"/>
+	<classpathentry kind="lib" path="src/libs/httpcore-4.4.4.jar"/>
+	<classpathentry kind="lib" path="src/libs/httpmime-4.5.2.jar"/>
+	<classpathentry kind="lib" path="src/libs/java-json.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
