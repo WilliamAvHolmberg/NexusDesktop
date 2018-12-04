@@ -3,3 +3,5 @@
 /libs/
 /manifest.mf
 /org/
+/CreateAccount$Proxy.class
+/CreateAccount$ProxyAuth.class

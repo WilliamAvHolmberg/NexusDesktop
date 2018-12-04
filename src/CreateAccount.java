@@ -1,8 +1,6 @@
 
-
 import com.anti_captcha.Api.NoCaptchaProxyless;
 import com.anti_captcha.Helper.DebugHelper;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -18,14 +16,18 @@ import org.json.JSONException;
 import org.medusa.Utils.Logger;
 import org.medusa.Utils.SessionStorage;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.Authenticator;
 import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,32 +74,37 @@ public class CreateAccount {
 		Logger.log("Please note that this might not work 100% of the time");
 	}
 
-	// Make request to solve captcha. If solved proceed to account creation.
-	public void createAccount() throws MalformedURLException, InterruptedException {
+	public void createAccount(String username, String email, String password, Proxy proxy)
+			throws MalformedURLException, InterruptedException {
 		Logger.log("Waiting for captcha code... This might take a while...");
-		DebugHelper.setVerboseMode(false);
+		if (proxy != null) {
+			Logger.log("Hello");
+			setProxy(proxy);
+			Logger.log("hello again");
+		}
 		NoCaptchaProxyless api = new NoCaptchaProxyless();
 		api.setClientKey(antiCaptchaKey);
 		api.setWebsiteUrl(new URL("https://secure.runescape.com/m=account-creation/create_account"));
 		api.setWebsiteKey("6LccFA0TAAAAAHEwUJx_c1TfTBWMTAOIphwTtd1b");
-		Logger.log("we are down here");
+
 		if (!api.createTask()) {
 			Logger.log(api.getErrorMessage());
 		} else if (!api.waitForResult()) {
 			Logger.log("-----------------------");
 			Logger.log("Failed to solve captcha");
 		} else {
-			createPost(api.getTaskSolution().getGRecaptchaResponse());
-			Logger.log("we are even down here");
+			createPost(api.getTaskSolution().getGRecaptchaResponse(), username, email, password);
 		}
 	}
 
 	// Create Account without proxy
-	public void createPost(String string) {
+	public void createPost(String string, String username, String email, String password) {
 		HttpClient httpclient = HttpClients.createDefault();
 		try {
 
 			HttpPost httppost = new HttpPost("https://secure.runescape.com/m=account-creation/create_account");
+
+			Logger.log("username: " + username);
 
 			// Request parameters and other properties.
 			List<NameValuePair> params = new ArrayList<NameValuePair>(2);
@@ -133,18 +140,9 @@ public class CreateAccount {
 					Logger.log("-----------------------");
 					Logger.log(email + ":" + password + ":" + username);
 					if (getResponseString.contains("Account Created") || getResponseString.length() < 2) {
-						String proxy1 = "-proxy " + " " + ":" + " " + ":" + " " + ":" + " ";
+						// start script ScriptLaunch.launchScript(st.scriptNameID, st.osbotUsername,
+						// st.osbotPassword, email, password);
 
-						AccountLauncher.launchClient("./osbot.jar", "NEX", "wavh", "Lifeosbotbook123", email,
-								password, "301", proxy1, "asd");
-
-						Logger.log("-----------------------");
-						Logger.log("Task done");
-
-					} else {
-						Logger.log("Creation failed...");
-						Logger.log("-----------------------");
-						Logger.log("Task done");
 					}
 				} finally {
 					instream.close();
@@ -155,8 +153,25 @@ public class CreateAccount {
 		}
 	}
 
-	// Reader
-	static String readStream(InputStream stream) throws IOException {
+	void setProxy(Proxy currentProxy) {
+		System.getProperties().put("proxySet", "true");
+		System.getProperties().put("socksProxyHost", currentProxy.host);
+		System.getProperties().put("socksProxyPort", currentProxy.port);
+		Authenticator.setDefault(new ProxyAuth(currentProxy.username, currentProxy.password));
+		URL whatismyip;
+		try {
+			whatismyip = new URL("http://checkip.amazonaws.com");
+			BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
+
+			String ip = in.readLine(); // you get the IP as a String
+			System.out.println(ip);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	String readStream(InputStream stream) throws IOException {
 		try (ByteArrayOutputStream result = new ByteArrayOutputStream()) {
 			byte[] buffer = new byte[1024];
 			int length;
@@ -167,16 +182,30 @@ public class CreateAccount {
 		}
 	}
 
-	// Random alphanum String
-	private static final String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	public class Proxy {
+		public String username;
+		public String password;
+		public String host;
+		public String port;
 
-	public static String randomAlphaNumeric(int count) {
-		StringBuilder builder = new StringBuilder();
-		while (count-- != 0) {
-			int character = (int) (Math.random() * ALPHA_NUMERIC_STRING.length());
-			builder.append(ALPHA_NUMERIC_STRING.charAt(character));
+		public Proxy(String username, String password, String host, String port) {
+			this.username = username;
+			this.password = password;
+			this.host = host;
+			this.port = port;
 		}
-		return builder.toString();
+	}
+
+	public class ProxyAuth extends Authenticator {
+		private PasswordAuthentication auth;
+
+		private ProxyAuth(String user, String password) {
+			auth = new PasswordAuthentication(user, password == null ? new char[] {} : password.toCharArray());
+		}
+
+		protected PasswordAuthentication getPasswordAuthentication() {
+			return auth;
+		}
 	}
 
 }
