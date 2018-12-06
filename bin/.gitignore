@@ -1,8 +1,12 @@
+/AccThread.class
+/AccountLauncher$1.class
+/AccountLauncher$OSType.class
+/AccountLauncher.class
+/CreateAccount$ProxyAuth.class
 /CreateAccount.class
+/NexHelper.class
+/Proxy.class
 /com/
 /libs/
 /manifest.mf
 /org/
-/CreateAccount$Proxy.class
-/CreateAccount$ProxyAuth.class
-/Proxy.class

@@ -67,7 +67,7 @@ public class CreateAccount {
 	public void createAccount(String username, String email, String password, Proxy proxy)
 			throws MalformedURLException, InterruptedException {
 		Logger.log("Waiting for captcha code... This might take a while...");
-		if (proxy != null) {
+		if (proxy != null && proxy.host.length() > 5) {
 			Logger.log("Hello");
 			setProxy(proxy);
 			Logger.log("hello again");

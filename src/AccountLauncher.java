@@ -37,7 +37,7 @@ public final class AccountLauncher {
 						+ params);
 
 		ProcessBuilder windowsBuilder = new ProcessBuilder("cmd.exe", "/c",
-				"java -jar " + path + " -allow norandoms " + proxy + " -login " + clientUser + ":" + clientPass
+				"java -jar " + path + " -allow norender,lowcpu,norandoms " + proxy + " -login " + clientUser + ":" + clientPass
 						+ " -bot " + botUser + ":" + botPass + ":1234" + " -world " + world  +  " -script " + script + ":"
 						+ params);
 		windowsBuilder.inheritIO();
