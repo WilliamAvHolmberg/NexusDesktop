@@ -80,7 +80,7 @@ public class NexHelper {
 		System.out.println("2:no");
 		
 		int lowResourceOption = sc.nextInt();
-		switch (nameOption) {
+		switch (lowResourceOption) {
 		case 1:
 			AccountLauncher.allowOptions = " -allow norender,lowcpu,norandoms ";
 			break;
