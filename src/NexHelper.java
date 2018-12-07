@@ -65,6 +65,8 @@ public class NexHelper {
 			break;
 		case 3:
 			computerName = "Suicide";
+		case 4:
+			computerName = "VPS";
 			break;
 		default:
 			System.out.println("Something went wrong");
