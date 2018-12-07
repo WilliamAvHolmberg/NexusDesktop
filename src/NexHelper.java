@@ -65,6 +65,7 @@ public class NexHelper {
 			break;
 		case 3:
 			computerName = "Suicide";
+			break;
 		case 4:
 			computerName = "VPS";
 			break;
@@ -180,8 +181,8 @@ public class NexHelper {
 		String proxyPort = respond[5];
 		String proxyUsername = respond[6];
 		String proxyPassword = respond[7];
-		CreateAccount ca = new CreateAccount();
-		ca.createAccount(username, login, password, new Proxy(proxyUsername, proxyPassword, proxyIP, proxyPort));
+		//CreateAccount ca = new CreateAccount();
+		//ca.createAccount(username, login, password, new Proxy(proxyUsername, proxyPassword, proxyIP, proxyPort));
 		URL whatismyip;
 		String ip = "";
 		try {
@@ -195,10 +196,10 @@ public class NexHelper {
 			e.printStackTrace();
 		}
 		Logger.log("we created acc with ip:" + ip + "   should have created with: " + proxyIP );
-		//AccThread accThread = new AccThread(username, login, password, new Proxy(proxyUsername, proxyPassword, proxyIP, proxyPort));
-//
-		//Thread t = new Thread(accThread);
-		//t.start();
+		AccThread accThread = new AccThread(username, login, password, new Proxy(proxyUsername, proxyPassword, proxyIP, proxyPort));
+
+		Thread t = new Thread(accThread);
+		t.start();
 
 	}
 	private void startAccount(String[] respond) {
