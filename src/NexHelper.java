@@ -75,6 +75,23 @@ public class NexHelper {
 			break;
 		}
 		System.out.println("We are gonna connect with user:" + computerName);
+		System.out.println("Please choose if you wanna use low resources:");
+		System.out.println("1:yes");
+		System.out.println("2:no");
+		
+		int lowResourceOption = sc.nextInt();
+		switch (nameOption) {
+		case 1:
+			AccountLauncher.allowOptions = " -allow norender,lowcpu,norandoms ";
+			break;
+		case 2:
+			AccountLauncher.allowOptions = " -allow norandoms ";
+			break;
+		default:
+			System.out.println("Something went wrong");
+			System.exit(1);
+			break;
+		}
 		try {
 			Socket socket = new Socket(ip, port);
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
