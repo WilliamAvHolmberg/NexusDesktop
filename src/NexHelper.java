@@ -205,18 +205,7 @@ public class NexHelper {
 		//CreateAccount ca = new CreateAccount();
 		//ca.createAccount(username, login, password, new Proxy(proxyUsername, proxyPassword, proxyIP, proxyPort));
 		URL whatismyip;
-		String ip = "";
-		try {
-			whatismyip = new URL("http://checkip.amazonaws.com");
-			BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
 
-			ip = in.readLine(); // you get the IP as a String
-			System.out.println(ip);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Logger.log("we created acc with ip:" + ip + "   should have created with: " + proxyIP );
 		AccThread accThread = new AccThread(username, login, password, new Proxy(proxyUsername, proxyPassword, proxyIP, proxyPort));
 
 		Thread t = new Thread(accThread);

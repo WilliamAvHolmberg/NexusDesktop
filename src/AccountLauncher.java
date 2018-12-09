@@ -13,6 +13,9 @@ public final class AccountLauncher {
 	public static enum OSType {
 		Windows, MacOS, Linux;
 	};
+	
+	public static String lastName = "";
+	public static long lastStartup = 0;
 
 	protected static OSType detectedOS;
 
@@ -31,6 +34,9 @@ public final class AccountLauncher {
 
 	public static void launchClient(String path, String script, String clientUser, String clientPass, String botUser,
 			String botPass, String world, String proxy, String params) {
+		if(!botUser.equals(lastName) || System.currentTimeMillis() > (lastStartup + 1000 * 120)) {
+			lastName = botUser;
+			lastStartup = System.currentTimeMillis();
 		System.out.println("Starting");
 		ProcessBuilder linuxBuilder = new ProcessBuilder("/bin/bash", "-c",
 				"java -jar " + "." + path + allowOptions + proxy + " -login " + clientUser + ":" + clientPass
@@ -71,6 +77,7 @@ public final class AccountLauncher {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			System.out.println(e1.getMessage());
+		}
 		}
 
 	}
