@@ -76,8 +76,9 @@ public class NexHelper {
 		}
 		System.out.println("We are gonna connect with user:" + computerName);
 		System.out.println("Please choose if you wanna use low resources:");
-		System.out.println("1:yes");
-		System.out.println("2:no");
+		System.out.println("1:lowcpu no render");
+		System.out.println("2:normal");
+		System.out.println("3:no interface (extreme)");
 		
 		int lowResourceOption = sc.nextInt();
 		switch (lowResourceOption) {
@@ -86,6 +87,9 @@ public class NexHelper {
 			break;
 		case 2:
 			AccountLauncher.allowOptions = " -allow norandoms ";
+			break;
+		case 3:
+			AccountLauncher.allowOptions = " -allow nointerface,norender,lowcpu,norandoms ";
 			break;
 		default:
 			System.out.println("Something went wrong");
