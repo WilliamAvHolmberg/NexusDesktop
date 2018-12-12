@@ -102,7 +102,7 @@ public class CreateAccount {
 			params.add(new BasicNameValuePair("onlyOneEmail", "1"));
 			params.add(new BasicNameValuePair("password1", password));
 			params.add(new BasicNameValuePair("onlyOnePassword", "1"));
-			params.add(new BasicNameValuePair("displayname", username));
+			//params.add(new BasicNameValuePair("displayname", username));
 			params.add(new BasicNameValuePair("day", "1"));
 			params.add(new BasicNameValuePair("month", "2"));
 			params.add(new BasicNameValuePair("year", "1999"));
