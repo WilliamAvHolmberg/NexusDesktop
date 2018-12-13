@@ -75,7 +75,7 @@ public class CreateAccount {
 		NoCaptchaProxyless api = new NoCaptchaProxyless();
 		api.setClientKey(antiCaptchaKey);
 		api.setWebsiteUrl(new URL("https://secure.runescape.com/m=account-creation/create_account"));
-		api.setWebsiteKey("6LccFA0TAAAAAHEwUJx_c1TfTBWMTAOIphwTtd1b");
+		api.setWebsiteKey("6Lcsv3oUAAAAAGFhlKrkRb029OHio098bbeyi_Hv");
 
 		if (!api.createTask()) {
 			Logger.log(api.getErrorMessage());
@@ -165,16 +165,6 @@ public class CreateAccount {
 		}
 	}
 
-	String readStream(InputStream stream) throws IOException {
-		try (ByteArrayOutputStream result = new ByteArrayOutputStream()) {
-			byte[] buffer = new byte[1024];
-			int length;
-			while ((length = stream.read(buffer)) != -1) {
-				result.write(buffer, 0, length);
-			}
-			return result.toString("UTF-8");
-		}
-	}
 
 
 	public class ProxyAuth extends Authenticator {
@@ -186,6 +176,18 @@ public class CreateAccount {
 
 		protected PasswordAuthentication getPasswordAuthentication() {
 			return auth;
+		}
+	}
+	
+
+	String readStream(InputStream stream) throws IOException {
+		try (ByteArrayOutputStream result = new ByteArrayOutputStream()) {
+			byte[] buffer = new byte[1024];
+			int length;
+			while ((length = stream.read(buffer)) != -1) {
+				result.write(buffer, 0, length);
+			}
+			return result.toString("UTF-8");
 		}
 	}
 

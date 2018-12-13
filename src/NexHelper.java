@@ -202,15 +202,9 @@ public class NexHelper {
 		String proxyPort = respond[5];
 		String proxyUsername = respond[6];
 		String proxyPassword = respond[7];
-		//CreateAccount ca = new CreateAccount();
-		//ca.createAccount(username, login, password, new Proxy(proxyUsername, proxyPassword, proxyIP, proxyPort));
-		URL whatismyip;
-
-		AccThread accThread = new AccThread(username, login, password, new Proxy(proxyUsername, proxyPassword, proxyIP, proxyPort));
-
-		Thread t = new Thread(accThread);
-		t.start();
-
+		AccountCreator ac = new AccountCreator();
+		ac.createAccount(username, login, password, new Proxy(proxyUsername, proxyPassword, proxyIP, proxyPort));
+		
 	}
 	private void startAccount(String[] respond) {
 		String login = respond[2];
