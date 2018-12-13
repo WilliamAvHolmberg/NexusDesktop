@@ -10,10 +10,20 @@ import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.medusa.Utils.Logger;
 import org.openqa.selenium.By;
@@ -74,7 +84,7 @@ public class AccountCreator {
 			Logger.log("hello again");
 		}
             int attempts = 0;
-
+            
             while (token == null) {
                 if (attempts < 5) {
                     switch (CAPTCHA_SOLVER) {
@@ -123,6 +133,36 @@ public class AccountCreator {
     }
 
 
+    private static void setDriver() {
+    	ClassLoader classLoader = Test.class.getClassLoader();
+        URL resource = classLoader.getResource("drivers/" + getDriverName());
+        System.out.println(resource);
+        File f = new File("Driver");
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+        File driver = new File("Driver" + File.separator + getDriverName());
+        if (!driver.exists()) {
+            try {
+				driver.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            driver.setExecutable(true);
+            try {
+				org.apache.commons.io.FileUtils.copyURLToFile(resource, driver);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
+        System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
+        //driver = new ChromeDriver();
+        System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
+    }
+
+   
     private static void postForm(String gresponse,String username, String loginEmail, String loginPassword, Proxy proxy) throws UnsupportedEncodingException, InterruptedException {
     	 //ChromeOptions options = new ChromeOptions();
     	    // setting headless mode to true.. so there isn't any ui
@@ -130,8 +170,10 @@ public class AccountCreator {
 
     	    // Create a new instance of the Chrome driver
     	  //  WebDriver driver = new ChromeDriver(options);       
-    	
-		System.setProperty("webdriver.gecko.driver", getPathName());
+ 
+           System.out.println("lets get path");
+  
+    	setDriver();
 		WebDriver driver = new FirefoxDriver();
 		
         driver.manage().window().maximize();
@@ -203,9 +245,9 @@ public class AccountCreator {
 
     
 
-    
+  
 
-    private static String getPathName() {
+    private static String getDriverName() {
 		switch(AccountLauncher.getOperatingSystemType()) {
 		case Linux:
 			return "geckodriver_linux";

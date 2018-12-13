@@ -23,6 +23,8 @@ public class NexHelper {
 	long lastLog = 0;
 	private String respond = "none";
 	private String computerName;
+	private long lastStart = 0;
+	private long interval = 10000;
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 
@@ -96,6 +98,9 @@ public class NexHelper {
 			System.exit(1);
 			break;
 		}
+		
+		System.out.println("Please choose your interval:");
+		int interval = sc.nextInt();
 		try {
 			Socket socket = new Socket(ip, port);
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -123,8 +128,13 @@ public class NexHelper {
 							newAccountRequest(out, in);
 							break;
 						} else if (parsed[1].equals("1")) {
+							if(System.currentTimeMillis() > lastStart + interval) {
 							System.out.println("lets start?");
 							startAccount(parsed);
+							lastStart = System.currentTimeMillis();
+							}else {
+								messageQueue.push(nextRequest);
+							}
 							break;
 						}
 					default:
