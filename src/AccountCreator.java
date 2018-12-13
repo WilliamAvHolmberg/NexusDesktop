@@ -166,10 +166,10 @@ public class AccountCreator {
 
             driver.switchTo().defaultContent();
             jse.executeScript("window.scrollBy(0,250)", "");
-            TimeUnit.SECONDS.sleep(3);
+            TimeUnit.SECONDS.sleep(6);
             jse.executeScript("onSubmit()");
             submit.sendKeys(Keys.ENTER);
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.SECONDS.sleep(6);
             waitForLoad(driver);
 
             if (driver.findElements(By.className("m-character-name-alts__name")).size() != 0) {
