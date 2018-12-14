@@ -180,7 +180,7 @@ public class AccountCreator {
 
         boolean created = false;
         boolean captchaFailed = false;
-
+        int attempts = 0;
         while(!created && !captchaFailed) {
             driver.get(RUNESCAPE_URL);
             waitForLoad(driver);
@@ -225,16 +225,20 @@ public class AccountCreator {
                 captchaFailed = true;
             }
 
-            waitForLoad(driver);
-
+            
             if (driver.findElements(By.id("p-account-created")).size() != 0) {
                 created = true;
                 System.out.println("Account Created");
                 String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port+ ":" + proxy.username + ":" + proxy.password;
 				AccountLauncher.launchClient("./osbot.jar", "NEX", "wavh", "Lifeosbotbook123", loginEmail, loginPassword, "301", parsedProxy,
 						loginPassword + "_");
-            } else {
+            } else if(attempts < 2) {
+            	attempts++;
                 System.out.println("Failed To Create Account - Retrying");
+            }else {
+            	created = true;
+                System.out.println("We failed. lets not retry -");
+
             }
 
             token = null;
