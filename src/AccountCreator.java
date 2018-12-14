@@ -33,6 +33,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -171,10 +173,24 @@ public class AccountCreator {
     	    // Create a new instance of the Chrome driver
     	  //  WebDriver driver = new ChromeDriver(options);       
  
-           System.out.println("lets get path");
-  
+         /*  System.out.println("lets get path");
+           FirefoxOptions options = new FirefoxOptions();
+           FirefoxProfile profile = new FirefoxProfile();
+           profile.setPreference("network.proxy.type", 1);
+           profile.setPreference("network.proxy.socks", proxy.host);
+           profile.setPreference("network.proxy.socks_port", proxy.port);
+           
+           options.setProfile(profile);*/
     	setDriver();
-		WebDriver driver = new FirefoxDriver();
+        FirefoxOptions options = new FirefoxOptions();
+
+    	FirefoxProfile profile = new FirefoxProfile();
+        profile.setPreference("network.proxy.type", 1);
+        profile.setPreference("network.proxy.socks", proxy.host);
+        profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
+        options.setProfile(profile);
+        FirefoxDriver driver = new FirefoxDriver(options);
+        driver.get("https://www.ipinfo.io");
 		
         driver.manage().window().maximize();
 
