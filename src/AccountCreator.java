@@ -113,7 +113,7 @@ public class AccountCreator {
 				
             try {
 				postForm(token, username, email, password, proxy);
-			} catch (UnsupportedEncodingException | InterruptedException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -165,7 +165,7 @@ public class AccountCreator {
     }
 
    
-    private static void postForm(String gresponse,String username, String loginEmail, String loginPassword, Proxy proxy) throws UnsupportedEncodingException, InterruptedException {
+    private static void postForm(String gresponse,String username, String loginEmail, String loginPassword, Proxy proxy) throws Exception {
     	 //ChromeOptions options = new ChromeOptions();
     	    // setting headless mode to true.. so there isn't any ui
     	 //   options.setHeadless(true);
@@ -248,15 +248,11 @@ public class AccountCreator {
                 String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port+ ":" + proxy.username + ":" + proxy.password;
 				AccountLauncher.launchClient("./osbot.jar", "NEX", "wavh", "Lifeosbotbook123", loginEmail, loginPassword, "301", parsedProxy,
 						loginPassword + "_");
-            } else if(attempts < 2) {
-            	attempts++;
-                System.out.println("Failed To Create Account - Retrying");
             }else {
             	created = true;
                 System.out.println("We failed. lets not retry -");
 
             }
-
             token = null;
         }
 
