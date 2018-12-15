@@ -32,7 +32,7 @@ public class NexHelper {
 	}
 
 	public NexHelper() throws MalformedURLException, InterruptedException {
-		System.out.println("started NexHelper 2.0 with selenium support");
+		System.out.println("started NexHelper 3.0 with selenium support");
 		//CreateAccount ca = new CreateAccount();
 		//ca.createAccount("MonkTomte","MonkWilo@gmail.com",  "ugot00wned2", new Proxy("CejurP","Rz7Kpw", "185.201.255.99", "8000"));
 		messageQueue = new Stack<String>();
@@ -112,7 +112,8 @@ public class NexHelper {
 			String nextRequest;
 
 			while (true) {
-				if (!messageQueue.isEmpty()) {
+				if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + interval) {
+					lastStart = System.currentTimeMillis();
 					nextRequest = messageQueue.pop();
 					String[] parsed = nextRequest.split(":");
 					switch (parsed[0]) {
@@ -129,14 +130,10 @@ public class NexHelper {
 							newAccountRequest(out, in);
 							break;
 						} else if (parsed[1].equals("1")) {
-							if(System.currentTimeMillis() > lastStart + interval) {
-							System.out.println("lets start?");
+							
 							startAccount(parsed);
-							lastStart = System.currentTimeMillis();
-							}else {
-								messageQueue.push(nextRequest);
-							}
 							break;
+							
 						}
 					default:
 						log(out, in);
