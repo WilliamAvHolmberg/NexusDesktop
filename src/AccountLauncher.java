@@ -32,26 +32,20 @@ public final class AccountLauncher {
 		return detectedOS;
 	}
 
-	public static void launchClient(String path, String script, String clientUser, String clientPass, String botUser,
-			String botPass, String world, String proxy, String params) {
-		if(!botUser.equals(lastName) || System.currentTimeMillis() > (lastStartup + 1000 * 120)) {
-			lastName = botUser;
+	public static void launchClient(String address) {
+		System.out.println(address);
+		if(!address.equals(lastName) || System.currentTimeMillis() > (lastStartup + 1000 * 120)) {
+			lastName = address;
 			lastStartup = System.currentTimeMillis();
 		System.out.println("Starting");
 		ProcessBuilder linuxBuilder = new ProcessBuilder("/bin/bash", "-c",
-				"java -jar " + "." + path + allowOptions + proxy + " -login " + clientUser + ":" + clientPass
-						+ " -bot " + botUser + ":" + botPass + ":1234" + " -world " + world + " -script " + script + ":"
-						+ params);
+				"java -jar " + "." + "./rspeer-launcher.jar" + " " + address);
 
 		ProcessBuilder windowsBuilder = new ProcessBuilder("cmd.exe", "/c",
-				"java -jar " + path +  allowOptions + proxy + " -login " + clientUser + ":" + clientPass
-						+ " -bot " + botUser + ":" + botPass + ":1234" + " -world " + world  +  " -script " + script + ":"
-						+ params);
+				"java -jar " +  "./rspeer-launcher.jar" + " " + address);
 		windowsBuilder.inheritIO();
 		ProcessBuilder macBuilder = new ProcessBuilder("osascript", "-e",
-				"tell application \"Terminal\" to do script \"java -jar " + path +  allowOptions + proxy + " -login " + clientUser + ":" + clientPass
-				+ " -bot " + botUser + ":" + botPass + ":1234" + " -world " + world + " -script " + script + ":"
-				+ params +  "\"");
+				"tell application \"Terminal\" to do script \"java -jar " +  "./rspeer-launcher.jar" + " " + address);
 
 		try {
 			System.out.println(AccountLauncher.getOperatingSystemType());

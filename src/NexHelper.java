@@ -32,7 +32,7 @@ public class NexHelper {
 	}
 
 	public NexHelper() throws MalformedURLException, InterruptedException {
-		System.out.println("started NexHelper 3.0 with selenium support");
+		System.out.println("started NexHelper 4.0 with selenium support");
 		//CreateAccount ca = new CreateAccount();
 		//ca.createAccount("MonkTomte","MonkWilo@gmail.com",  "ugot00wned2", new Proxy("CejurP","Rz7Kpw", "185.201.255.99", "8000"));
 		messageQueue = new Stack<String>();
@@ -118,7 +118,7 @@ public class NexHelper {
 					String[] parsed = nextRequest.split(":");
 					switch (parsed[0]) {
 					case "create_account":
-						createAccount(parsed);
+						createAccount(parsed, nextRequest);
 						break;
 					case "account_request":
 						/*
@@ -130,8 +130,8 @@ public class NexHelper {
 							newAccountRequest(out, in);
 							break;
 						} else if (parsed[1].equals("1")) {
-							
-							startAccount(parsed);
+							String address = nextRequest.substring(nextRequest.indexOf("http"), nextRequest.length());
+							startAccount(address);
 							break;
 							
 						}
@@ -194,15 +194,16 @@ public class NexHelper {
 	 */
 	private void newAccountRequest(PrintWriter out, BufferedReader in) throws IOException {
 		out.println("account_request:0");
-
-		String[] respond = in.readLine().split(":");
+		String res = in.readLine();
+		String[] respond = res.split(":");
 		if (respond[0].equals("account_request") && respond[1].equals("1")) {
-			startAccount(respond);
+			String address = res.substring(res.indexOf("http"), res.length());
+			startAccount(address);
 		} else {
 			System.out.println("No Account available atm. Try again in 5 minutes");
 		}
 	}
-	private void createAccount(String[] respond) throws MalformedURLException, InterruptedException {
+	private void createAccount(String[] respond, String res) throws MalformedURLException, InterruptedException {
 		String username = respond[1];
 		String login = respond[2];
 		String password = respond[3];
@@ -210,23 +211,14 @@ public class NexHelper {
 		String proxyPort = respond[5];
 		String proxyUsername = respond[6];
 		String proxyPassword = respond[7];
+		String address = res.substring(res.indexOf("http"), res.length());
 		AccountCreator ac = new AccountCreator();
-		ac.createAccount(username, login, password, new Proxy(proxyUsername, proxyPassword, proxyIP, proxyPort));
+		ac.createAccount(username, login, password, new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort), address);
 		
 	}
-	private void startAccount(String[] respond) {
-		String login = respond[2];
-		String password = respond[3];
-		String proxyIP = respond[4];
-		String proxyPort = respond[5];
-		String proxyUsername = respond[6];
-		String proxyPassword = respond[7];
-		String world = respond[8];
-		String script = respond[9];
-		String proxy = "-proxy " + proxyIP + ":" + proxyPort + ":" + proxyUsername + ":" + proxyPassword;
-		String params = password + "_";
-		AccountLauncher.launchClient("./osbot.jar", script, "wavh", "Lifeosbotbook123", login, password, world, proxy,
-				params);
+	private void startAccount(String address) {
+
+		AccountLauncher.launchClient(address);
 
 	}
 }

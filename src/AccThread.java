@@ -11,8 +11,8 @@ public class AccThread implements Runnable{
 	String username;
 	String email;
 	String password;
-	Proxy proxy;
-	public AccThread(String username, String email, String password, Proxy proxy) {
+	PrivateProxy proxy;
+	public AccThread(String username, String email, String password, PrivateProxy proxy) {
 		this.username = username;
 		this.email = email;
 		this.password = password;
@@ -20,10 +20,10 @@ public class AccThread implements Runnable{
 	}
 	@Override
 	public void run() {
-		CreateAccount ca = new CreateAccount();
+		/*//CreateAccount ca = new CreateAccount();
 		Logger.log("Trying to create acc");
 		try {
-			ca.createAccount(username, email, password, proxy);
+			//ca.createAccount(username, email, password, proxy);
 			URL whatismyip;
 			String ip = "";
 			try {
@@ -44,7 +44,7 @@ public class AccThread implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Logger.log("finished with trying to create acc");
+		Logger.log("finished with trying to create acc");*/
 	}
 
 }

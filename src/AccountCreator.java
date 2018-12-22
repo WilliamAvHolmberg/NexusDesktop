@@ -47,7 +47,7 @@ public class AccountCreator {
     private static String token = null;
 
 
-    void setProxy(Proxy currentProxy) {
+    void setProxy(PrivateProxy currentProxy) {
 		System.getProperties().put("proxySet", "true");
 		System.getProperties().put("socksProxyHost", currentProxy.host);
 		System.getProperties().put("socksProxyPort", currentProxy.port);
@@ -78,7 +78,7 @@ public class AccountCreator {
 			return auth;
 		}
 	}
-    public void createAccount(String username, String email, String password, Proxy proxy) {
+    public void createAccount(String username, String email, String password, PrivateProxy proxy, String address) {
     	Logger.log("Waiting for captcha code... This might take a while...");
 		if (proxy != null && proxy.host.length() > 5) {
 			Logger.log("Hello");
@@ -112,7 +112,7 @@ public class AccountCreator {
             }
 				
             try {
-				postForm(token, username, email, password, proxy);
+				postForm(token, username, email, password, proxy, address);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -165,7 +165,7 @@ public class AccountCreator {
     }
 
    
-    private static void postForm(String gresponse,String username, String loginEmail, String loginPassword, Proxy proxy) throws Exception {
+    private static void postForm(String gresponse,String username, String loginEmail, String loginPassword, PrivateProxy proxy, String address) throws Exception {
     	 //ChromeOptions options = new ChromeOptions();
     	    // setting headless mode to true.. so there isn't any ui
     	 //   options.setHeadless(true);
@@ -246,8 +246,7 @@ public class AccountCreator {
                 created = true;
                 System.out.println("Account Created");
                 String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port+ ":" + proxy.username + ":" + proxy.password;
-				AccountLauncher.launchClient("./osbot.jar", "NEX", "wavh", "Lifeosbotbook123", loginEmail, loginPassword, "301", parsedProxy,
-						loginPassword + "_");
+				AccountLauncher.launchClient(address);
             }else {
             	created = true;
                 System.out.println("We failed. lets not retry -");
