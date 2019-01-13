@@ -1,20 +1,14 @@
 
-import java.awt.GraphicsEnvironment;
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
-
-import org.medusa.*;
-import org.medusa.Utils.Logger;
-
-import com.anti_captcha.*;
 
 
 
@@ -24,7 +18,7 @@ public class NexHelper {
 	private String respond = "none";
 	private String computerName;
 	private long lastStart = 0;
-	private long interval = 10000;
+	//private List<User> users;
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 
@@ -32,7 +26,8 @@ public class NexHelper {
 	}
 
 	public NexHelper() throws MalformedURLException, InterruptedException {
-		System.out.println("started NexHelper 4.0 with selenium support");
+		//TODO IN FUTURE createUsers();
+		System.out.println("started NexHelper 5.0 with selenium support");
 		//CreateAccount ca = new CreateAccount();
 		//ca.createAccount("MonkTomte","MonkWilo@gmail.com",  "ugot00wned2", new Proxy("CejurP","Rz7Kpw", "185.201.255.99", "8000"));
 		messageQueue = new Stack<String>();
@@ -72,9 +67,28 @@ public class NexHelper {
 		case 4:
 			computerName = "VPS";
 			break;
+		case 5:
+			computerName = "MINIMAC";
+			break;
+		case 6:
+			computerName = "ACCOUNT";
+			break;
+		case 7:
+			computerName = "BATCH1";
+			break;
+		case 8:
+			computerName = "BATCH2";
+			break;
+		case 9:
+			computerName = "BATCH3";
+			break;
+		case 10:
+			computerName = "BATCH4";
+			break;
+	
+	
 		default:
-			System.out.println("Something went wrong");
-			System.exit(1);
+			computerName = "BATCH" + nameOption;
 			break;
 		}
 		System.out.println("We are gonna connect with user:" + computerName);
@@ -149,6 +163,8 @@ public class NexHelper {
 		}
 	}
 
+
+
 	private void log(PrintWriter out, BufferedReader in) throws InterruptedException, IOException {
 		if (System.currentTimeMillis() - lastLog > 5000) { // only log every 5 sec
 			out.println("log:0");
@@ -217,7 +233,7 @@ public class NexHelper {
 		
 	}
 	private void startAccount(String address) {
-
+		
 		AccountLauncher.launchClient(address);
 
 	}

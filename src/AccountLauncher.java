@@ -46,7 +46,7 @@ public final class AccountLauncher {
 		windowsBuilder.inheritIO();
 		ProcessBuilder macBuilder = new ProcessBuilder("osascript", "-e",
 				"tell application \"Terminal\" to do script \"java -jar " +  "./rspeer-launcher.jar" + " " + address);
-
+		Process p = null;
 		try {
 			System.out.println(AccountLauncher.getOperatingSystemType());
 			switch (AccountLauncher.getOperatingSystemType()) {
@@ -54,22 +54,27 @@ public final class AccountLauncher {
 			case Windows:
 				int i = 1;
 				System.out.println("Start windows");
-				Process p1 = windowsBuilder.start();
-				setOutputStream(p1);
+				p = windowsBuilder.start();
+				setOutputStream(p);
 
 				break;
 			case MacOS:
-				Process p2 = macBuilder.start();
-
+				//Process p2 = macBuilder.start();
+				p = Runtime.getRuntime().exec("java -jar rspeer-launcher.jar " + address);
+				setOutputStream(p);
 				break;
 			case Linux:
 				System.out.println("lets go linux");
-				Process p3 = linuxBuilder.start();
-				setOutputStream(p3);
+				p = linuxBuilder.start();
+				setOutputStream(p);
 				break;
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
+			if(p != null && p.isAlive()) {
+				System.out.println("DESTROYYYYYY");
+				p.destroy();
+			}
 			System.out.println(e1.getMessage());
 		}
 		}
