@@ -228,9 +228,10 @@ public class NexHelper {
 		String proxyUsername = respond[6];
 		String proxyPassword = respond[7];
 		String address = res.substring(res.indexOf("http"), res.length());
-		AccountCreator ac = new AccountCreator();
-		ac.createAccount(username, login, password, new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort), address);
-		
+		AccThread accThread = new AccThread(username, login, password, new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort), address);
+		Thread thread = new Thread(accThread);
+		thread.start();
+		System.out.println("Started new create acc thread");
 	}
 	private void startAccount(String address) {
 		

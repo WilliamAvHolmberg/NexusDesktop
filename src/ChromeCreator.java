@@ -146,7 +146,7 @@ public class ChromeCreator {
 
 
     private static void setDriver() {
-    	ClassLoader classLoader = Test.class.getClassLoader();
+    	ClassLoader classLoader = ChromeCreator.class.getClassLoader();
         URL resource = classLoader.getResource("drivers/" + getDriverName());
         System.out.println(resource);
         File f = new File("Driver");
