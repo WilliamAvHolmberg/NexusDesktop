@@ -1,5 +1,5 @@
-/rspeer-launcher.jar
+/libs/
 /com/
-/background.js
-/manifest.json
-/drivers/
+/manifest.mf
+/org/
+/rspeer-launcher.jar

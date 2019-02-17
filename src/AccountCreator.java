@@ -40,11 +40,11 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class AccountCreator {
 
-	private static final String RUNESCAPE_URL = "https://secure.runescape.com/m=account-creation/create_account";
-	private static final String RANDGEN_URL = "https://randomuser.me/api/?nat=gb";
-	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0";
-	private static String CAPTCHA_SOLVER = "anticaptcha";
-	private static String token = null;
+	private  final String RUNESCAPE_URL = "https://secure.runescape.com/m=account-creation/create_account";
+	private  final String RANDGEN_URL = "https://randomuser.me/api/?nat=gb";
+	private  final String USER_AGENT = "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0";
+	private  String CAPTCHA_SOLVER = "anticaptcha";
+	private String token = null;
 
 	void setProxy(PrivateProxy currentProxy) {
 		System.getProperties().put("proxySet", "true");
@@ -119,7 +119,7 @@ public class AccountCreator {
 
 	}
 
-	private static void waitForLoad(WebDriver driver) {
+	private  void waitForLoad(WebDriver driver) {
 		ExpectedCondition<Boolean> pageLoadCondition = new ExpectedCondition<Boolean>() {
 			public Boolean apply(WebDriver driver) {
 				return ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
@@ -129,7 +129,7 @@ public class AccountCreator {
 		wait.until(pageLoadCondition);
 	}
 
-	private static void setFirefoxDriver() {
+	private  void setFirefoxDriver() {
 		ClassLoader classLoader = AccountCreator.class.getClassLoader();
 		URL resource = classLoader.getResource("drivers/" + getDriverNameFirefox());
 		System.out.println(resource);
@@ -158,7 +158,7 @@ public class AccountCreator {
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
 	}
 
-	private static void postForm(String gresponse, String username, String loginEmail, String loginPassword,
+	private  void postForm(String gresponse, String username, String loginEmail, String loginPassword,
 			PrivateProxy proxy, String address) throws Exception {
 		// ChromeOptions options = new ChromeOptions();
 		// setting headless mode to true.. so there isn't any ui
@@ -252,7 +252,7 @@ public class AccountCreator {
 		driver.quit();
 	}
 
-	private static String getDriverNameFirefox() {
+	private  String getDriverNameFirefox() {
 		switch (AccountLauncher.getOperatingSystemType()) {
 		case Linux:
 			return "geckodriver_linux";

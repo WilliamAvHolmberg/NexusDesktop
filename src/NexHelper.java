@@ -27,7 +27,7 @@ public class NexHelper {
 
 	public NexHelper() throws MalformedURLException, InterruptedException {
 		//TODO IN FUTURE createUsers();
-		System.out.println("started NexHelper 5.0 with selenium support");
+		System.out.println("started NexHelper 6.0 with multi-thread support, fixed acc");
 		//CreateAccount ca = new CreateAccount();
 		//ca.createAccount("MonkTomte","MonkWilo@gmail.com",  "ugot00wned2", new Proxy("CejurP","Rz7Kpw", "185.201.255.99", "8000"));
 		messageQueue = new Stack<String>();
