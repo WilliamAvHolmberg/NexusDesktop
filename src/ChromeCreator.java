@@ -53,6 +53,7 @@ public class ChromeCreator {
     private static String token = null;
 
     public static void main(String[] args) {
+        //This code is defunct anyway
     	ChromeCreator ac = new ChromeCreator();
     	ac.createAccount("Wiholiaz", "willooeos@gmail.com", "ugot00wned2", new PrivateProxy("william5050", "william5050", "50.237.102.208", "17000"), "asd");
     }

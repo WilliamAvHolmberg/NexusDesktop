@@ -40,14 +40,16 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class AccountCreator {
 
-	private  final String RUNESCAPE_URL = "https://secure.runescape.com/m=account-creation/create_account";
-	private  final String RANDGEN_URL = "https://randomuser.me/api/?nat=gb";
-	private  final String USER_AGENT = "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0";
-	private  String CAPTCHA_SOLVER = "anticaptcha";
-	private String token = null;
+	private static final String RUNESCAPE_URL = "https://secure.runescape.com/m=account-creation/create_account";
+	private static final String RANDGEN_URL = "https://randomuser.me/api/?nat=gb";
+	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0";
+	private static String CAPTCHA_SOLVER = "anticaptcha";
+	//private static String token = null;
 
-	void setProxy(PrivateProxy currentProxy) {
-		System.getProperties().put("proxySet", "true");
+	boolean setProxy(PrivateProxy currentProxy) {
+
+		String proxySet = currentProxy.host.length() > 7 ? "true" : "false";
+		System.getProperties().put("proxySet", proxySet);
 		System.getProperties().put("socksProxyHost", currentProxy.host);
 		System.getProperties().put("socksProxyPort", currentProxy.port);
 		Authenticator.setDefault(new ProxyAuth(currentProxy.username, currentProxy.password));
@@ -58,10 +60,13 @@ public class AccountCreator {
 
 			String ip = in.readLine(); // you get the IP as a String
 			System.out.println(ip);
+			return true;
 		} catch (IOException e) {
+			System.out.println("Proxy " + currentProxy.host + " is bad");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	public class ProxyAuth extends Authenticator {
@@ -76,15 +81,17 @@ public class AccountCreator {
 		}
 	}
 
-	public void createAccount(String username, String email, String password, PrivateProxy proxy, String address) {
+	public boolean createAccount(String username, String email, String password, PrivateProxy proxy, String address) {
 		Logger.log("Waiting for captcha code... This might take a while...");
 		if (proxy != null && proxy.host.length() > 5) {
-			Logger.log("Hello");
-			setProxy(proxy);
-			Logger.log("hello again");
+			Logger.log("Connecting to Proxy " + proxy.host + ":" + proxy.port);
+			if(!setProxy(proxy))
+				return false;
+			Logger.log("Successfully connected");
 		}
 		int attempts = 0;
 		boolean completed = false;
+		String token = null;
 		while (token == null) {
 			if (attempts < 5) {
 				switch (CAPTCHA_SOLVER) {
@@ -107,19 +114,24 @@ public class AccountCreator {
 				System.out.println("Captcha Solver Failed 5 Times - Stopping");
 				break;
 			}
+			if(token == null)
+				try { Thread.sleep(2000); }catch (Exception ex){}
 		}
 		if (completed) {
 			try {
 				postForm(token, username, email, password, proxy, address);
+				return true;
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}else{
+			System.out.println("Couldnt get captcha :(");
 		}
-
+		return false;
 	}
 
-	private  void waitForLoad(WebDriver driver) {
+	private static void waitForLoad(WebDriver driver) {
 		ExpectedCondition<Boolean> pageLoadCondition = new ExpectedCondition<Boolean>() {
 			public Boolean apply(WebDriver driver) {
 				return ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
@@ -129,10 +141,10 @@ public class AccountCreator {
 		wait.until(pageLoadCondition);
 	}
 
-	private  void setFirefoxDriver() {
+	private static void setFirefoxDriver() {
 		ClassLoader classLoader = AccountCreator.class.getClassLoader();
 		URL resource = classLoader.getResource("drivers/" + getDriverNameFirefox());
-		System.out.println(resource);
+		//System.out.println(resource);
 		File f = new File("Driver");
 		if (!f.exists()) {
 			f.mkdirs();
@@ -158,7 +170,7 @@ public class AccountCreator {
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
 	}
 
-	private  void postForm(String gresponse, String username, String loginEmail, String loginPassword,
+	private static void postForm(String gresponse, String username, String loginEmail, String loginPassword,
 			PrivateProxy proxy, String address) throws Exception {
 		// ChromeOptions options = new ChromeOptions();
 		// setting headless mode to true.. so there isn't any ui
@@ -178,81 +190,111 @@ public class AccountCreator {
 		 */
 		setFirefoxDriver();
 		FirefoxOptions options = new FirefoxOptions();
-
 		FirefoxProfile profile = new FirefoxProfile();
 		profile.setPreference("network.proxy.type", 1);
-		profile.setPreference("network.proxy.socks", proxy.host);
-		profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
+		String host = proxy.host;
+		profile.setPreference("network.proxy.socks", host);
+		profile.setPreference("network.proxy.socks_port", proxy.port);
 		options.setProfile(profile);
 		WebDriver driver = new FirefoxDriver(options);
+		try {
+			driver.manage().window().maximize();
 
-		driver.manage().window().maximize();
-
-		boolean created = false;
-		boolean captchaFailed = false;
-		int attempts = 0;
-		while (!created && !captchaFailed) {
-			driver.get(RUNESCAPE_URL);
-			waitForLoad(driver);
-
-			WebElement dobDay = driver.findElement(By.name("day"));
-			WebElement dobMonth = driver.findElement(By.name("month"));
-			WebElement dobYear = driver.findElement(By.name("year"));
-			WebElement email = driver.findElement(By.name("email1"));
-			// WebElement displayname = driver.findElement(By.name("displayname"));
-			WebElement password = driver.findElement(By.name("password1"));
-			WebElement textarea = driver.findElement(By.id("g-recaptcha-response"));
-			WebElement submit = driver.findElement(By.id("create-submit"));
-
-			dobDay.sendKeys("01");
-			dobMonth.sendKeys("01");
-			dobYear.sendKeys("1990");
-			email.sendKeys(loginEmail);
-			// displayname.sendKeys("williamsosos");
-			password.sendKeys(loginPassword);
-
-			JavascriptExecutor jse = (JavascriptExecutor) driver;
-			jse.executeScript("arguments[0].style.display = 'block';", textarea);
-
-			textarea.sendKeys(gresponse);
-
-			driver.switchTo().defaultContent();
-			jse.executeScript("window.scrollBy(0,250)", "");
-			TimeUnit.SECONDS.sleep(6);
-			jse.executeScript("onSubmit()");
-			submit.sendKeys(Keys.ENTER);
-			TimeUnit.SECONDS.sleep(6);
-			waitForLoad(driver);
-
-			if (driver.findElements(By.className("m-character-name-alts__name")).size() != 0) {
-				System.out.println("Username In Use - Trying another");
-				WebElement newUsername = driver.findElement(By.className("m-character-name-alts__name"));
-				newUsername.click();
+			boolean created = false;
+			boolean captchaFailed = false;
+			int attempts = 0;
+			while (!created && !captchaFailed) {
+				driver.get(RUNESCAPE_URL);
+				Logger.log("Waiting for Page Load...");
 				waitForLoad(driver);
-				// submit.sendKeys(Keys.ENTER);
-				TimeUnit.SECONDS.sleep(3);
-			} else if (driver.findElements(By.className("google-recaptcha-error")).size() != 0) {
-				captchaFailed = true;
-			}
+				TimeUnit.SECONDS.sleep(1);
 
-			if (driver.findElements(By.id("p-account-created")).size() != 0) {
-				created = true;
-				System.out.println("Account Created");
-				String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port + ":" + proxy.username + ":"
-						+ proxy.password;
-				AccountLauncher.launchClient(address);
-			} else {
-				created = true;
-				System.out.println("We failed. lets not retry -");
-				
+				WebElement dobDay = null, dobMonth = null, dobYear = null, email = null, password = null, textarea = null, submit = null;
+				for (int i = 0; i < 3; i++) {
+					Logger.log("Page Loaded");
+					try {
+						dobDay = driver.findElement(By.name("day"));
+						dobMonth = driver.findElement(By.name("month"));
+						dobYear = driver.findElement(By.name("year"));
+						email = driver.findElement(By.name("email1"));
+						// WebElement displayname = driver.findElement(By.name("displayname"));
+						password = driver.findElement(By.name("password1"));
+						textarea = driver.findElement(By.id("g-recaptcha-response"));
+						submit = driver.findElement(By.id("create-submit"));
+					} catch (Exception ex) {
+						ex.printStackTrace();
+						Logger.log("Retrying..");
+					}
+					if (dobDay == null || dobMonth == null || dobYear == null || email == null || password == null || textarea == null || submit == null) {
+						TimeUnit.MILLISECONDS.sleep(700);
+						continue;
+					}
+					break;
+				}
+
+				Random r = new Random();
+				String year = (1980 + (int)(r.nextDouble() * 20)) + "";
+				String month = (1 + (int)(r.nextDouble() * 10)) + "";
+				String day = (1 + (int)(r.nextDouble() * 26)) + "";
+				Logger.log("Elements found");
+				dobDay.sendKeys(day);
+				dobMonth.sendKeys(month);
+				dobYear.sendKeys(year);
+				email.sendKeys(loginEmail);
+				// displayname.sendKeys("williamsosos");
+				password.sendKeys(loginPassword);
+
+				Logger.log("Form filled");
+				JavascriptExecutor jse = (JavascriptExecutor) driver;
+
+				jse.executeScript("arguments[0].style.display = 'block';", textarea);
+				if(gresponse != null && textarea != null) {
+					textarea.sendKeys(gresponse);
+				}
+
+				Logger.log("Scrolling");
+				driver.switchTo().defaultContent();
+				jse.executeScript("window.scrollBy(0,250)", "");
+				TimeUnit.SECONDS.sleep(6);
+				jse.executeScript("onSubmit()");
+				submit.sendKeys(Keys.ENTER);
+				TimeUnit.SECONDS.sleep(6);
+				waitForLoad(driver);
+
+				Logger.log("Opening Captcha");
+
+				if (driver.findElements(By.className("m-character-name-alts__name")).size() != 0) {
+					System.out.println("Username In Use - Trying another");
+					WebElement newUsername = driver.findElement(By.className("m-character-name-alts__name"));
+					newUsername.click();
+					waitForLoad(driver);
+					// submit.sendKeys(Keys.ENTER);
+					TimeUnit.SECONDS.sleep(3);
+				} else if (driver.findElements(By.className("google-recaptcha-error")).size() != 0) {
+					captchaFailed = true;
+				}
+
+				if (driver.findElements(By.id("p-account-created")).size() != 0) {
+					created = true;
+					System.out.println("Account Created");
+					String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port + ":" + proxy.username + ":"
+							+ proxy.password;
+					AccountLauncher.launchClient(address);
+				} else {
+					created = true;
+					System.out.println("We failed. lets not retry -");
+
+				}
 			}
-			token = null;
+		}finally {
+			try {
+				if (driver != null)
+					driver.quit();
+			} catch (Exception e){ }
 		}
-
-		driver.quit();
 	}
 
-	private  String getDriverNameFirefox() {
+	private static String getDriverNameFirefox() {
 		switch (AccountLauncher.getOperatingSystemType()) {
 		case Linux:
 			return "geckodriver_linux";

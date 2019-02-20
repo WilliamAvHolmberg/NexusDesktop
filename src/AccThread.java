@@ -22,10 +22,14 @@ public class AccThread implements Runnable{
 	}
 	@Override
 	public void run() {
-		Logger.log("Trying to create acc");
-		AccountCreator ac = new AccountCreator();
-		ac.createAccount(username, email, password, proxy, address);
-		Logger.log("finished with trying to create acc");
+		try {
+			Logger.log("Trying to create acc");
+			AccountCreator ac = new AccountCreator();
+			ac.createAccount(username, email, password, proxy, address);
+			Logger.log("finished with trying to create acc");
+		}catch (Exception ex){
+			ex.printStackTrace();
+		}
 	}
 
 }

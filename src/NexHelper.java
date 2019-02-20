@@ -1,11 +1,11 @@
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
@@ -23,6 +23,28 @@ public class NexHelper {
 	public static void main(String[] args) throws IOException, InterruptedException {
 
 		new NexHelper();
+	}
+
+	String readFile(String filename){
+		String content = null;
+		Scanner scanner = null;
+		try {
+			scanner = new Scanner(new File(filename));
+			content = scanner.useDelimiter("\\Z").next();
+		} catch (FileNotFoundException e) {
+			//e.printStackTrace();
+		} finally {
+			if(scanner != null)
+				scanner.close();
+		}
+		return content;
+	}
+	private static void writeFile(String filename, String data) {
+		try {
+			Files.write(Paths.get(filename), data.getBytes());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public NexHelper() throws MalformedURLException, InterruptedException {
@@ -47,50 +69,25 @@ public class NexHelper {
 		//System.out.println("Enter leee IP");
 		//String ip = sc.nextLine();
 		//System.out.println("Enter Port");
-		String ip = "oxnetserver.ddns.net";
-		//String ip = "nexus.no-ip.org";
+
+		String serverData = readFile("server.txt");
+		if (serverData == null){
+			System.out.println("server.txt was missing. Lets create it");
+			serverData = "oxnetserver.ddns.net\r\n1:William\r\n2:Brandon\r\n3:Suicide\r\n4:VPS\r\n5:MINIMAC\r\n6:ACCOUNT\r\n7:BATCH1\r\n8:BATCH2\r\n9:BATCH3\r\n10:BATCH4";
+			writeFile("server.txt", serverData);
+		}
+
+		String[] lines = serverData.split("\\r?\\n");
+		String ip = lines[0];
+
 		int port = 43594;
 		System.out.println("Please choose which user you want to use:");
-		System.out.println("1:William");
-		System.out.println("2:Brandon");
-		int nameOption = sc.nextInt();
-		switch (nameOption) {
-		case 1:
-			computerName = "William";
-			break;
-		case 2:
-			computerName = "Brandon";
-			break;
-		case 3:
-			computerName = "Suicide";
-			break;
-		case 4:
-			computerName = "VPS";
-			break;
-		case 5:
-			computerName = "MINIMAC";
-			break;
-		case 6:
-			computerName = "ACCOUNT";
-			break;
-		case 7:
-			computerName = "BATCH1";
-			break;
-		case 8:
-			computerName = "BATCH2";
-			break;
-		case 9:
-			computerName = "BATCH3";
-			break;
-		case 10:
-			computerName = "BATCH4";
-			break;
-	
-	
-		default:
-			computerName = "BATCH" + nameOption;
-			break;
+		for(int i = 1; i < lines.length; i++){
+			System.out.println(lines[i]);
 		}
+		int nameOption = sc.nextInt();
+		computerName = lines[nameOption].split(":")[1];
+
 		System.out.println("We are gonna connect with user:" + computerName);
 		System.out.println("Please choose if you wanna use low resources:");
 		System.out.println("1:lowcpu no render");
@@ -114,7 +111,7 @@ public class NexHelper {
 			break;
 		}
 		
-		System.out.println("Please choose your interval:");
+		System.out.println("Please choose your launch interval:");
 		int interval = sc.nextInt();
 		try {
 			Socket socket = new Socket(ip, port);
