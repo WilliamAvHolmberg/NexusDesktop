@@ -45,7 +45,7 @@ public final class AccountLauncher {
 				"java -jar " + "." + "./rspeer-launcher.jar" + " " + address);
 
 			ProcessBuilder windowsBuilder = new ProcessBuilder("cmd.exe", "/c",
-					"java -Xms100m -Xmx550m -jar " +  "./rspeer-launcher.jar" + " " + address);
+					"java -jar " +  "./rspeer-launcher.jar" + " " + address);
 			windowsBuilder.inheritIO();
 			ProcessBuilder macBuilder = new ProcessBuilder("osascript", "-e",
 					"tell application \"Terminal\" to do script \"java -jar " +  "./rspeer-launcher.jar" + " " + address);
