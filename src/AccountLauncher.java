@@ -1,10 +1,8 @@
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.ProcessBuilder.Redirect;
+import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.Locale;
 
 public final class AccountLauncher {
@@ -32,7 +30,12 @@ public final class AccountLauncher {
 		return detectedOS;
 	}
 
+	static HashSet<Process> runningprocesses = new HashSet<>();
 	public static void launchClient(String address) {
+		runningprocesses.removeIf(process -> process == null || !process.isAlive());
+//		if(runningprocesses.size() >= 6)
+//			return;
+
 		System.out.println(address);
 		if(!address.equals(lastName) || System.currentTimeMillis() > (lastStartup + 1000 * 120)) {
 			lastName = address;
@@ -41,48 +44,65 @@ public final class AccountLauncher {
 		ProcessBuilder linuxBuilder = new ProcessBuilder("/bin/bash", "-c",
 				"java -jar " + "." + "./rspeer-launcher.jar" + " " + address);
 
-		ProcessBuilder windowsBuilder = new ProcessBuilder("cmd.exe", "/c",
-				"java -Xms100m -Xmx550m -jar " +  "./rspeer-launcher.jar" + " " + address);
-		windowsBuilder.inheritIO();
-		ProcessBuilder macBuilder = new ProcessBuilder("osascript", "-e",
-				"tell application \"Terminal\" to do script \"java -jar " +  "./rspeer-launcher.jar" + " " + address);
-		Process p = null;
-		try {
-			System.out.println(AccountLauncher.getOperatingSystemType());
-			switch (AccountLauncher.getOperatingSystemType()) {
-			
-			case Windows:
-				int i = 1;
-				System.out.println("Start windows");
-				p = windowsBuilder.start();
-				setOutputStream(p);
+			ProcessBuilder windowsBuilder = new ProcessBuilder("cmd.exe", "/c",
+					"java -Xms100m -Xmx550m -jar " +  "./rspeer-launcher.jar" + " " + address);
+			windowsBuilder.inheritIO();
+			ProcessBuilder macBuilder = new ProcessBuilder("osascript", "-e",
+					"tell application \"Terminal\" to do script \"java -jar " +  "./rspeer-launcher.jar" + " " + address);
+			Process p = null;
+			try {
+				//System.out.println(AccountLauncher.getOperatingSystemType());
+				switch (AccountLauncher.getOperatingSystemType()) {
 
-				break;
-			case MacOS:
-				//Process p2 = macBuilder.start();
-				p = Runtime.getRuntime().exec("java -jar rspeer-launcher.jar " + address);
-				setOutputStream(p);
-				break;
-			case Linux:
-				System.out.println("lets go linux");
-				p = linuxBuilder.start();
-				setOutputStream(p);
-				break;
+				case Windows:
+					int i = 1;
+					System.out.println("Start windows");
+					p = windowsBuilder.start();
+					setOutputStream(p);
+
+					break;
+				case MacOS:
+					//Process p2 = macBuilder.start();
+					p = Runtime.getRuntime().exec("java -jar rspeer-launcher.jar " + address);
+					setOutputStream(p);
+					break;
+				case Linux:
+					System.out.println("lets go linux");
+					p = linuxBuilder.start();
+					if(new File(curDir() + "/layout.sh").exists()) {
+						try {
+							Thread.sleep(1000);
+							String[] cmd = new String[]{"/bin/sh", curDir() + "/layout.sh"};
+							Process pr = Runtime.getRuntime().exec(cmd);
+						}catch (Exception ex) { }
+					}
+					setOutputStream(p);
+					break;
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				if(p != null && p.isAlive()) {
+					System.out.println("DESTROYYYYYY");
+					p.destroy();
+				}
+				System.out.println(ex.getMessage());
 			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			if(p != null && p.isAlive()) {
-				System.out.println("DESTROYYYYYY");
-				p.destroy();
-			}
-			System.out.println(e1.getMessage());
-		}
 		}
 
 	}
 
+	public static String curDir(){
+		try {
+			return new File(NexHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
+		}catch (URISyntaxException e){
+			e.printStackTrace();
+		}
+		return "";
+	}
+
 	public static void setOutputStream(Process process) {
 
+		runningprocesses.add(process);
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -90,7 +110,7 @@ public final class AccountLauncher {
 				int c;
 				try {
 					while ((c = is.read()) >= 0) {
-						System.out.println(c);
+						//System.out.println(c);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();

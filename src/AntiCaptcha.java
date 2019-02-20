@@ -19,7 +19,7 @@ public class AntiCaptcha {
         System.out.println("Sending Task To AntiCaptcha");
 
         if (!api.createTask()) {
-            System.out.println(api.getErrorMessage());
+            System.out.println("Captcha Failure:" + api.getErrorMessage());
         } else if (!api.waitForResult()) {
             System.out.println("Failed To Solve Captcha");
         } else {
