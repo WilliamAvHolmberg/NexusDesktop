@@ -48,7 +48,7 @@ public class AccountCreator {
 
 	boolean setProxy(PrivateProxy currentProxy) {
 
-		String proxySet = currentProxy.host.length() > 7 ? "true" : "false";
+		String proxySet = currentProxy.host.length() > 6 ? "true" : "false";
 		System.getProperties().put("proxySet", proxySet);
 		System.getProperties().put("socksProxyHost", currentProxy.host);
 		System.getProperties().put("socksProxyPort", currentProxy.port);
@@ -192,8 +192,7 @@ public class AccountCreator {
 		FirefoxOptions options = new FirefoxOptions();
 		FirefoxProfile profile = new FirefoxProfile();
 		profile.setPreference("network.proxy.type", 1);
-		String host = proxy.host;
-		profile.setPreference("network.proxy.socks", host);
+		profile.setPreference("network.proxy.socks", proxy.host);
 		profile.setPreference("network.proxy.socks_port", proxy.port);
 		options.setProfile(profile);
 		WebDriver driver = new FirefoxDriver(options);
