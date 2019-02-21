@@ -32,7 +32,7 @@ public class AccountCreatorTest {
 	private static String token = null;
 	
 
-	public static void createZip(PrivateProxy proxy)
+	public static void createProfile(PrivateProxy proxy)
 			throws IOException {
 		FileOutputStream fout = new FileOutputStream("extension.zip");
 		ZipOutputStream zout = new ZipOutputStream(fout);

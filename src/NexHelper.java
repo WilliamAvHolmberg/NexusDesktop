@@ -50,10 +50,7 @@ public class NexHelper {
 	public NexHelper() throws MalformedURLException, InterruptedException {
 		//TODO IN FUTURE createUsers();
 		System.out.println("started NexHelper 6.0 with multi-thread support, fixed acc");
-		//CreateAccount ca = new CreateAccount();
-		//ca.createAccount("MonkTomte","MonkWilo@gmail.com",  "ugot00wned2", new Proxy("CejurP","Rz7Kpw", "185.201.255.99", "8000"));
 		messageQueue = new Stack<String>();
-		// messageQueue.push("account_request");
 		URL whatismyip;
 		try {
 			whatismyip = new URL("http://checkip.amazonaws.com");
@@ -66,9 +63,7 @@ public class NexHelper {
 			e.printStackTrace();
 		}
 		Scanner sc = new Scanner(System.in);
-		//System.out.println("Enter leee IP");
-		//String ip = sc.nextLine();
-		//System.out.println("Enter Port");
+
 
 		String serverData = readFile("server.txt");
 		if (serverData == null){

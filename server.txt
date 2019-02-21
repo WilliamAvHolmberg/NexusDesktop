@@ -1,0 +1,11 @@
+oxnetserver.ddns.net
+1:William
+2:Brandon
+3:Suicide
+4:VPS
+5:MINIMAC
+6:ACCOUNT
+7:BATCH1
+8:BATCH2
+9:BATCH3
+10:BATCH4
