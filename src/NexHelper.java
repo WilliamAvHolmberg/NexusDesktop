@@ -77,7 +77,7 @@ public class NexHelper {
 			writeFile("server.txt", serverData);
 		}
 
-		String[] lines = serverData.split("\\r?\\n");
+		String[] lines = serverData.split("\\s*\\r?\\n\\s*");
 		String ip = lines[0];
 
 		int port = 43594;
