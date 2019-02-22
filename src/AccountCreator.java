@@ -233,7 +233,7 @@ public class AccountCreator {
 		
 		FirefoxProfile profile;
 		FirefoxOptions options;
-		if (proxy.username != null || proxy.username.length > 0) {
+		if (proxy.username != null || proxy.username.length() > 0) {
 			ProfilesIni ini = new ProfilesIni();
 			profile = ini.getProfile("default");
 			options = new FirefoxOptions();
