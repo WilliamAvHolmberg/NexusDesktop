@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
+import org.apache.commons.io.FileUtils;
 import org.medusa.Utils.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -52,7 +54,7 @@ public class AccountCreatorTest2 {
 
 	boolean setProxy(PrivateProxy currentProxy) {
 
-		String proxySet = currentProxy.host.length() > 7 ? "true" : "false";
+		String proxySet = currentProxy.host.length() > 6 ? "true" : "false";
 		System.getProperties().put("proxySet", proxySet);
 		System.getProperties().put("socksProxyHost", currentProxy.host);
 		System.getProperties().put("socksProxyPort", currentProxy.port);
@@ -72,8 +74,6 @@ public class AccountCreatorTest2 {
 		}
 		return false;
 	}
-	
-	
 
 	public class ProxyAuth extends Authenticator {
 		private PasswordAuthentication auth;
@@ -88,7 +88,6 @@ public class AccountCreatorTest2 {
 	}
 
 	public boolean createAccount(String username, String email, String password, PrivateProxy proxy, String address) {
-		Logger.log("Waiting for captcha code... This might take a while...");
 		if (proxy != null && proxy.host.length() > 5) {
 			Logger.log("Connecting to Proxy " + proxy.host + ":" + proxy.port);
 			if(!setProxy(proxy))
@@ -96,33 +95,8 @@ public class AccountCreatorTest2 {
 			Logger.log("Successfully connected");
 		}
 		int attempts = 0;
-		boolean completed = false;
-		String token = null;
-		while (token == null) {
-			if (attempts < 5) {
-				switch (CAPTCHA_SOLVER) {
-				case "anticaptcha":
-					AntiCaptcha antiCaptcha = new AntiCaptcha();
-					try {
-						token = antiCaptcha.solveCaptcha(RUNESCAPE_URL);
-						completed = true;
-					} catch (MalformedURLException | InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					break;
-				case "twocaptcha":
-					// TODO: 2Captcha Support
-					break;
-				}
-				attempts++;
-			} else {
-				System.out.println("Captcha Solver Failed 5 Times - Stopping");
-				break;
-			}
-			if(token == null)
-				try { Thread.sleep(2000); }catch (Exception ex){}
-		}
+		boolean completed = true;
+		String token = "CAPTCHA_TOKEN";
 		if (completed) {
 			try {
 				postForm(token, username, email, password, proxy, address);
@@ -176,70 +150,106 @@ public class AccountCreatorTest2 {
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
 	}
 	
-	public static void createProfile(PrivateProxy proxy)
+	public static void createProfile(FirefoxProfile prfile, PrivateProxy proxy)
 			throws IOException {
 		
 	
-		File background = new File(	System.getenv("ROAMING") + "\\Mozilla\\Firefox\\Profiles\\jf4mx129.SeleniumFF");
-		if (!background.exists()) {
-			try {
-				background.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			background.setExecutable(true);
-			try {
-				org.apache.commons.io.FileUtils.copyURLToFile(resource, background);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		URL resource2 = classLoader.getResource("manifest.json");
-		System.out.println(resource);
-		File driver = new File("manifest.json");
-		if (!driver.exists()) {
-			try {
-				driver.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			driver.setExecutable(true);
-			try {
-				org.apache.commons.io.FileUtils.copyURLToFile(resource2, driver);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		//background js that will be dynamic for us
-		Charset charset = StandardCharsets.UTF_8;
-		//read js file and replace proxy details
-		String content = new String(Files.readAllBytes(background.toPath()), charset);
-		content = content.replaceAll("proxy_type", "http");
-		content = content.replaceAll("proxy_host", proxy.host);
-		content = content.replaceAll("proxy_port", "10000");
-		content = content.replaceAll("proxy_username", proxy.username);
-		content = content.replaceAll("proxy_password", proxy.password);
+//		File background = new File(	System.getenv("ROAMING") + "\\Mozilla\\Firefox\\Profiles\\jf4mx129.SeleniumFF");
+//		if (!background.exists()) {
+//			try {
+//				background.createNewFile();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			background.setExecutable(true);
+//			try {
+//				org.apache.commons.io.FileUtils.copyURLToFile(resource, background);
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//
+//		URL resource2 = classLoader.getResource("manifest.json");
+//		System.out.println(resource);
+//		File driver = new File("manifest.json");
+//		if (!driver.exists()) {
+//			try {
+//				driver.createNewFile();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			driver.setExecutable(true);
+//			try {
+//				org.apache.commons.io.FileUtils.copyURLToFile(resource2, driver);
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		//background js that will be dynamic for us
+//		Charset charset = StandardCharsets.UTF_8;
+//		//read js file and replace proxy details
+//		String content = new String(Files.readAllBytes(background.toPath()), charset);
+//		content = content.replaceAll("proxy_type", "http");
+//		content = content.replaceAll("proxy_host", proxy.host);
+//		content = content.replaceAll("proxy_port", "10000");
+//		content = content.replaceAll("proxy_username", proxy.username);
+//		content = content.replaceAll("proxy_password", proxy.password);
+//
+//		//add modified background.js to zip
+//		ZipEntry ze = new ZipEntry(background.getPath());
+//		zout.putNextEntry(ze);
+//		zout.write(content.getBytes(), 0, content.getBytes().length);
+//		zout.closeEntry();
+//
+//
+//		//add manifest to zip
+//		File manifest = new File("manifest.json");
+//		ZipEntry zeManifest = new ZipEntry(manifest.getPath());
+//		zout.putNextEntry(zeManifest);
+//		byte[] bytes = Files.readAllBytes(manifest.toPath());
+//		zout.write(bytes, 0, bytes.length);
+//		zout.closeEntry();
+//		zout.close();
+	}
 
-		//add modified background.js to zip
-		ZipEntry ze = new ZipEntry(background.getPath());
-		zout.putNextEntry(ze);
-		zout.write(content.getBytes(), 0, content.getBytes().length);
-		zout.closeEntry();
-		
-		
-		//add manifest to zip
-		File manifest = new File("manifest.json");
-		ZipEntry zeManifest = new ZipEntry(manifest.getPath());
-		zout.putNextEntry(zeManifest);
-		byte[] bytes = Files.readAllBytes(manifest.toPath());
-		zout.write(bytes, 0, bytes.length);
-		zout.closeEntry();
-		zout.close();
+	static FirefoxProfile copyProfileData(FirefoxProfile profile, PrivateProxy proxy){
+		try
+		{
+			Field profileFolderVal = profile.getClass().getDeclaredField("model");
+			profileFolderVal.setAccessible(true);
+			File profileFolder = (File)profileFolderVal.get(profile);
+			File extensionsDir = new File(AccountLauncher.curDir(), "extension");
+			File localProfileFolder = new File(extensionsDir.toString(), "profile");
+
+			File[] files = extensionsDir.listFiles((dir1, name) -> name.endsWith(".xpi"));
+			for (File file : files)
+				profile.addExtension(file);
+
+			try {
+				FileUtils.copyDirectory(localProfileFolder, profileFolder);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			Path proxySwitchSett = Paths.get(profileFolder.getPath(), "browser-extension-data/{0c3ab5c8-57ac-4ad8-9dd1-ee331517884d}/storage.js");
+			if(Files.exists(proxySwitchSett)){
+				Charset charset = StandardCharsets.UTF_8;
+				String content = new String(Files.readAllBytes(proxySwitchSett), charset);
+				content = content.replaceAll("%HOST%", proxy.host)
+						.replaceAll("%PORT%", proxy.port)
+						.replaceAll("%USERNAME%", proxy.username)
+						.replaceAll("%PASSWORD%", proxy.password);
+				Files.write(proxySwitchSett, content.getBytes(charset));
+			}
+
+			profile.setPreference("extensions.pendingOperations", true);
+			profile.setPreference("services.sync.globalScore", 606);
+		} catch (Exception ex){ex.printStackTrace(); return null;}
+		return profile;
 	}
 
 	private static void postForm(String gresponse, String username, String loginEmail, String loginPassword,
@@ -261,100 +271,33 @@ public class AccountCreatorTest2 {
 		 * options.setProfile(profile);
 		 */
 		setFirefoxDriver();
-		ProfilesIni profile = new ProfilesIni();
-		FirefoxProfile FF = profile.getProfile("default");
-		FirefoxOptions options = new FirefoxOptions();
-		options.setProfile(FF);
+		
+		FirefoxProfile profile;
+		FirefoxOptions options;
+		if (proxy.username != null || proxy.username.length() > 0) {
+			ProfilesIni ini = new ProfilesIni();
+			profile = ini.getProfile("default");
+			options = new FirefoxOptions();
+			profile = copyProfileData(profile, proxy);
+		} else {
+			options = new FirefoxOptions();
+			profile = new FirefoxProfile();
+			profile.setPreference("network.proxy.type", 1);
+			profile.setPreference("network.proxy.socks", proxy.host);
+			profile.setPreference("network.proxy.socks_port", proxy.port);
+		}
+		options.setProfile(profile);
 		WebDriver driver = new FirefoxDriver(options);
 		try {
 			driver.manage().window().maximize();
 
-			boolean created = false;
-			boolean captchaFailed = false;
-			int attempts = 0;
-			while (!created && !captchaFailed) {
-				driver.get(RUNESCAPE_URL);
-				Logger.log("Waiting for Page Load...");
-				waitForLoad(driver);
+			driver.get("http://ipchicken.com/");
+			Logger.log("Waiting for Page Load...");
+			waitForLoad(driver);
+
+			while (driver != null)
 				TimeUnit.SECONDS.sleep(1);
 
-				WebElement dobDay = null, dobMonth = null, dobYear = null, email = null, password = null, textarea = null, submit = null;
-				for (int i = 0; i < 3; i++) {
-					Logger.log("Page Loaded");
-					try {
-						dobDay = driver.findElement(By.name("day"));
-						dobMonth = driver.findElement(By.name("month"));
-						dobYear = driver.findElement(By.name("year"));
-						email = driver.findElement(By.name("email1"));
-						// WebElement displayname = driver.findElement(By.name("displayname"));
-						password = driver.findElement(By.name("password1"));
-						textarea = driver.findElement(By.id("g-recaptcha-response"));
-						submit = driver.findElement(By.id("create-submit"));
-					} catch (Exception ex) {
-						ex.printStackTrace();
-						Logger.log("Retrying..");
-					}
-					if (dobDay == null || dobMonth == null || dobYear == null || email == null || password == null || textarea == null || submit == null) {
-						TimeUnit.MILLISECONDS.sleep(700);
-						continue;
-					}
-					break;
-				}
-
-				Random r = new Random();
-				String year = (1980 + (int)(r.nextDouble() * 20)) + "";
-				String month = (1 + (int)(r.nextDouble() * 10)) + "";
-				String day = (1 + (int)(r.nextDouble() * 26)) + "";
-				Logger.log("Elements found");
-				dobDay.sendKeys(day);
-				dobMonth.sendKeys(month);
-				dobYear.sendKeys(year);
-				email.sendKeys(loginEmail);
-				// displayname.sendKeys("williamsosos");
-				password.sendKeys(loginPassword);
-
-				Logger.log("Form filled");
-				JavascriptExecutor jse = (JavascriptExecutor) driver;
-
-				jse.executeScript("arguments[0].style.display = 'block';", textarea);
-				if(gresponse != null && textarea != null) {
-					textarea.sendKeys(gresponse);
-				}
-
-				Logger.log("Scrolling");
-				driver.switchTo().defaultContent();
-				jse.executeScript("window.scrollBy(0,250)", "");
-				TimeUnit.SECONDS.sleep(6);
-				jse.executeScript("onSubmit()");
-				submit.sendKeys(Keys.ENTER);
-				TimeUnit.SECONDS.sleep(6);
-				waitForLoad(driver);
-
-				Logger.log("Opening Captcha");
-
-				if (driver.findElements(By.className("m-character-name-alts__name")).size() != 0) {
-					System.out.println("Username In Use - Trying another");
-					WebElement newUsername = driver.findElement(By.className("m-character-name-alts__name"));
-					newUsername.click();
-					waitForLoad(driver);
-					// submit.sendKeys(Keys.ENTER);
-					TimeUnit.SECONDS.sleep(3);
-				} else if (driver.findElements(By.className("google-recaptcha-error")).size() != 0) {
-					captchaFailed = true;
-				}
-
-				if (driver.findElements(By.id("p-account-created")).size() != 0) {
-					created = true;
-					System.out.println("Account Created");
-					String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port + ":" + proxy.username + ":"
-							+ proxy.password;
-					AccountLauncher.launchClient(address);
-				} else {
-					created = true;
-					System.out.println("We failed. lets not retry -");
-
-				}
-			}
 		}finally {
 			try {
 				if (driver != null)

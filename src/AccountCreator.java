@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,12 +6,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -24,7 +26,9 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
 
+import org.apache.commons.io.FileUtils;
 import org.medusa.Utils.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -35,6 +39,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.ProfilesIni;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -169,6 +174,42 @@ public class AccountCreator {
 		// driver = new ChromeDriver();
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
 	}
+	
+	static FirefoxProfile copyProfileData(FirefoxProfile profile, PrivateProxy proxy){
+		try
+		{
+			Field profileFolderVal = profile.getClass().getDeclaredField("model");
+			profileFolderVal.setAccessible(true);
+			File profileFolder = (File)profileFolderVal.get(profile);
+			File extensionsDir = new File(AccountLauncher.curDir(), "extension");
+			File localProfileFolder = new File(extensionsDir.toString(), "profile");
+
+			File[] files = extensionsDir.listFiles((dir1, name) -> name.endsWith(".xpi"));
+			for (File file : files)
+				profile.addExtension(file);
+
+			try {
+				FileUtils.copyDirectory(localProfileFolder, profileFolder);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			Path proxySwitchSett = Paths.get(profileFolder.getPath(), "browser-extension-data/{0c3ab5c8-57ac-4ad8-9dd1-ee331517884d}/storage.js");
+			if(Files.exists(proxySwitchSett)){
+				Charset charset = StandardCharsets.UTF_8;
+				String content = new String(Files.readAllBytes(proxySwitchSett), charset);
+				content = content.replaceAll("%HOST%", proxy.host)
+						.replaceAll("%PORT%", proxy.port)
+						.replaceAll("%USERNAME%", proxy.username)
+						.replaceAll("%PASSWORD%", proxy.password);
+				Files.write(proxySwitchSett, content.getBytes(charset));
+			}
+
+			profile.setPreference("extensions.pendingOperations", true);
+			profile.setPreference("services.sync.globalScore", 606);
+		} catch (Exception ex){ex.printStackTrace(); return null;}
+		return profile;
+	}
 
 	private static void postForm(String gresponse, String username, String loginEmail, String loginPassword,
 			PrivateProxy proxy, String address) throws Exception {
@@ -189,11 +230,21 @@ public class AccountCreator {
 		 * options.setProfile(profile);
 		 */
 		setFirefoxDriver();
-		FirefoxOptions options = new FirefoxOptions();
-		FirefoxProfile profile = new FirefoxProfile();
-		profile.setPreference("network.proxy.type", 1);
-		profile.setPreference("network.proxy.socks", proxy.host);
-		profile.setPreference("network.proxy.socks_port", proxy.port);
+		
+		FirefoxProfile profile;
+		FirefoxOptions options;
+		if (proxy.username != null || proxy.username.length() > 0) {
+			ProfilesIni ini = new ProfilesIni();
+			profile = ini.getProfile("default");
+			options = new FirefoxOptions();
+			profile = copyProfileData(profile, proxy);
+		} else {
+			options = new FirefoxOptions();
+			profile = new FirefoxProfile();
+			profile.setPreference("network.proxy.type", 1);
+			profile.setPreference("network.proxy.socks", proxy.host);
+			profile.setPreference("network.proxy.socks_port", proxy.port);
+		}
 		options.setProfile(profile);
 		WebDriver driver = new FirefoxDriver(options);
 		try {

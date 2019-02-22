@@ -106,12 +106,6 @@ public class AccountCreatorTest {
 	public void createAccount(String username, String email, String password, PrivateProxy proxy, String address) {
 		Logger.log("Waiting for captcha code... This might take a while...");
 		int attempts = 0;
-		try {
-			createZip(proxy);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		while (token == null) {
 			if (attempts < 5) {
 				switch (CAPTCHA_SOLVER) {

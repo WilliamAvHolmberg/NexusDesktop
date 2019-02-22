@@ -193,6 +193,10 @@ public class ChromeCreator {
             driver.get(RUNESCAPE_URL);
             waitForLoad(driver);
 
+            TimeUnit.MILLISECONDS.sleep(200);
+            JavascriptExecutor jse = (JavascriptExecutor)driver;
+            jse.executeScript("window.scrollBy(0,50)", "");
+
             WebElement dobDay = driver.findElement(By.name("day"));
             WebElement dobMonth = driver.findElement(By.name("month"));
             WebElement dobYear = driver.findElement(By.name("year"));
@@ -209,13 +213,21 @@ public class ChromeCreator {
            // displayname.sendKeys("williamsosos");
             password.sendKeys(loginPassword);
 
-            JavascriptExecutor jse = (JavascriptExecutor)driver;
             jse.executeScript("arguments[0].style.display = 'block';", textarea);
             
             textarea.sendKeys(gresponse);
 
+            //Trigger Mouse mouse on everything
+            String javaScript = "var evObj = document.createEvent('MouseEvents');" +
+                    "evObj.initMouseEvent(\"mouseover\",true, false, window, 0, 200, 200, 200, 200, false, false, false, false, 0, null);" +
+                    "arguments[0].dispatchEvent(evObj);";
+
             driver.switchTo().defaultContent();
             jse.executeScript("window.scrollBy(0,250)", "");
+            TimeUnit.MILLISECONDS.sleep(300);
+            jse.executeScript("window.scrollBy(0,100)", "");
+            TimeUnit.MILLISECONDS.sleep(300);
+            jse.executeScript("window.scrollBy(0,200)", "");
             TimeUnit.SECONDS.sleep(6);
             jse.executeScript("onSubmit()");
             submit.sendKeys(Keys.ENTER);

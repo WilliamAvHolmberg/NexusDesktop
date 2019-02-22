@@ -19,6 +19,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openqa.selenium.json.JsonException;
 
 public class Test {
 
@@ -43,6 +44,25 @@ public class Test {
 			e1.printStackTrace();
 		}
 
+		PrivateProxy proxy = null;
+		try {
+			JSONObject proxySettings = obj.getJSONObject("proxySettings");
+			proxy = new PrivateProxy(
+					proxySettings.getString("username"), proxySettings.getString("password"),
+					proxySettings.getString("host"), proxySettings.getString("port"));
+		}catch (JSONException je){ je.printStackTrace(); }
+
+		// Test Code
+		proxy.host = "50.237.102.215";
+		proxy.port = "17000";
+		proxy.username = "william0523";
+		proxy.password = "william0523";
+
+		AccountCreatorTest2 creator = new AccountCreatorTest2();
+		creator.createAccount("Will-I-Am", "notpewdiepie@youtube.com", "Sub2Pewdiepie", proxy, "");
+
+		if(creator != null)
+			return;
 		String windowsProfilePath = System.getenv("APPDATA") + "\\Mozilla\\Firefox\\Profiles";
 		String profileName = getProfileName(windowsProfilePath);
 		if (profileName == null) {
