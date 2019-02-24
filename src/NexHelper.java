@@ -49,7 +49,7 @@ public class NexHelper {
 
 	public NexHelper() throws MalformedURLException, InterruptedException {
 		//TODO IN FUTURE createUsers();
-		System.out.println("started NexHelper 6.0 with multi-thread support, fixed acc");
+		System.out.println("started NexHelper 7.0 with multi-thread support, fixed acc");
 		messageQueue = new Stack<String>();
 		URL whatismyip;
 		try {
