@@ -57,7 +57,7 @@ public class NexHelper {
 			BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
 
 			String ip = in.readLine(); // you get the IP as a String
-			System.out.println(ip);
+			System.out.println("My IP: " + ip);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -72,8 +72,9 @@ public class NexHelper {
 			writeFile("server.txt", serverData);
 		}
 
-		String[] lines = serverData.split("\\r?\\n");
+		String[] lines = serverData.split("\\s*\\r?\\n\\s*");
 		String ip = lines[0];
+		System.out.println("Server IP: " + ip);
 
 		int port = 43594;
 		System.out.println("Please choose which user you want to use:");
@@ -152,6 +153,7 @@ public class NexHelper {
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
