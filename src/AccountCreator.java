@@ -199,7 +199,13 @@ public class AccountCreator {
 		return profile;
 	}
 
-	private  void postForm(String gresponse, String username, String loginEmail, String loginPassword,
+	static boolean isNullOrEmpty(String str){
+		if(str == null) return  true;
+		if(str.trim().isEmpty()) return true;
+		return false;
+	}
+
+	private static void postForm(String gresponse, String username, String loginEmail, String loginPassword,
 			PrivateProxy proxy, String address) throws Exception {
 		// ChromeOptions options = new ChromeOptions();
 		// setting headless mode to true.. so there isn't any ui
@@ -221,7 +227,7 @@ public class AccountCreator {
 
 		FirefoxProfile profile;
 		FirefoxOptions options;
-		if (proxy.username != null || proxy.username.length() > 0) {
+		if (!isNullOrEmpty(proxy.host) && !isNullOrEmpty(proxy.username)) {
 			ProfilesIni ini = new ProfilesIni();
 			profile = ini.getProfile("default");
 			options = new FirefoxOptions();
@@ -236,65 +242,73 @@ public class AccountCreator {
 		options.setProfile(profile);
 		WebDriver driver = new FirefoxDriver(options);
 
-		driver.manage().window().maximize();
+				Random r = new Random();
+				String year = (1980 + (int)(r.nextDouble() * 20)) + "";
+				String month = (1 + (int)(r.nextDouble() * 10)) + "";
+				String day = (1 + (int)(r.nextDouble() * 26)) + "";
+				Logger.log("Elements found");
+				dobDay.sendKeys(day);
+				dobMonth.sendKeys(month);
+				dobYear.sendKeys(year);
+				email.sendKeys(loginEmail);
+				// displayname.sendKeys("williamsosos");
+				password.sendKeys(loginPassword);
 
-		boolean created = false;
-		boolean captchaFailed = false;
-		int attempts = 0;
-		while (!created && !captchaFailed) {
-			driver.get(RUNESCAPE_URL);
-			waitForLoad(driver);
+				Logger.log("Form filled");
+				JavascriptExecutor jse = (JavascriptExecutor) driver;
 
-			WebElement dobDay = driver.findElement(By.name("day"));
-			WebElement dobMonth = driver.findElement(By.name("month"));
-			WebElement dobYear = driver.findElement(By.name("year"));
-			WebElement email = driver.findElement(By.name("email1"));
-			// WebElement displayname = driver.findElement(By.name("displayname"));
-			WebElement password = driver.findElement(By.name("password1"));
-			WebElement textarea = driver.findElement(By.id("g-recaptcha-response"));
-			WebElement submit = driver.findElement(By.id("create-submit"));
+				jse.executeScript("arguments[0].style.display = 'block';", textarea);
+				if(gresponse != null && textarea != null) {
+					Logger.log("Filled in g-recaptcha-response text-area");
+					textarea.sendKeys(gresponse);
+				}else{
+					Logger.log("Could not find g-recaptcha-response text-area");
+				}
 
-			dobDay.sendKeys("01");
-			dobMonth.sendKeys("01");
-			dobYear.sendKeys("1990");
-			email.sendKeys(loginEmail);
-			// displayname.sendKeys("williamsosos");
-			password.sendKeys(loginPassword);
-
-			JavascriptExecutor jse = (JavascriptExecutor) driver;
-			jse.executeScript("arguments[0].style.display = 'block';", textarea);
-
-			textarea.sendKeys(gresponse);
-
-			driver.switchTo().defaultContent();
-			jse.executeScript("window.scrollBy(0,250)", "");
-			TimeUnit.SECONDS.sleep(6);
-			jse.executeScript("onSubmit()");
-			submit.sendKeys(Keys.ENTER);
-			TimeUnit.SECONDS.sleep(6);
-			waitForLoad(driver);
-
-			if (driver.findElements(By.className("m-character-name-alts__name")).size() != 0) {
-				System.out.println("Username In Use - Trying another");
-				WebElement newUsername = driver.findElement(By.className("m-character-name-alts__name"));
-				newUsername.click();
+				Logger.log("Scrolling");
+				driver.switchTo().defaultContent();
+				jse.executeScript("window.scrollBy(0,250)", "");
+				TimeUnit.SECONDS.sleep(6);
+				jse.executeScript("onSubmit()");
+				//submit.sendKeys(Keys.ENTER);
+				submit.click();
+				TimeUnit.SECONDS.sleep(6);
 				waitForLoad(driver);
-				// submit.sendKeys(Keys.ENTER);
-				TimeUnit.SECONDS.sleep(3);
-			} else if (driver.findElements(By.className("google-recaptcha-error")).size() != 0) {
-				captchaFailed = true;
-			}
+				TimeUnit.SECONDS.sleep(2);
 
-			if (driver.findElements(By.id("p-account-created")).size() != 0) {
-				created = true;
-				System.out.println("Account Created");
-				String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port + ":" + proxy.username + ":"
-						+ proxy.password;
-				AccountLauncher.launchClient(address);
-			} else {
-				created = true;
-				System.out.println("We failed. lets not retry -");
+				Logger.log("Opening Captcha");
 
+				for(int i = 0; i < 10; i++) {
+					waitForLoad(driver);
+					if (driver.findElements(By.className("m-character-name-alts__name")).size() != 0) {
+						System.out.println("Username In Use - Trying another");
+						WebElement newUsername = driver.findElement(By.className("m-character-name-alts__name"));
+						newUsername.click();
+						waitForLoad(driver);
+						// submit.sendKeys(Keys.ENTER);
+						TimeUnit.SECONDS.sleep(3);
+					} else if (driver.findElements(By.className("google-recaptcha-error")).size() != 0) {
+						Logger.log("Google Recaptcha Error");
+						captchaFailed = true;
+					}
+
+					waitForLoad(driver);
+					TimeUnit.SECONDS.sleep(1);
+
+					if (driver.findElements(By.id("p-account-created")).size() != 0) {
+						created = true;
+						System.out.println("Account Created");
+						String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port + ":" + proxy.username + ":"
+								+ proxy.password;
+						AccountLauncher.launchClient(address);
+					}
+					if(created)
+						break;
+				}
+				if (!created){
+					created = true;
+					System.out.println("We failed. lets not retry -");
+				}
 			}
 			token = null;
 		}
