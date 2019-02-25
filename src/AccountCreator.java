@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
+import org.apache.commons.exec.util.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.medusa.Utils.Logger;
 import org.openqa.selenium.By;
