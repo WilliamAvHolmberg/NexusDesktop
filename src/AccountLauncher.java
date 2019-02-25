@@ -69,6 +69,13 @@ public final class AccountLauncher {
 				case Linux:
 					System.out.println("lets go linux");
 					p = linuxBuilder.start();
+					if(new File(curDir() + "/layout.sh").exists()) {
+						try {
+							Thread.sleep(1000);
+							String[] cmd = new String[]{"/bin/sh", curDir() + "/layout.sh"};
+							Process pr = Runtime.getRuntime().exec(cmd);
+						}catch (Exception ex) { }
+					}
 					setOutputStream(p);
 					break;
 				}
