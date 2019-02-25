@@ -45,16 +45,14 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class AccountCreator {
 
-	private static final String RUNESCAPE_URL = "https://secure.runescape.com/m=account-creation/create_account";
-	private static final String RANDGEN_URL = "https://randomuser.me/api/?nat=gb";
-	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0";
-	private static String CAPTCHA_SOLVER = "anticaptcha";
-	//private static String token = null;
+	private  final String RUNESCAPE_URL = "https://secure.runescape.com/m=account-creation/create_account";
+	private  final String RANDGEN_URL = "https://randomuser.me/api/?nat=gb";
+	private  final String USER_AGENT = "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0";
+	private  String CAPTCHA_SOLVER = "anticaptcha";
+	private String token = null;
 
-	boolean setProxy(PrivateProxy currentProxy) {
-
-		String proxySet = currentProxy.host.length() > 6 ? "true" : "false";
-		System.getProperties().put("proxySet", proxySet);
+	void setProxy(PrivateProxy currentProxy) {
+		System.getProperties().put("proxySet", "true");
 		System.getProperties().put("socksProxyHost", currentProxy.host);
 		System.getProperties().put("socksProxyPort", currentProxy.port);
 		Authenticator.setDefault(new ProxyAuth(currentProxy.username, currentProxy.password));
@@ -65,13 +63,10 @@ public class AccountCreator {
 
 			String ip = in.readLine(); // you get the IP as a String
 			System.out.println(ip);
-			return true;
 		} catch (IOException e) {
-			System.out.println("Proxy " + currentProxy.host + " is bad");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return false;
 	}
 
 	public class ProxyAuth extends Authenticator {
@@ -86,17 +81,15 @@ public class AccountCreator {
 		}
 	}
 
-	public boolean createAccount(String username, String email, String password, PrivateProxy proxy, String address) {
+	public void createAccount(String username, String email, String password, PrivateProxy proxy, String address) {
 		Logger.log("Waiting for captcha code... This might take a while...");
 		if (proxy != null && proxy.host.length() > 5) {
-			Logger.log("Connecting to Proxy " + proxy.host + ":" + proxy.port);
-			if(!setProxy(proxy))
-				return false;
-			Logger.log("Successfully connected");
+			Logger.log("Hello");
+			setProxy(proxy);
+			Logger.log("hello again");
 		}
 		int attempts = 0;
 		boolean completed = false;
-		String token = null;
 		while (token == null) {
 			if (attempts < 5) {
 				switch (CAPTCHA_SOLVER) {
@@ -119,24 +112,19 @@ public class AccountCreator {
 				System.out.println("Captcha Solver Failed 5 Times - Stopping");
 				break;
 			}
-			if(token == null)
-				try { Thread.sleep(2000); }catch (Exception ex){}
 		}
 		if (completed) {
 			try {
 				postForm(token, username, email, password, proxy, address);
-				return true;
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else{
-			System.out.println("Couldnt get captcha :(");
 		}
-		return false;
+
 	}
 
-	private static void waitForLoad(WebDriver driver) {
+	private  void waitForLoad(WebDriver driver) {
 		ExpectedCondition<Boolean> pageLoadCondition = new ExpectedCondition<Boolean>() {
 			public Boolean apply(WebDriver driver) {
 				return ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
@@ -146,10 +134,10 @@ public class AccountCreator {
 		wait.until(pageLoadCondition);
 	}
 
-	private static void setFirefoxDriver() {
+	private  void setFirefoxDriver() {
 		ClassLoader classLoader = AccountCreator.class.getClassLoader();
 		URL resource = classLoader.getResource("drivers/" + getDriverNameFirefox());
-		//System.out.println(resource);
+		System.out.println(resource);
 		File f = new File("Driver");
 		if (!f.exists()) {
 			f.mkdirs();
@@ -174,7 +162,7 @@ public class AccountCreator {
 		// driver = new ChromeDriver();
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
 	}
-	
+
 	static FirefoxProfile copyProfileData(FirefoxProfile profile, PrivateProxy proxy){
 		try
 		{
@@ -232,11 +220,11 @@ public class AccountCreator {
 		 * profile.setPreference("network.proxy.type", 1);
 		 * profile.setPreference("network.proxy.socks", proxy.host);
 		 * profile.setPreference("network.proxy.socks_port", proxy.port);
-		 * 
+		 *
 		 * options.setProfile(profile);
 		 */
 		setFirefoxDriver();
-		
+
 		FirefoxProfile profile;
 		FirefoxOptions options;
 		if (!isNullOrEmpty(proxy.host) && !isNullOrEmpty(proxy.username)) {
@@ -253,40 +241,6 @@ public class AccountCreator {
 		}
 		options.setProfile(profile);
 		WebDriver driver = new FirefoxDriver(options);
-		try {
-			driver.manage().window().maximize();
-
-			boolean created = false;
-			boolean captchaFailed = false;
-			int attempts = 0;
-			while (!created && !captchaFailed) {
-				driver.get(RUNESCAPE_URL);
-				Logger.log("Waiting for Page Load...");
-				waitForLoad(driver);
-				TimeUnit.SECONDS.sleep(1);
-
-				WebElement dobDay = null, dobMonth = null, dobYear = null, email = null, password = null, textarea = null, submit = null;
-				for (int i = 0; i < 3; i++) {
-					Logger.log("Page Loaded");
-					try {
-						dobDay = driver.findElement(By.name("day"));
-						dobMonth = driver.findElement(By.name("month"));
-						dobYear = driver.findElement(By.name("year"));
-						email = driver.findElement(By.name("email1"));
-						// WebElement displayname = driver.findElement(By.name("displayname"));
-						password = driver.findElement(By.name("password1"));
-						textarea = driver.findElement(By.id("g-recaptcha-response"));
-						submit = driver.findElement(By.id("create-submit"));
-					} catch (Exception ex) {
-						ex.printStackTrace();
-						Logger.log("Retrying..");
-					}
-					if (dobDay == null || dobMonth == null || dobYear == null || email == null || password == null || textarea == null || submit == null) {
-						TimeUnit.MILLISECONDS.sleep(700);
-						continue;
-					}
-					break;
-				}
 
 				Random r = new Random();
 				String year = (1980 + (int)(r.nextDouble() * 20)) + "";
@@ -356,15 +310,13 @@ public class AccountCreator {
 					System.out.println("We failed. lets not retry -");
 				}
 			}
-		}finally {
-			try {
-				if (driver != null)
-					driver.quit();
-			} catch (Exception e){ }
+			token = null;
 		}
+
+		driver.quit();
 	}
 
-	private static String getDriverNameFirefox() {
+	private  String getDriverNameFirefox() {
 		switch (AccountLauncher.getOperatingSystemType()) {
 		case Linux:
 			return "geckodriver_linux";
