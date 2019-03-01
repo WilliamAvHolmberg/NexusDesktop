@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -28,30 +29,123 @@ import org.openqa.selenium.firefox.ProfilesIni;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class AccountChangeMail {
+public class AccountRecover {
 
-	private static final String RUNESCAPE_URL = "https://secure.runescape.com/m=weblogin/loginform.ws?mod=www&ssl=1&expired=0&dest=account_settings";
+	private static final String RECOVERY_URL = "https://secure.runescape.com/m=accountappeal/passwordrecovery";
+	private static final String EMAIL_SET_URL = "https://temp-mail.org/en/option/change/";
+	private static final String EMAIL_REFRESH_URL = "https://temp-mail.org/en/option/refresh/";
+
+	private static String SET_PASSWORD_URL = null;
+	private static String OUR_MAIL_LINK = null;
+
 	private static final String RANDGEN_URL = "https://randomuser.me/api/?nat=gb";
 	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0";
 	private static String CAPTCHA_SOLVER = "anticaptcha";
 	// private static String token = null;
 	private static int cooldown = 90;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 
-		new AccountChangeMail();
+		new AccountRecover();
 	}
 
-	public AccountChangeMail() {
-		String gResponse = getCaptchaResponse();
+	public AccountRecover() throws InterruptedException {
+		// String gResponse = getCaptchaResponse();
 		PrivateProxy proxy = new PrivateProxy("", "", "92.32.69.103", "8888");
 		String username = "desktdu@gmail.com";
 		String password = "ugot00wned2";
-		if (gResponse != null) {
-			logIntoRunescape(gResponse, proxy, username, password);
-		}else {
-			Logger.log("Response == null");
+		// if (gResponse != null) {
+		// logIntoRunescape(gResponse, proxy, username, password);
+		// }else {
+		// Logger.log("Response == null");
+		// }
+		FirefoxProfile profile;
+		FirefoxOptions options;
+		if (proxy.username != null && proxy.username.length() > 3) {
+			ProfilesIni ini = new ProfilesIni();
+			profile = ini.getProfile("default");
+			options = new FirefoxOptions();
+			profile = copyProfileData(profile, proxy);
+		} else {
+			options = new FirefoxOptions();
+			profile = new FirefoxProfile();
+			profile.setPreference("network.proxy.type", 1);
+			profile.setPreference("network.proxy.socks", proxy.host);
+			profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
 		}
+		options.setProfile(profile);
+		WebDriver driver = new FirefoxDriver(options);
+		if (doEmailLogin(driver, "sojusopa@yourweb.email")) {
+			doEmailCheck(driver);
+		}
+		if (OUR_MAIL_LINK != null) {
+			Logger.log(OUR_MAIL_LINK);
+			getPasswordLink(driver);
+		}
+
+		if (SET_PASSWORD_URL != null) {
+			setNewPassword(driver, "ugot00wned");
+		}
+		Logger.log("not logged in");
+	}
+
+	public static boolean setNewPassword(WebDriver driver, String ourPassword) {
+		try {
+			driver.get(SET_PASSWORD_URL);
+			Logger.log("Waiting for Page Load...");
+			waitForLoad(driver);
+			if (driver.findElements(By.id("p-account-recovery-reset-password")).size() == 0) {
+				Logger.log("Did not load page. lets try again");
+				setNewPassword(driver, ourPassword);
+			}
+			WebElement password = driver.findElement(By.name("password"));
+			WebElement confirmPassword = driver.findElement(By.name("confirm"));
+			WebElement submitButton = driver.findElement(By.name("submit"));
+			// send recovery
+			if (password != null) {
+				password.sendKeys(ourPassword);
+				confirmPassword.sendKeys(ourPassword);
+				TimeUnit.SECONDS.sleep(6);
+				Logger.log("Form filled");
+				submitButton.click();
+				TimeUnit.SECONDS.sleep(6); // added this for leaving the captcha too fast
+				waitForLoad(driver);
+				TimeUnit.SECONDS.sleep(20); // added this for leaving the captcha too fast
+			} else {
+				Logger.log("Page failed to load..");
+			}
+
+			// check if recovery was successful
+			if (driver.findElements(By.id("p-account-recovery-pre-confirmation")).size() != 0) {
+				Logger.log("Successfully sent recovery");
+				Logger.log("lets check mail");
+				doEmailLogin(driver, "sojusopa@yourweb.email");
+			} else {
+				Logger.log("something went wrong");
+			}
+		} catch (Exception e) {
+			Logger.log("we failed");
+		}
+		return true;
+	}
+
+	public static boolean getPasswordLink(WebDriver driver) {
+		driver.get(OUR_MAIL_LINK);
+		Logger.log("Waiting for Page Load...");
+		waitForLoad(driver);
+
+		List<WebElement> elements = driver.findElements(By.tagName("a"));
+		String setPasswordUrl = null;
+		for (WebElement element : elements) {
+			String text = element.getText();
+			Logger.log(text);
+			if (text.contains("RESET PASSWORD")) {
+				Logger.log("found mess");
+				setPasswordUrl = element.getAttribute("href");
+			}
+		}
+		SET_PASSWORD_URL = setPasswordUrl;
+		return true;
 	}
 
 	public void logIntoRunescape(String gResponse, PrivateProxy proxy, String username, String password) {
@@ -82,18 +176,16 @@ public class AccountChangeMail {
 				return;
 			}
 
-			driver.get(RUNESCAPE_URL);
+			driver.get(RECOVERY_URL);
 			Logger.log("Waiting for Page Load...");
 			waitForLoad(driver);
 			Logger.log("Site loaded.. Lets fill in username details");
-			WebElement formUsername = driver.findElement(By.name("username"));
-			WebElement formPassword = driver.findElement(By.name("password"));
-			WebElement submitButton = driver.findElement(By.id("du-login-submit"));
+			WebElement formUsername = driver.findElement(By.name("email"));
 			WebElement textarea = driver.findElement(By.id("g-recaptcha-response"));
 
-			if (formUsername != null && formPassword != null) {
+			// send recovery
+			if (formUsername != null) {
 				formUsername.sendKeys(username);
-				formPassword.sendKeys(password);
 				TimeUnit.SECONDS.sleep(6);
 				Logger.log("Form filled");
 				JavascriptExecutor jse = (JavascriptExecutor) driver;
@@ -118,10 +210,74 @@ public class AccountChangeMail {
 			} else {
 				Logger.log("Page failed to load..");
 			}
+
+			// check if recovery was successful
+			if (driver.findElements(By.id("p-account-recovery-pre-confirmation")).size() != 0) {
+				Logger.log("Successfully sent recovery");
+				Logger.log("lets check mail");
+				doEmailLogin(driver, "sojusopa@yourweb.email");
+			} else {
+				Logger.log("something went wrong");
+			}
 		} catch (Exception e) {
 
 		}
 
+	}
+
+	private static boolean doEmailCheck(WebDriver driver) throws InterruptedException {
+		driver.get(EMAIL_REFRESH_URL);
+		Logger.log("Waiting for Page Load...");
+		waitForLoad(driver);
+
+		List<WebElement> elements = driver.findElements(By.className("title-subject"));
+		String ourMailLink = null;
+		for (WebElement element : elements) {
+			String text = element.getText();
+			Logger.log(text);
+			if (text.contains("Reset your Jagex password")) {
+				Logger.log("found mess");
+				ourMailLink = element.getAttribute("href");
+			}
+		}
+		OUR_MAIL_LINK = ourMailLink;
+		return true;
+	}
+
+	private static boolean doEmailLogin(WebDriver driver, String loginEmail) throws InterruptedException {
+		driver.get(EMAIL_SET_URL);
+		Logger.log("Waiting for Page Load...");
+		waitForLoad(driver);
+
+		WebElement inputMail = null, inputDomain = null, submit = null;
+		for (int i = 0; i < 3; i++) {
+			Logger.log("Page Loaded");
+			try {
+				inputMail = driver.findElement(By.name("mail"));
+				inputDomain = driver.findElement(By.name("domain"));
+				submit = driver.findElement(By.id("postbut"));
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				Logger.log("Retrying..");
+			}
+			if (inputMail == null || inputDomain == null) {
+				TimeUnit.MILLISECONDS.sleep(700);
+				continue;
+			}
+			break;
+		}
+
+		WebElement initialMailLabel = driver.findElement(By.id("mail"));
+		String initialMail = initialMailLabel.getText();
+
+		String firstHalf = loginEmail.substring(0, loginEmail.indexOf('@'));
+		String secondHalf = loginEmail.substring(loginEmail.indexOf('@'));
+		Logger.log(secondHalf);
+		inputMail.sendKeys(firstHalf);
+		inputDomain.sendKeys(secondHalf);
+		submit.click();
+		TimeUnit.SECONDS.sleep(6);
+		return true;
 	}
 
 	public String getCaptchaResponse() {
@@ -134,7 +290,7 @@ public class AccountChangeMail {
 				case "anticaptcha":
 					AntiCaptcha antiCaptcha = new AntiCaptcha();
 					try {
-						token = antiCaptcha.solveCaptcha(RUNESCAPE_URL);
+						token = antiCaptcha.solveCaptcha(RECOVERY_URL);
 						completed = true;
 						return token;
 					} catch (MalformedURLException | InterruptedException e) {
@@ -205,7 +361,7 @@ public class AccountChangeMail {
 				case "anticaptcha":
 					AntiCaptcha antiCaptcha = new AntiCaptcha();
 					try {
-						token = antiCaptcha.solveCaptcha(RUNESCAPE_URL);
+						token = antiCaptcha.solveCaptcha(RECOVERY_URL);
 						completed = true;
 					} catch (MalformedURLException | InterruptedException e) {
 						// TODO Auto-generated catch block
@@ -373,7 +529,7 @@ public class AccountChangeMail {
 			boolean captchaFailed = false;
 			int attempts = 0;
 			while (!failed && !created && !captchaFailed) {
-				driver.get(RUNESCAPE_URL);
+				driver.get(RECOVERY_URL);
 				Logger.log("Waiting for Page Load...");
 				waitForLoad(driver);
 				TimeUnit.SECONDS.sleep(1);
