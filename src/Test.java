@@ -33,55 +33,58 @@ public class Test {
 
 	public Test() {
 
-		String sURL = "http://oxnetserver.ddns.net:3000/proxies/1/json"; // just a string
+//		String sURL = "http://60.226.19.173:3000/proxies/140/json"; // just a string
+//
+//		JSONObject obj = null;
+//		try {
+//			obj = getJSONFromUrl(sURL);
+//			System.out.println(obj);
+//		} catch (Exception e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
 
-		JSONObject obj = null;
-		try {
-			obj = getJSONFromUrl(sURL);
-			System.out.println(obj);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		PrivateProxy proxy = null;
-		try {
-			JSONObject proxySettings = obj.getJSONObject("proxySettings");
-			proxy = new PrivateProxy(
-					proxySettings.getString("username"), proxySettings.getString("password"),
-					proxySettings.getString("host"), proxySettings.getString("port"));
-		}catch (JSONException je){ je.printStackTrace(); }
+//		PrivateProxy proxy = null;
+//		try {
+//			JSONObject proxySettings = obj.getJSONObject("proxySettings");
+//			proxy = new PrivateProxy(
+//					proxySettings.getString("username"), proxySettings.getString("password"),
+//					proxySettings.getString("host"), proxySettings.getString("port"));
+//		}catch (JSONException je){ je.printStackTrace(); }
 
 		// Test Code
-		proxy.host = "50.237.102.215";
-		proxy.port = "17000";
-		proxy.username = "william0523";
-		proxy.password = "william0523";
+		PrivateProxy proxy = new PrivateProxy("", "", "", "");
+		proxy.host = "12.164.246.97";
+		proxy.port = "20000";
+		proxy.username = "craig343";
+		proxy.password = "craig343";
 
-		AccountCreatorTest2 creator = new AccountCreatorTest2();
-		creator.createAccount("Will-I-Am", "notpewdiepie@youtube.com", "Sub2Pewdiepie", proxy, "");
+//		AccountCreatorTest2 creator = new AccountCreatorTest2();
+//		creator.createAccount("Will-I-Am", "notpewdiepie@youtube.com", "Sub2Pewdiepie", proxy, "");
+		TempMailRestorer creator = new TempMailRestorer();
+		creator.recoverAccount("Will-I-Am", "notpewdiepie@youtube.com", "Sub2Pewdiepie", proxy, "");
 
-		if(creator != null)
-			return;
-		String windowsProfilePath = System.getenv("APPDATA") + "\\Mozilla\\Firefox\\Profiles";
-		String profileName = getProfileName(windowsProfilePath);
-		if (profileName == null) {
-			return;
-		}
-		String jsonPath = windowsProfilePath + "\\" + profileName
-				+ "\\browser-extension-data\\{0c3ab5c8-57ac-4ad8-9dd1-ee331517884d}\\storage.js";
-		File jsonFile = new File(jsonPath);
-		System.out.println("Writing JSON object to file");
-		System.out.println("-----------------------");
-		try {
-			FileWriter fileWriter = new FileWriter(jsonFile);
-			fileWriter.write(obj.toString());
-			fileWriter.flush();
-			fileWriter.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		if(creator != null)
+//			return;
+//		String windowsProfilePath = System.getenv("APPDATA") + "\\Mozilla\\Firefox\\Profiles";
+//		String profileName = getProfileName(windowsProfilePath);
+//		if (profileName == null) {
+//			return;
+//		}
+//		String jsonPath = windowsProfilePath + "\\" + profileName
+//				+ "\\browser-extension-data\\{0c3ab5c8-57ac-4ad8-9dd1-ee331517884d}\\storage.js";
+//		File jsonFile = new File(jsonPath);
+//		System.out.println("Writing JSON object to file");
+//		System.out.println("-----------------------");
+//		try {
+//			FileWriter fileWriter = new FileWriter(jsonFile);
+//			fileWriter.write(obj.toString());
+//			fileWriter.flush();
+//			fileWriter.close();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	public void listFiles(String path) {

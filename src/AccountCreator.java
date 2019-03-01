@@ -179,16 +179,18 @@ public class AccountCreator {
 	static FirefoxProfile copyProfileData(FirefoxProfile profile, PrivateProxy proxy){
 		try
 		{
+			System.out.println("CurDir: " + AccountLauncher.curDir());
 			Field profileFolderVal = profile.getClass().getDeclaredField("model");
 			profileFolderVal.setAccessible(true);
 			File profileFolder = (File)profileFolderVal.get(profile);
-			File extensionsDir = new File(AccountLauncher.curDir(), "extension");
+			File extensionsDir = new File(AccountLauncher.curDir(),"extension");
 			File localProfileFolder = new File(extensionsDir.toString(), "profile");
 
 			File[] files = extensionsDir.listFiles((dir1, name) -> name.endsWith(".xpi"));
 			for (File file : files)
 				profile.addExtension(file);
 
+			System.out.println("Copying profile data to: " + profileFolder);
 			try {
 				FileUtils.copyDirectory(localProfileFolder, profileFolder);
 			} catch (IOException e) {
@@ -218,7 +220,7 @@ public class AccountCreator {
 		return false;
 	}
 
-	private static void postForm(String gresponse, String username, String loginEmail, String loginPassword,
+	public static void postForm(String gresponse, String username, String loginEmail, String loginPassword,
 			PrivateProxy proxy, String address) throws Exception {
 		// ChromeOptions options = new ChromeOptions();
 		// setting headless mode to true.. so there isn't any ui
@@ -250,7 +252,7 @@ public class AccountCreator {
 			profile = new FirefoxProfile();
 			profile.setPreference("network.proxy.type", 1);
 			profile.setPreference("network.proxy.socks", proxy.host);
-			profile.setPreference("network.proxy.socks_port", proxy.port);
+			profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
 		}
 		options.setProfile(profile);
 		WebDriver driver = new FirefoxDriver(options);
@@ -303,6 +305,8 @@ public class AccountCreator {
 
 				Logger.log("Form filled");
 				JavascriptExecutor jse = (JavascriptExecutor) driver;
+
+				TimeUnit.SECONDS.sleep(2);
 
 				jse.executeScript("arguments[0].style.display = 'block';", textarea);
 				if(gresponse != null && textarea != null) {
