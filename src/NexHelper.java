@@ -46,6 +46,15 @@ public class NexHelper {
 			e.printStackTrace();
 		}
 	}
+	public Integer tryParse(Object obj) {
+		Integer retVal;
+		try {
+			retVal = Integer.parseInt((String) obj);
+		} catch (NumberFormatException nfe) {
+			retVal = 0; // or null if that is your preference
+		}
+		return retVal;
+	}
 
 	public NexHelper() throws MalformedURLException, InterruptedException {
 		//TODO IN FUTURE createUsers();
@@ -64,6 +73,15 @@ public class NexHelper {
 		}
 		Scanner sc = new Scanner(System.in);
 
+		if(System.getProperty("testfirefox", null) != null){
+			try {
+				AccountCreator.postForm(null, "", "", "", new PrivateProxy("craig343", "craig343", "12.164.246.97", "20000"), "");
+			}catch (Exception ex){ ex.printStackTrace(); }
+			return;
+		}
+
+		String dir = AccountLauncher.curDir();
+		System.out.println(dir);
 
 		String serverData = readFile("server.txt");
 		if (serverData == null){
@@ -77,20 +95,40 @@ public class NexHelper {
 		System.out.println("Server IP: " + ip);
 
 		int port = 43594;
-		System.out.println("Please choose which user you want to use:");
+		System.out.println("\r\nPlease choose which computer you want to use:");
 		for(int i = 1; i < lines.length; i++){
 			System.out.println(lines[i]);
 		}
-		int nameOption = sc.nextInt();
-		computerName = lines[nameOption].split(":")[1];
 
-		System.out.println("We are gonna connect with user:" + computerName);
+		String computerArg = System.getProperty("computer", null);
+		if(computerArg != null){//You can call -computer=1 OR -computer=William
+			for (int i = 1; i < lines.length; i++){
+				String[] parts = lines[i].split(":");
+				if(parts.length == 2 && (parts[0] == computerArg || parts[1].equalsIgnoreCase(computerArg)))
+					computerName = parts[1];
+			}
+		}
+		if(computerName == null) {
+			int nameOption = sc.nextInt();
+			computerName = lines[nameOption].split(":")[1];
+		}else{
+			System.out.println(computerName);
+		}
+
+		System.out.println("\r\nWe are gonna connect with user:" + computerName);
 		System.out.println("Please choose if you wanna use low resources:");
 		System.out.println("1:lowcpu no render");
 		System.out.println("2:normal");
 		System.out.println("3:no interface (extreme)");
-		
-		int lowResourceOption = sc.nextInt();
+
+		Integer lowResourceOption = null;
+		String resourcesStr = System.getProperty("resources", null);
+		if(resourcesStr != null)
+			lowResourceOption = tryParse(resourcesStr);
+		if (lowResourceOption == null || lowResourceOption < 1 || lowResourceOption > 3)
+			lowResourceOption = sc.nextInt();
+		else
+			System.out.println(lowResourceOption);
 		switch (lowResourceOption) {
 		case 1:
 			AccountLauncher.allowOptions = " -allow norender,lowcpu,norandoms ";
@@ -107,8 +145,16 @@ public class NexHelper {
 			break;
 		}
 		
-		System.out.println("Please choose your launch interval:");
-		int interval = sc.nextInt();
+		System.out.println("\r\nPlease choose your launch interval:");
+		Integer interval = null;
+		String intervalStr = System.getProperty("interval", null);
+		if (intervalStr != null)
+			interval = tryParse(intervalStr);
+		if (interval == null || interval < 0 || interval > 10000000)
+			interval = sc.nextInt();
+		else
+			System.out.println(interval + "\r\n");
+
 		try {
 			Socket socket = new Socket(ip, port);
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
