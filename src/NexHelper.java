@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
 
+import org.medusa.Utils.Logger;
+
 
 
 public class NexHelper {
-	Stack<String> messageQueue;
+	public static Stack<String> messageQueue;
 	long lastLog = 0;
 	private String respond = "none";
 	private String computerName;
@@ -49,7 +51,7 @@ public class NexHelper {
 
 	public NexHelper() throws MalformedURLException, InterruptedException {
 		//TODO IN FUTURE createUsers();
-		System.out.println("started NexHelper 7.0 with multi-thread support, fixed acc");
+		System.out.println("started NexHelper 8.0 with multi-thread support, fixed acc");
 		messageQueue = new Stack<String>();
 		URL whatismyip;
 		try {
@@ -68,7 +70,7 @@ public class NexHelper {
 		String serverData = readFile("server.txt");
 		if (serverData == null){
 			System.out.println("server.txt was missing. Lets create it");
-			serverData = "oxnetserver.ddns.net\r\n1:William\r\n2:Brandon\r\n3:Suicide\r\n4:VPS\r\n5:MINIMAC\r\n6:ACCOUNT\r\n7:BATCH1\r\n8:BATCH2\r\n9:BATCH3\r\n10:BATCH4";
+			serverData = "oxnetserver.ddns.net\r\n1:William\r\n2:Brandon\r\n3:Suicide\r\n4:VPS\r\n5:MINIMAC\r\n6:ACCOUNT\r\n7:BATCH1\r\n8:BATCH2\r\n9:BATCH3\r\n10:BATCH4r\\n10:BATCH5";
 			writeFile("server.txt", serverData);
 		}
 
@@ -117,15 +119,23 @@ public class NexHelper {
 			initializeContactToSocket(out, in);
 
 			String nextRequest;
-
+			//AccountCreator.createIPCooldownMessage("50.237.102.215", 300);
 			while (true) {
 				if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + interval) {
 					lastStart = System.currentTimeMillis();
 					nextRequest = messageQueue.pop();
 					String[] parsed = nextRequest.split(":");
+					Logger.log(nextRequest);
+					Logger.log(parsed[0]);
 					switch (parsed[0]) {
+					case "ip_cooldown":
+						sendIPCooldown(parsed, out, in);
+						Logger.log("SENT IP COOLDOWN MESS");
+						break;
 					case "create_account":
-						createAccount(parsed, nextRequest);
+						
+							createAccount(parsed, nextRequest);
+					
 						break;
 					case "account_request":
 						/*
@@ -212,6 +222,16 @@ public class NexHelper {
 		} else {
 			System.out.println("No Account available atm. Try again in 5 minutes");
 		}
+	}
+	
+	private void sendIPCooldown(String[] ipInfo, PrintWriter out, BufferedReader in) throws IOException {
+		
+		String ip = ipInfo[1];
+		Logger.log(ip);
+		String cooldown = ipInfo[2];
+		out.println("ip_cooldown:" + ip + ":" + cooldown);
+		String res = in.readLine();
+		System.out.println("Successfully gave information about bad ip");
 	}
 	private void createAccount(String[] respond, String res) throws MalformedURLException, InterruptedException {
 		String username = respond[1];

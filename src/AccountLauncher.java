@@ -91,14 +91,12 @@ public final class AccountLauncher {
 
 	}
 
-	public static String curDir(){
-		try {
-			return new File(NexHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
-		}catch (URISyntaxException e){
-			e.printStackTrace();
-		}
-		return "";
-	}
+	public static String curDir() {
+
+        return new File(ClassLoader.getSystemClassLoader().getResource(".").getPath()).getAbsolutePath().replace("%20",
+                " ");
+
+    }
 
 	public static void setOutputStream(Process process) {
 
