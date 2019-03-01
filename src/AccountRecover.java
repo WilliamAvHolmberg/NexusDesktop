@@ -116,12 +116,14 @@ public class AccountRecover {
 			}
 
 			// check if recovery was successful
-			if (driver.findElements(By.id("p-account-recovery-pre-confirmation")).size() != 0) {
-				Logger.log("Successfully sent recovery");
+			if (driver.findElements(By.id("p-account-recovery-tracking-result")).size() != 0) {
+				Logger.log("Successfully set password");
 				Logger.log("lets check mail");
-				doEmailLogin(driver, "sojusopa@yourweb.email");
+				//send message - account is unlocked
 			} else {
 				Logger.log("something went wrong");
+				//send message - account is not unlocked
+				
 			}
 		} catch (Exception e) {
 			Logger.log("we failed");
