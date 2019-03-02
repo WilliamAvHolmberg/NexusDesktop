@@ -91,6 +91,7 @@ public final class AccountLauncher {
 
 	}
 
+<<<<<<< HEAD
 	public static String curDir(){
 		try {
 			return new File(NexHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath();
@@ -99,6 +100,15 @@ public final class AccountLauncher {
 		}
 		return "";
 	}
+=======
+	public static String curDir() {
+
+        return new File(ClassLoader.getSystemClassLoader().getResource(".").getPath()).getAbsolutePath().replace("%20",
+                " ");
+
+    }
+
+>>>>>>> upstream/master
 
 	public static void setOutputStream(Process process) {
 
