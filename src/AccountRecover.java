@@ -116,6 +116,7 @@ public class AccountRecover {
 		driver = null;
 	}
 
+	private int fails = 0;
 	public boolean setNewPassword(WebDriver driver, String ourPassword) {
 		try {
 			driver.get(SET_PASSWORD_URL);
@@ -123,6 +124,10 @@ public class AccountRecover {
 			waitForLoad(driver);
 			if (driver.findElements(By.id("p-account-recovery-reset-password")).size() == 0) {
 				Logger.log("Did not load page. lets try again");
+				if(fails > 3) {
+					return false;
+				}
+				fails++;
 				setNewPassword(driver, ourPassword);
 			}
 			WebElement password = driver.findElement(By.name("password"));
@@ -294,7 +299,7 @@ public class AccountRecover {
 		String initialMail = initialMailLabel.getText();
 
 		String firstHalf = loginEmail.substring(0, loginEmail.indexOf('@'));
-		String secondHalf = loginEmail.substring(loginEmail.indexOf('@'));
+		String secondHalf = loginEmail.substring(loginEmail.indexOf('@')).substring(0, 2);
 		inputMail.sendKeys(firstHalf);
 		Logger.log(secondHalf);
 		TimeUnit.SECONDS.sleep(6);
