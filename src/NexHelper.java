@@ -88,13 +88,17 @@ public class NexHelper {
 		String serverData = readFile("server.txt");
 		if (serverData == null){
 			System.out.println("server.txt was missing. Lets create it");
-			serverData = "oxnetserver.ddns.net\r\n1:William\r\n2:Brandon\r\n3:Suicide\r\n4:VPS\r\n5:MINIMAC\r\n6:ACCOUNT\r\n7:BATCH1\r\n8:BATCH2\r\n9:BATCH3\r\n10:BATCH4r\\n10:BATCH5";
+			serverData = "0:oxnetserver.ddns.net\r\n1:oxnetdebug.ddns.net\r\n1:Brandon\r\n2:Suicide\r\n3:VPS\r\n4:MINIMAC\r\n5:ACCOUNT\r\n6:BATCH1\r\n7:BATCH2\r\n8:BATCH3\r\n9:BATCH4\r\n11:BATCH5\r\n12:William";
 			writeFile("server.txt", serverData);
 		}
 
 		String[] lines = serverData.split("\\s*\\r?\\n\\s*");
-		String ip = lines[0];
-		System.out.println("Server IP: " + ip);
+		System.out.println("\r\nPlease choose which ip you want to use:");
+		for(int i = 1; i < lines.length; i++){
+			System.out.println(lines[i]);
+		}
+			int nameOption = sc.nextInt();
+			String ip = lines[nameOption].split(":")[1];
 
 		int port = 43594;
 		System.out.println("\r\nPlease choose which computer you want to use:");
@@ -111,7 +115,7 @@ public class NexHelper {
 			}
 		}
 		if(computerName == null) {
-			int nameOption = sc.nextInt();
+			nameOption = sc.nextInt();
 			computerName = lines[nameOption].split(":")[1];
 		}else{
 			System.out.println(computerName);
@@ -174,6 +178,10 @@ public class NexHelper {
 					Logger.log(nextRequest);
 					Logger.log(parsed[0]);
 					switch (parsed[0]) {
+					case "unlocked_account":
+						sendUnlockedAcc(parsed, out, in);
+						Logger.log("SENT ACC UNLOCKED MESS");
+						break;
 					case "ip_cooldown":
 						sendIPCooldown(parsed, out, in);
 						Logger.log("SENT IP COOLDOWN MESS");
@@ -222,7 +230,7 @@ public class NexHelper {
 			// standard message is 'logged:fine'
 			// if respond is anything else than logged:fine we can assume it is a new
 			// instruction
-			if (!respond.equals("logged:fine")) {
+			if (respond != null && !respond.equals("logged:fine")) {
 				System.out.println("we got a new instructionToQueue:" + respond);
 				messageQueue.push(respond);
 			}
@@ -268,6 +276,16 @@ public class NexHelper {
 		} else {
 			System.out.println("No Account available atm. Try again in 5 minutes");
 		}
+	}
+	
+	private void sendUnlockedAcc(String[] accInfo, PrintWriter out, BufferedReader in) throws IOException {
+		
+		String email = accInfo[1];
+		Logger.log(email);
+		String newPassword = accInfo[2];
+		out.println("unlocked_acc:" + email + ":" + newPassword);
+		String res = in.readLine();
+		System.out.println("Successfully gave information about updated acc");
 	}
 	
 	private void sendIPCooldown(String[] ipInfo, PrintWriter out, BufferedReader in) throws IOException {
