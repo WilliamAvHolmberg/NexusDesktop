@@ -179,9 +179,10 @@ public class NexHelper {
 						Logger.log("SENT IP COOLDOWN MESS");
 						break;
 					case "create_account":
-						
-							createAccount(parsed, nextRequest);
-					
+						createAccount(parsed, nextRequest);
+						break;
+					case "unlock_account":
+						unlock(parsed, nextRequest);
 						break;
 					case "account_request":
 						/*
