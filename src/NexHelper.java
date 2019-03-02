@@ -16,6 +16,7 @@ import org.medusa.Utils.Logger;
 
 public class NexHelper {
 	public static Stack<String> messageQueue;
+	public static boolean UNLOCK_IS_READY = true;
 	long lastLog = 0;
 	private String respond = "none";
 	private String computerName;
@@ -182,14 +183,19 @@ public class NexHelper {
 						sendUnlockedAcc(parsed, out, in);
 						Logger.log("SENT ACC UNLOCKED MESS");
 						break;
+					case "unlock_cooldown":
+						sendUnlockCooldown(parsed, out, in);
+						Logger.log("SENT UNLOCK COOLDOWN MESS");
+						
+						break;
 					case "ip_cooldown":
 						sendIPCooldown(parsed, out, in);
 						Logger.log("SENT IP COOLDOWN MESS");
 						break;
 					case "unlock_account":
 						unlockAccount(parsed, nextRequest);
-				
-					break;	
+						
+						break;	
 					case "create_account":
 						
 							createAccount(parsed, nextRequest);
@@ -214,10 +220,9 @@ public class NexHelper {
 						log(out, in);
 						break;
 					}
-				} else {
+				}
 					log(out, in);
 					Thread.sleep(1000);
-				}
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -287,7 +292,7 @@ public class NexHelper {
 		String email = accInfo[1];
 		Logger.log(email);
 		String newPassword = accInfo[2];
-		out.println("unlocked_acc:" + email + ":" + newPassword);
+		out.println("unlocked_account:" + email + ":" + newPassword);
 		String res = in.readLine();
 		System.out.println("Successfully gave information about updated acc");
 	}
@@ -298,6 +303,15 @@ public class NexHelper {
 		Logger.log(ip);
 		String cooldown = ipInfo[2];
 		out.println("ip_cooldown:" + ip + ":" + cooldown);
+		String res = in.readLine();
+		System.out.println("Successfully gave information about bad ip");
+	}
+	private void sendUnlockCooldown(String[] ipInfo, PrintWriter out, BufferedReader in) throws IOException {
+		
+		String ip = ipInfo[1];
+		Logger.log(ip);
+		String cooldown = ipInfo[2];
+		out.println("unlock_cooldown:" + ip + ":" + cooldown);
 		String res = in.readLine();
 		System.out.println("Successfully gave information about bad ip");
 	}
@@ -325,7 +339,9 @@ public class NexHelper {
 		String proxyPassword = respond[7];
 		String address = res.substring(res.indexOf("http"), res.length());
 		PrivateProxy proxy = new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort);
-		AccountRecover recover = new AccountRecover(proxy, login, password);
+		RecoverThread accThread = new RecoverThread(username, login, password, new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort), address);
+		Thread thread = new Thread(accThread);
+		thread.start();
 		System.out.println("Started new create acc thread");
 	}
 	private void startAccount(String address) {
