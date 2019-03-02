@@ -147,7 +147,7 @@ public class AccountRecover {
 	}
 
 	public void logIntoRunescape(String gResponse, PrivateProxy proxy, String username, String password) {
-		// setFirefoxDriver();
+		 setFirefoxDriver();
 		// hardcoded
 
 		FirefoxProfile profile;

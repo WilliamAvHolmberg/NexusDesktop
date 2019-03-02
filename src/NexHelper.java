@@ -186,6 +186,10 @@ public class NexHelper {
 						sendIPCooldown(parsed, out, in);
 						Logger.log("SENT IP COOLDOWN MESS");
 						break;
+					case "unlock_account":
+						unlockAccount(parsed, nextRequest);
+				
+					break;	
 					case "create_account":
 						
 							createAccount(parsed, nextRequest);
@@ -309,6 +313,19 @@ public class NexHelper {
 		AccThread accThread = new AccThread(username, login, password, new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort), address);
 		Thread thread = new Thread(accThread);
 		thread.start();
+		System.out.println("Started new create acc thread");
+	}
+	private void unlockAccount(String[] respond, String res) throws MalformedURLException, InterruptedException {
+		String username = respond[1];
+		String login = respond[2];
+		String password = respond[3];
+		String proxyIP = respond[4];
+		String proxyPort = respond[5];
+		String proxyUsername = respond[6];
+		String proxyPassword = respond[7];
+		String address = res.substring(res.indexOf("http"), res.length());
+		PrivateProxy proxy = new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort);
+		AccountRecover recover = new AccountRecover(proxy, login, password);
 		System.out.println("Started new create acc thread");
 	}
 	private void startAccount(String address) {
