@@ -219,7 +219,7 @@ public class AccountCreator {
 
 	static boolean isNullOrEmpty(String str){
 		if(str == null) return  true;
-		if(str.length() < 3) return true;
+		if(str.trim().isEmpty()) return true;
 		return false;
 	}
 
@@ -245,7 +245,8 @@ public class AccountCreator {
 		
 		FirefoxProfile profile;
 		FirefoxOptions options;
-		if (proxy.username != null && proxy.username.length() > 3) {
+		if (proxy.host != null && proxy.host.length() > 3 &&
+			proxy.username != null && proxy.username.length() > 3) {
 			ProfilesIni ini = new ProfilesIni();
 			profile = ini.getProfile("default");
 			options = new FirefoxOptions();
@@ -338,6 +339,7 @@ public class AccountCreator {
 				TimeUnit.SECONDS.sleep(6);
 				jse.executeScript("onSubmit()");
 				//submit.sendKeys(Keys.ENTER);
+				submit.click();
 				TimeUnit.SECONDS.sleep(6);	//added this for leaving the captcha too fast
 				waitForLoad(driver);
 				TimeUnit.SECONDS.sleep(20);	//added this for leaving the captcha too fast

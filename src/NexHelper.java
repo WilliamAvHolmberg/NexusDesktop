@@ -188,13 +188,9 @@ public class NexHelper {
 						break;
 					case "unlock_account":
 						unlockAccount(parsed, nextRequest);
-				
 					break;	
 					case "create_account":
 						createAccount(parsed, nextRequest);
-						break;
-					case "unlock_account":
-						unlock(parsed, nextRequest);
 						break;
 					case "account_request":
 						/*
@@ -325,9 +321,10 @@ public class NexHelper {
 		String proxyUsername = respond[6];
 		String proxyPassword = respond[7];
 		String address = res.substring(res.indexOf("http"), res.length());
-		PrivateProxy proxy = new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort);
-		AccountRecover recover = new AccountRecover(proxy, login, password);
-		System.out.println("Started new create acc thread");
+		AccThread accThread = new AccThread(username, login, password, new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort), address);
+		Thread thread = new Thread(accThread);
+		thread.start();
+		System.out.println("Started new create recover thread");
 	}
 	private void startAccount(String address) {
 		

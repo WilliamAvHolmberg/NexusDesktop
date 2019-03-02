@@ -12,6 +12,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +46,7 @@ public class AccountRecover {
 	private static String CAPTCHA_SOLVER = "anticaptcha";
 	// private static String token = null;
 	private static int cooldown = 90;
-	public static String newPassword = "ugot00wned3"; //hardcoded :)
+	public static String newPassword = "ugot00wned4"; //hardcoded :)
 
 
 
@@ -104,13 +107,11 @@ public class AccountRecover {
 				TimeUnit.SECONDS.sleep(6);
 				Logger.log("Form filled");
 				submitButton.click();
-				TimeUnit.SECONDS.sleep(6); // added this for leaving the captcha too fast
-				waitForLoad(driver);
-				TimeUnit.SECONDS.sleep(20); // added this for leaving the captcha too fast
 			} else {
 				Logger.log("Page failed to load..");
 			}
 
+			sleepUntilFindElement(driver, By.id("p-account-recovery-tracking-result"), 30);
 			// check if recovery was successful
 			if (driver.findElements(By.id("p-account-recovery-tracking-result")).size() != 0) {
 				Logger.log("Successfully set password");
@@ -119,12 +120,28 @@ public class AccountRecover {
 			} else {
 				Logger.log("something went wrong");
 				//send message - account is not unlocked
-				
 			}
 		} catch (Exception e) {
 			Logger.log("we failed");
 		}
 		return true;
+	}
+
+	static List<WebElement> sleepUntilFindElement(WebDriver driver, By by, long timeoutSecs) throws InterruptedException {
+		long timeout = System.currentTimeMillis() + (timeoutSecs * 1000);
+		while (driver.findElements(by).size() == 0 && System.currentTimeMillis() < timeout) {
+			waitForLoad(driver);
+			TimeUnit.SECONDS.sleep(1);
+		}
+		return driver.findElements(by);
+	}
+	static boolean sleepWhileFindElement(WebDriver driver, By by, long timeoutSecs) throws InterruptedException {
+		long timeout = System.currentTimeMillis() + (timeoutSecs * 1000);
+		while (driver.findElements(by).size() > 0 && System.currentTimeMillis() < timeout) {
+			waitForLoad(driver);
+			TimeUnit.SECONDS.sleep(1);
+		}
+		return driver.findElements(by).size() == 0;
 	}
 
 	public static boolean getPasswordLink(WebDriver driver) {
@@ -138,7 +155,7 @@ public class AccountRecover {
 			String text = element.getText();
 			Logger.log(text);
 			if (text.contains("RESET PASSWORD")) {
-				Logger.log("found mess");
+				Logger.log("found RESET PASSWORD");
 				setPasswordUrl = element.getAttribute("href");
 			}
 		}
@@ -202,12 +219,11 @@ public class AccountRecover {
 				TimeUnit.SECONDS.sleep(6);
 				jse.executeScript("onSubmit()");
 				// submit.sendKeys(Keys.ENTER);
-				TimeUnit.SECONDS.sleep(6); // added this for leaving the captcha too fast
-				waitForLoad(driver);
-				TimeUnit.SECONDS.sleep(20); // added this for leaving the captcha too fast
 			} else {
 				Logger.log("Page failed to load..");
 			}
+
+			sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 30);
 
 			// check if recovery was successful
 			if (driver.findElements(By.id("p-account-recovery-pre-confirmation")).size() != 0) {
