@@ -30,6 +30,7 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.ProfilesIni;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class AccountRecover {
@@ -106,7 +107,7 @@ public class AccountRecover {
 		if (!failed && doEmailLogin(driver, username)) {
 			doEmailCheck(driver);
 		}
-		if (!failed &&OUR_MAIL_LINK != null) {
+		if (!failed && OUR_MAIL_LINK != null) {
 			Logger.log(OUR_MAIL_LINK);
 			getPasswordLink(driver);
 		}
@@ -177,22 +178,27 @@ public class AccountRecover {
 		return driver.findElements(by).size() == 0;
 	}
 
-	public boolean getPasswordLink(WebDriver driver) {
+	public boolean getPasswordLink(WebDriver driver) throws InterruptedException {
 		driver.get(OUR_MAIL_LINK);
 		Logger.log("Waiting for Page Load...");
 		waitForLoad(driver);
 
-		List<WebElement> elements = driver.findElements(By.tagName("a"));
 		String setPasswordUrl = null;
-		for (WebElement element : elements) {
-			String text = element.getText();
-			Logger.log(text);
-			if (text.contains("RESET PASSWORD")) {
-				Logger.log("found mess");
-				if(element.getAttribute("href") != null) {
-				setPasswordUrl = element.getAttribute("href");
+		for(int i= 0; i < 10; i++) {
+			List<WebElement> elements = driver.findElements(By.tagName("a"));
+			for (WebElement element : elements) {
+				String text = element.getText();
+				Logger.log(text);
+				if (text.contains("RESET PASSWORD")) {
+					Logger.log("found mess");
+					if (element.getAttribute("href") != null) {
+						setPasswordUrl = element.getAttribute("href");
+					}
 				}
 			}
+			if(setPasswordUrl != null)
+				break;
+			TimeUnit.SECONDS.sleep(3);
 		}
 		SET_PASSWORD_URL = setPasswordUrl;
 		return true;
@@ -240,7 +246,15 @@ public class AccountRecover {
 				Logger.log("Page failed to load..");
 			}
 
-			sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 30);
+			sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 50);
+
+			WebElement tryAgainLink = driver.findElement(By.cssSelector("a[data-test='try-again-link']"));
+			if(tryAgainLink != null){
+				tryAgainLink.click();
+				TimeUnit.SECONDS.sleep(1);
+				waitForLoad(driver);
+				sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 50);
+			}
 
 			// check if recovery was successful
 			if (driver.findElements(By.id("p-account-recovery-pre-confirmation")).size() != 0) {
@@ -268,6 +282,7 @@ public class AccountRecover {
 		driver.get(EMAIL_REFRESH_URL);
 		Logger.log("Waiting for Page Load...");
 		waitForLoad(driver);
+		sleepUntilFindElement(driver, By.id("mails"), 40);
 
 		List<WebElement> elements = driver.findElements(By.className("title-subject"));
 		String ourMailLink = null;
@@ -314,10 +329,13 @@ public class AccountRecover {
 		inputMail.sendKeys(firstHalf);
 		Logger.log(secondHalf);
 		TimeUnit.SECONDS.sleep(6);
-		inputDomain.sendKeys(secondHalf);
+		Select dropdown = new Select(inputDomain);
+		dropdown.selectByVisibleText(secondHalf);
 		TimeUnit.SECONDS.sleep(6);
 		submit.click();
 		TimeUnit.SECONDS.sleep(6);
+		sleepUntilFindElement(driver, By.className("alert-success"), 30);
+
 		return true;
 	}
 
