@@ -45,11 +45,6 @@ public class AccountRecover {
 	private final String USER_AGENT = "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0";
 	private String CAPTCHA_SOLVER = "anticaptcha";
 	// private static String token = null;
-<<<<<<< HEAD
-	private static int cooldown = 90;
-	public static String newPassword = "ugot00wned4"; //hardcoded :)
-
-=======
 	private int cooldown = 90;
 	private String newPassword = "ugot00wned4" ; //hardcoded :)
 	private PrivateProxy proxy;
@@ -57,7 +52,7 @@ public class AccountRecover {
 	private String username;
 	private boolean failed = false;
 	/*
-	
+
 	public static void main(String[]args) {
 		PrivateProxy proxy = new PrivateProxy("","", "92.32.69.103", "8888");
 		String username = "BlueArmaBr@weave.email";
@@ -77,7 +72,6 @@ public class AccountRecover {
 		this.newPassword = password + "1";
 		recoverAccount(proxy, username, password, address);
 	}
->>>>>>> upstream/master
 
 
 	public void recoverAccount(PrivateProxy proxy, String username, String password, String address) throws InterruptedException {
@@ -108,7 +102,7 @@ public class AccountRecover {
 		 	Logger.log("Response == null");
 		 	return;
 		}
-		
+
 		if (!failed && doEmailLogin(driver, username)) {
 			doEmailCheck(driver);
 		}
@@ -155,7 +149,7 @@ public class AccountRecover {
 				Logger.log("lets check mail");
 				//send message - account is unlocked
 				createAccountUnlocked(username, newPassword);
-				
+
 			} else {
 				Logger.log("something went wrong");
 				//send message - account is not unlocked
@@ -166,7 +160,6 @@ public class AccountRecover {
 		return true;
 	}
 
-<<<<<<< HEAD
 	static List<WebElement> sleepUntilFindElement(WebDriver driver, By by, long timeoutSecs) throws InterruptedException {
 		long timeout = System.currentTimeMillis() + (timeoutSecs * 1000);
 		while (driver.findElements(by).size() == 0 && System.currentTimeMillis() < timeout) {
@@ -184,10 +177,7 @@ public class AccountRecover {
 		return driver.findElements(by).size() == 0;
 	}
 
-	public static boolean getPasswordLink(WebDriver driver) {
-=======
 	public boolean getPasswordLink(WebDriver driver) {
->>>>>>> upstream/master
 		driver.get(OUR_MAIL_LINK);
 		Logger.log("Waiting for Page Load...");
 		waitForLoad(driver);
@@ -198,12 +188,8 @@ public class AccountRecover {
 			String text = element.getText();
 			Logger.log(text);
 			if (text.contains("RESET PASSWORD")) {
-<<<<<<< HEAD
-				Logger.log("found RESET PASSWORD");
-=======
 				Logger.log("found mess");
 				if(element.getAttribute("href") != null) {
->>>>>>> upstream/master
 				setPasswordUrl = element.getAttribute("href");
 				}
 			}
@@ -213,7 +199,7 @@ public class AccountRecover {
 	}
 
 	public void logIntoRunescape(WebDriver driver, String gResponse, PrivateProxy proxy, String username, String password) {
-		
+
 		failed = true;
 		try {
 			driver.manage().window().maximize();
@@ -273,7 +259,7 @@ public class AccountRecover {
 			Logger.log("something went wrong");
 			createUnlockCooldownMessage(proxy.host, 1000);
 		}
-		
+
 		NexHelper.UNLOCK_IS_READY = true;
 
 	}
@@ -485,7 +471,7 @@ public class AccountRecover {
 		return false;
 	}
 
-	
+
 
 	private static boolean ipIsRight(WebDriver driver, String host) {
 		driver.get("http://ipv4.plain-text-ip.com/");
@@ -519,7 +505,7 @@ public class AccountRecover {
 		Logger.log("CREATED UNLOCKED MESSAGE");
 		NexHelper.messageQueue.push("unlocked_account:" + email + ":" + newPassword);
 	}
-	
+
 	public static void createUnlockCooldownMessage(String host, int time) {
 		Logger.log("CREATED unlock COOLDOWNMESS");
 		NexHelper.messageQueue.push("unlock_cooldown:" + host + ":" + time);

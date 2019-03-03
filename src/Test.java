@@ -61,8 +61,8 @@ public class Test {
 
 //		AccountCreatorTest2 creator = new AccountCreatorTest2();
 //		creator.createAccount("Will-I-Am", "notpewdiepie@youtube.com", "Sub2Pewdiepie", proxy, "");
-		TempMailRestorer creator = new TempMailRestorer();
-		creator.recoverAccount("Will-I-Am", "notpewdiepie@youtube.com", "Sub2Pewdiepie", proxy, "");
+		//AccountRecover recover = new AccountRecover();
+		//recover.("Will-I-Am", "notpewdiepie@youtube.com", "Sub2Pewdiepie", proxy, "");
 
 //		if(creator != null)
 //			return;

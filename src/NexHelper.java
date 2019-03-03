@@ -151,7 +151,7 @@ public class NexHelper {
 			System.exit(1);
 			break;
 		}
-		
+
 		System.out.println("\r\nPlease choose your launch interval:");
 		Integer interval = null;
 		String intervalStr = System.getProperty("interval", null);
@@ -186,7 +186,7 @@ public class NexHelper {
 					case "unlock_cooldown":
 						sendUnlockCooldown(parsed, out, in);
 						Logger.log("SENT UNLOCK COOLDOWN MESS");
-						
+
 						break;
 					case "ip_cooldown":
 						sendIPCooldown(parsed, out, in);
@@ -194,12 +194,7 @@ public class NexHelper {
 						break;
 					case "unlock_account":
 						unlockAccount(parsed, nextRequest);
-<<<<<<< HEAD
-					break;	
-=======
-						
-						break;	
->>>>>>> upstream/master
+					break;
 					case "create_account":
 						createAccount(parsed, nextRequest);
 						break;
@@ -216,7 +211,7 @@ public class NexHelper {
 							String address = nextRequest.substring(nextRequest.indexOf("http"), nextRequest.length());
 							startAccount(address);
 							break;
-							
+
 						}
 					default:
 						log(out, in);
@@ -288,9 +283,9 @@ public class NexHelper {
 			System.out.println("No Account available atm. Try again in 5 minutes");
 		}
 	}
-	
+
 	private void sendUnlockedAcc(String[] accInfo, PrintWriter out, BufferedReader in) throws IOException {
-		
+
 		String email = accInfo[1];
 		Logger.log(email);
 		String newPassword = accInfo[2];
@@ -298,9 +293,9 @@ public class NexHelper {
 		String res = in.readLine();
 		System.out.println("Successfully gave information about updated acc");
 	}
-	
+
 	private void sendIPCooldown(String[] ipInfo, PrintWriter out, BufferedReader in) throws IOException {
-		
+
 		String ip = ipInfo[1];
 		Logger.log(ip);
 		String cooldown = ipInfo[2];
@@ -309,7 +304,7 @@ public class NexHelper {
 		System.out.println("Successfully gave information about bad ip");
 	}
 	private void sendUnlockCooldown(String[] ipInfo, PrintWriter out, BufferedReader in) throws IOException {
-		
+
 		String ip = ipInfo[1];
 		Logger.log(ip);
 		String cooldown = ipInfo[2];
@@ -340,21 +335,14 @@ public class NexHelper {
 		String proxyUsername = respond[6];
 		String proxyPassword = respond[7];
 		String address = res.substring(res.indexOf("http"), res.length());
-<<<<<<< HEAD
-		AccThread accThread = new AccThread(username, login, password, new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort), address);
-		Thread thread = new Thread(accThread);
-		thread.start();
-		System.out.println("Started new create recover thread");
-=======
 		PrivateProxy proxy = new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort);
 		RecoverThread accThread = new RecoverThread(username, login, password, new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort), address);
 		Thread thread = new Thread(accThread);
 		thread.start();
-		System.out.println("Started new create acc thread");
->>>>>>> upstream/master
+		System.out.println("Started new recover thread");
 	}
 	private void startAccount(String address) {
-		
+
 		AccountLauncher.launchClient(address);
 
 	}

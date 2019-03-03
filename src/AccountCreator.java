@@ -259,9 +259,10 @@ public class AccountCreator {
 			profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
 		}
 		options.setProfile(profile);
-		WebDriver driver = new FirefoxDriver(options);
+		WebDriver driver = null;
 		boolean failed = false;
 		try {
+		 	driver = new FirefoxDriver(options);
 			driver.manage().window().maximize();
 
 			if(!ipIsRight(driver, proxy.host)) { //check if the proxy is actually set
@@ -339,7 +340,7 @@ public class AccountCreator {
 				TimeUnit.SECONDS.sleep(6);
 				jse.executeScript("onSubmit()");
 				//submit.sendKeys(Keys.ENTER);
-				submit.click();
+				//submit.click();
 				TimeUnit.SECONDS.sleep(6);	//added this for leaving the captcha too fast
 				waitForLoad(driver);
 				TimeUnit.SECONDS.sleep(20);	//added this for leaving the captcha too fast
@@ -390,9 +391,8 @@ public class AccountCreator {
 				if (driver != null)
 					driver.quit();
 			} catch (Exception e){ }
+			driver = null;
 		}
-		
-		
 		
 	}
 
