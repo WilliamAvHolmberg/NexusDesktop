@@ -289,7 +289,7 @@ public class NexHelper {
 		String email = accInfo[1];
 		Logger.log(email);
 		String newPassword = accInfo[2];
-		out.println("unlocked_account:" + email + ":" + newPassword);
+		out.println("unlocked_account:" + email + ":" + newPassword + ":");
 		String res = in.readLine();
 		System.out.println("Successfully gave information about updated acc");
 	}

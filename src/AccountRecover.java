@@ -121,13 +121,17 @@ public class AccountRecover {
 	}
 
 	public boolean setNewPassword(WebDriver driver, String ourPassword) {
+		return setNewPassword(driver, ourPassword, 0);
+	}
+	public boolean setNewPassword(WebDriver driver, String ourPassword, int retries) {
 		try {
 			driver.get(SET_PASSWORD_URL);
 			Logger.log("Waiting for Page Load...");
 			waitForLoad(driver);
 			if (driver.findElements(By.id("p-account-recovery-reset-password")).size() == 0) {
+				if(retries > 2) return false;
 				Logger.log("Did not load page. lets try again");
-				setNewPassword(driver, ourPassword);
+				return setNewPassword(driver, ourPassword, retries + 1);
 			}
 			WebElement password = driver.findElement(By.name("password"));
 			WebElement confirmPassword = driver.findElement(By.name("confirm"));
@@ -246,7 +250,7 @@ public class AccountRecover {
 				Logger.log("Page failed to load..");
 			}
 
-			sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 50);
+			sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 30);
 
 			WebElement tryAgainLink = driver.findElement(By.cssSelector("a[data-test='try-again-link']"));
 			if(tryAgainLink != null){

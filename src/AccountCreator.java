@@ -256,7 +256,8 @@ public class AccountCreator {
 			profile = new FirefoxProfile();
 			profile.setPreference("network.proxy.type", 1);
 			profile.setPreference("network.proxy.socks", proxy.host);
-			profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
+			if(proxy.port.length() > 1)
+				profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
 		}
 		options.setProfile(profile);
 		WebDriver driver = null;
