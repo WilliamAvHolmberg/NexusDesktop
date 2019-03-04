@@ -2,8 +2,7 @@
 import java.io.*;
 import java.lang.ProcessBuilder.Redirect;
 import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.Locale;
+import java.util.*;
 
 public final class AccountLauncher {
 
@@ -30,11 +29,9 @@ public final class AccountLauncher {
 		return detectedOS;
 	}
 
-	static HashSet<Process> runningprocesses = new HashSet<>();
+	static HashMap<Process, Long> runningprocesses = new HashMap<>();
 	public static void launchClient(String address) {
-		runningprocesses.removeIf(process -> process == null || !process.isAlive());
-//		if(runningprocesses.size() >= 6)
-//			return;
+		cleanupExistingClients();
 
 		System.out.println(address);
 		if(!address.equals(lastName) || System.currentTimeMillis() > (lastStartup + 1000 * 120)) {
@@ -90,6 +87,17 @@ public final class AccountLauncher {
 		}
 
 	}
+	static void cleanupExistingClients(){
+		runningprocesses.entrySet().removeIf(entry ->
+						entry.getKey() == null ||
+						!entry.getKey().isAlive());
+//		for (Map.Entry<Process, Long> entry : runningprocesses.entrySet()) {
+//			if (System.currentTimeMillis() - entry.getValue() > (10 * 60 * 1000)){//10 minutes
+//				System.out.println("Killing process due to innactivity");
+//				entry.getKey().destroy();
+//			}
+//		}
+	}
 
 	public static String curDir(){
 		try {
@@ -102,7 +110,7 @@ public final class AccountLauncher {
 
 	public static void setOutputStream(Process process) {
 
-		runningprocesses.add(process);
+		runningprocesses.put(process, System.currentTimeMillis());
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -110,6 +118,7 @@ public final class AccountLauncher {
 				int c;
 				try {
 					while ((c = is.read()) >= 0) {
+						runningprocesses.put(process, System.currentTimeMillis());
 						//System.out.println(c);
 					}
 				} catch (IOException e) {
