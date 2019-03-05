@@ -143,7 +143,7 @@ public class AccountRecover {
 				Logger.log("Page failed to load..");
 			}
 
-			sleepUntilFindElement(driver, By.id("p-account-recovery-tracking-result"), 30);
+			sleepUntilFindElement(driver, By.id("p-account-recovery-tracking-result"), 200);
 			// check if recovery was successful
 			if (driver.findElements(By.id("p-account-recovery-tracking-result")).size() != 0) {
 				Logger.log("Successfully set password");
@@ -246,14 +246,14 @@ public class AccountRecover {
 				Logger.log("Page failed to load..");
 			}
 
-			sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 50);
+			sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 200);
 
 			WebElement tryAgainLink = driver.findElement(By.cssSelector("a[data-test='try-again-link']"));
 			if(tryAgainLink != null){
 				tryAgainLink.click();
 				TimeUnit.SECONDS.sleep(1);
 				waitForLoad(driver);
-				sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 50);
+				sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 200);
 			}
 
 			// check if recovery was successful
@@ -282,7 +282,7 @@ public class AccountRecover {
 		driver.get(EMAIL_REFRESH_URL);
 		Logger.log("Waiting for Page Load...");
 		waitForLoad(driver);
-		sleepUntilFindElement(driver, By.id("mails"), 40);
+		sleepUntilFindElement(driver, By.id("mails"), 200);
 
 		List<WebElement> elements = driver.findElements(By.className("title-subject"));
 		String ourMailLink = null;
@@ -334,7 +334,7 @@ public class AccountRecover {
 		TimeUnit.SECONDS.sleep(6);
 		submit.click();
 		TimeUnit.SECONDS.sleep(6);
-		sleepUntilFindElement(driver, By.className("alert-success"), 30);
+		sleepUntilFindElement(driver, By.className("alert-success"), 200);
 
 		return true;
 	}

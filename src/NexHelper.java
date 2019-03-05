@@ -61,7 +61,7 @@ public class NexHelper {
 
 	public NexHelper() throws MalformedURLException, InterruptedException {
 		//TODO IN FUTURE createUsers();
-		System.out.println("started NexHelper 8.0 with multi-thread support, fixed acc");
+		System.out.println("started NexHelper 9.0 with multi-thread support, multiple host support");
 		messageQueue = new Stack<String>();
 		URL whatismyip;
 		try {
