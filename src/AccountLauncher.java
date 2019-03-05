@@ -43,7 +43,7 @@ public final class AccountLauncher {
 			lastStartup = System.currentTimeMillis();
 			System.out.println("Starting");
 			ProcessBuilder linuxBuilder = new ProcessBuilder("/bin/bash", "-c",
-					"java -jar " + "." + "./rspeer-launcher.jar" + " " + address);
+					"java -jar " + getRSPeerJar() + " -qsArgs " + address);
 
 			ProcessBuilder windowsBuilder = new ProcessBuilder("cmd.exe", "/c",
 					"java -jar " + getRSPeerJar() + " -qsArgs " + address);
