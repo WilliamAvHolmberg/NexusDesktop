@@ -97,7 +97,7 @@ public class AccountRecover {
 		WebDriver driver;
 		String gResponse = getCaptchaResponse();
 		if (gResponse != null) {
-			 driver = new FirefoxDriver(options);
+		 	driver = new FirefoxDriver(options);
 			logIntoRunescape(driver, gResponse, proxy, username, password);
 		}else {
 		 	Logger.log("Response == null");
@@ -250,28 +250,36 @@ public class AccountRecover {
 				Logger.log("Page failed to load..");
 			}
 
-			sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 30);
-
-			WebElement tryAgainLink = driver.findElement(By.cssSelector("a[data-test='try-again-link']"));
-			if(tryAgainLink != null){
-				tryAgainLink.click();
-				TimeUnit.SECONDS.sleep(1);
-				waitForLoad(driver);
-				sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 50);
+			if(sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 50).size() == 0) {
+				WebElement tryAgainLink = driver.findElement(By.cssSelector("a[data-test='try-again-link']"));
+				if (tryAgainLink != null) {
+					try {
+						String url = tryAgainLink.getAttribute("href");
+						if(url != null)
+							driver.get(url);
+					} catch (Exception ex) { ex.printStackTrace(); }
+					TimeUnit.SECONDS.sleep(1);
+					waitForLoad(driver);
+					sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 50);
+				}
 			}
 
+			waitForLoad(driver);
+			TimeUnit.SECONDS.sleep(5);
+			waitForLoad(driver);
+
 			// check if recovery was successful
-			if (driver.findElements(By.id("p-account-recovery-pre-confirmation")).size() != 0) {
+			if (driver.findElements(By.id("p-account-recovery-pre-confirmation")).size() > 0 || driver.findElements(By.className("uc-game-stats")).size() > 0) {
 				Logger.log("Successfully sent recovery");
 				Logger.log("lets check mail");
 				failed = false;
 			} else {
-				Logger.log("something went wrong");
+				Logger.log("something went wrong with recovery");
 				createUnlockCooldownMessage(proxy.host, 1000);
 				this.failed = true;
 			}
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 		if(failed) {
 			Logger.log("something went wrong");
@@ -415,7 +423,7 @@ public class AccountRecover {
 				return ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
 			}
 		};
-		WebDriverWait wait = new WebDriverWait(driver, 30);
+		WebDriverWait wait = new WebDriverWait(driver, 40);
 		wait.until(pageLoadCondition);
 	}
 

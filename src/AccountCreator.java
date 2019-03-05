@@ -349,6 +349,7 @@ public class AccountCreator {
 				Logger.log("Opening Captcha");
 
 				for(int i = 0; i < 10; i++) {
+					TimeUnit.SECONDS.sleep(1);
 					waitForLoad(driver);
 					if (driver.findElements(By.id("p-create-error")).size() != 0) {
 						Logger.log("Errooororo. lets send message timeout 10min");
@@ -365,12 +366,7 @@ public class AccountCreator {
 					} else if (driver.findElements(By.className("google-recaptcha-error")).size() != 0) {
 						Logger.log("Google Recaptcha Error");
 						captchaFailed = true;
-					}
-
-					waitForLoad(driver);
-					TimeUnit.SECONDS.sleep(1);
-
-					if (driver.findElements(By.id("p-account-created")).size() != 0) {
+					} else if (driver.findElements(By.id("p-account-created")).size() != 0) {
 						created = true;
 						System.out.println("Account Created");
 						String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port + ":" + proxy.username + ":"
