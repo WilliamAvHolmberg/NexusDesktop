@@ -162,68 +162,82 @@ public class NexHelper {
 		else
 			System.out.println(interval + "\r\n");
 
-		try {
-			Socket socket = new Socket(ip, port);
-			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-			initializeContactToSocket(out, in);
+		while(true) {
+			try {
+				Socket socket = new Socket(ip, port);
+				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+				initializeContactToSocket(out, in);
 
-			String nextRequest;
-			//AccountCreator.createIPCooldownMessage("50.237.102.215", 300);
-			while (true) {
-				if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + interval) {
-					lastStart = System.currentTimeMillis();
-					nextRequest = messageQueue.pop();
-					String[] parsed = nextRequest.split(":");
-					Logger.log(nextRequest);
-					Logger.log(parsed[0]);
-					switch (parsed[0]) {
-					case "unlocked_account":
-						sendUnlockedAcc(parsed, out, in);
-						Logger.log("SENT ACC UNLOCKED MESS");
-						break;
-					case "unlock_cooldown":
-						sendUnlockCooldown(parsed, out, in);
-						Logger.log("SENT UNLOCK COOLDOWN MESS");
+				String nextRequest;
+				//AccountCreator.createIPCooldownMessage("50.237.102.215", 300);
+				while (true) {
+					if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + interval) {
+						lastStart = System.currentTimeMillis();
+						nextRequest = messageQueue.pop();
+						String[] parsed = nextRequest.split(":");
+						Logger.log(nextRequest);
+						Logger.log(parsed[0]);
+						switch (parsed[0]) {
+							case "unlocked_account":
+								sendUnlockedAcc(parsed, out, in);
+								Logger.log("SENT ACC UNLOCKED MESS");
+								break;
+							case "unlock_cooldown":
+								sendUnlockCooldown(parsed, out, in);
+								Logger.log("SENT UNLOCK COOLDOWN MESS");
 
-						break;
-					case "ip_cooldown":
-						sendIPCooldown(parsed, out, in);
-						Logger.log("SENT IP COOLDOWN MESS");
-						break;
-					case "unlock_account":
-						unlockAccount(parsed, nextRequest);
-					break;
-					case "create_account":
-						createAccount(parsed, nextRequest);
-						break;
-					case "account_request":
-						/*
-						 * Argument 0 == respond Argument 1 == 0 equals that we shall ask database for a
-						 * new account Argument 1 == 1 equals that we shall use provided details to
-						 * start a new client
-						 */
-						if (parsed[1].equals("0")) {
-							newAccountRequest(out, in);
-							break;
-						} else if (parsed[1].equals("1")) {
-							String address = nextRequest.substring(nextRequest.indexOf("http"), nextRequest.length());
-							startAccount(address);
-							break;
+								break;
+							case "ip_cooldown":
+								sendIPCooldown(parsed, out, in);
+								Logger.log("SENT IP COOLDOWN MESS");
+								break;
+							case "unlock_account":
+								unlockAccount(parsed, nextRequest);
+								break;
+							case "create_account":
+								createAccount(parsed, nextRequest);
+								break;
+							case "account_request":
+								/*
+								 * Argument 0 == respond Argument 1 == 0 equals that we shall ask database for a
+								 * new account Argument 1 == 1 equals that we shall use provided details to
+								 * start a new client
+								 */
+								if (parsed[1].equals("0")) {
+									newAccountRequest(out, in);
+									break;
+								} else if (parsed[1].equals("1")) {
+									String address = nextRequest.substring(nextRequest.indexOf("http"), nextRequest.length());
+									startAccount(address);
+									break;
 
+								}
+							default:
+								log(out, in);
+								break;
 						}
-					default:
-						log(out, in);
-						break;
 					}
-				}
 					log(out, in);
 					Thread.sleep(1000);
+				}
 			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
+			catch (SocketTimeoutException e) {
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+				break;
+			}
+			catch (SocketException e) {
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+				Thread.sleep(5000);
+			}
+			catch (Exception e) {
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+				Thread.sleep(5000);
+			}
 		}
 	}
 
