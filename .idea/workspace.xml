@@ -33,8 +33,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/NexHelper.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="139">
-              <caret line="194" column="24" selection-start-line="194" selection-start-column="24" selection-end-line="194" selection-end-column="24" />
+            <state relative-caret-position="350">
+              <caret line="208" lean-forward="true" selection-start-line="208" selection-end-line="208" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -54,8 +54,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/AccountLauncher.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="194">
-              <caret line="115" selection-start-line="115" selection-end-line="122" selection-end-column="5" />
+            <state relative-caret-position="360">
+              <caret line="105" column="8" selection-start-line="105" selection-start-column="8" selection-end-line="105" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -102,9 +102,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>, 30)</find>
-      <find>setNewPassword</find>
-      <find>RECOVERY_URL</find>
       <find>sleep</find>
       <find>p-account-recovery-pre-confirmation</find>
       <find>something went wrong</find>
@@ -132,6 +129,9 @@
       <find>windows</find>
       <find>submit.clic</find>
       <find>running</find>
+      <find>socket</find>
+      <find>&lt;</find>
+      <find>clean</find>
     </findStrings>
     <dirStrings>
       <dir>C:\Users\c-whi\IdeaProjects\NexusDesktop-master\src</dir>
@@ -148,9 +148,9 @@
         <option value="$PROJECT_DIR$/src/TempMailRestorer.java" />
         <option value="$PROJECT_DIR$/src/UnlockThread.java" />
         <option value="$PROJECT_DIR$/src/Test.java" />
-        <option value="$PROJECT_DIR$/src/NexHelper.java" />
         <option value="$PROJECT_DIR$/src/AccountRecover.java" />
         <option value="$PROJECT_DIR$/src/AccountCreator.java" />
+        <option value="$PROJECT_DIR$/src/NexHelper.java" />
         <option value="$PROJECT_DIR$/src/AccountLauncher.java" />
       </list>
     </option>
@@ -193,12 +193,12 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1551788834138" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1551886370917" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="configurable.group.appearance" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.other" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -487,16 +487,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/NexHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="139">
-          <caret line="194" column="24" selection-start-line="194" selection-start-column="24" selection-end-line="194" selection-end-column="24" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/AccountCreator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="78">
@@ -520,10 +510,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/NexHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="350">
+          <caret line="208" lean-forward="true" selection-start-line="208" selection-end-line="208" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/AccountLauncher.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="194">
-          <caret line="115" selection-start-line="115" selection-end-line="122" selection-end-column="5" />
+        <state relative-caret-position="360">
+          <caret line="105" column="8" selection-start-line="105" selection-start-column="8" selection-end-line="105" selection-end-column="8" />
         </state>
       </provider>
     </entry>
