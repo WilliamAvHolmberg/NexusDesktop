@@ -61,7 +61,7 @@ public class NexHelper {
 
 	public NexHelper() throws MalformedURLException, InterruptedException {
 		//TODO IN FUTURE createUsers();
-		System.out.println("started NexHelper 8.0 with multi-thread support, fixed acc");
+		System.out.println("started NexHelper 9.0 with multi-thread support, multiple host support");
 		messageQueue = new Stack<String>();
 		URL whatismyip;
 		try {
@@ -151,7 +151,7 @@ public class NexHelper {
 			System.exit(1);
 			break;
 		}
-		
+
 		System.out.println("\r\nPlease choose your launch interval:");
 		Integer interval = null;
 		String intervalStr = System.getProperty("interval", null);
@@ -162,71 +162,82 @@ public class NexHelper {
 		else
 			System.out.println(interval + "\r\n");
 
-		try {
-			Socket socket = new Socket(ip, port);
-			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-			initializeContactToSocket(out, in);
+		while(true) {
+			try {
+				Socket socket = new Socket(ip, port);
+				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+				initializeContactToSocket(out, in);
 
-			String nextRequest;
-			//AccountCreator.createIPCooldownMessage("50.237.102.215", 300);
-			while (true) {
-				if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + interval) {
-					lastStart = System.currentTimeMillis();
-					nextRequest = messageQueue.pop();
-					String[] parsed = nextRequest.split(":");
-					Logger.log(nextRequest);
-					Logger.log(parsed[0]);
-					switch (parsed[0]) {
-					case "unlocked_account":
-						sendUnlockedAcc(parsed, out, in);
-						Logger.log("SENT ACC UNLOCKED MESS");
-						break;
-					case "unlock_cooldown":
-						sendUnlockCooldown(parsed, out, in);
-						Logger.log("SENT UNLOCK COOLDOWN MESS");
-						
-						break;
-					case "ip_cooldown":
-						sendIPCooldown(parsed, out, in);
-						Logger.log("SENT IP COOLDOWN MESS");
-						break;
-					case "unlock_account":
-						unlockAccount(parsed, nextRequest);
-						
-						break;	
-					case "create_account":
-						
-							createAccount(parsed, nextRequest);
-					
-						break;
-					case "account_request":
-						/*
-						 * Argument 0 == respond Argument 1 == 0 equals that we shall ask database for a
-						 * new account Argument 1 == 1 equals that we shall use provided details to
-						 * start a new client
-						 */
-						if (parsed[1].equals("0")) {
-							newAccountRequest(out, in);
-							break;
-						} else if (parsed[1].equals("1")) {
-							String address = nextRequest.substring(nextRequest.indexOf("http"), nextRequest.length());
-							startAccount(address);
-							break;
-							
+				String nextRequest;
+				//AccountCreator.createIPCooldownMessage("50.237.102.215", 300);
+				while (true) {
+					if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + interval) {
+						lastStart = System.currentTimeMillis();
+						nextRequest = messageQueue.pop();
+						String[] parsed = nextRequest.split(":");
+						Logger.log(nextRequest);
+						Logger.log(parsed[0]);
+						switch (parsed[0]) {
+							case "unlocked_account":
+								sendUnlockedAcc(parsed, out, in);
+								Logger.log("SENT ACC UNLOCKED MESS");
+								break;
+							case "unlock_cooldown":
+								sendUnlockCooldown(parsed, out, in);
+								Logger.log("SENT UNLOCK COOLDOWN MESS");
+
+								break;
+							case "ip_cooldown":
+								sendIPCooldown(parsed, out, in);
+								Logger.log("SENT IP COOLDOWN MESS");
+								break;
+							case "unlock_account":
+								unlockAccount(parsed, nextRequest);
+								break;
+							case "create_account":
+								createAccount(parsed, nextRequest);
+								break;
+							case "account_request":
+								/*
+								 * Argument 0 == respond Argument 1 == 0 equals that we shall ask database for a
+								 * new account Argument 1 == 1 equals that we shall use provided details to
+								 * start a new client
+								 */
+								if (parsed[1].equals("0")) {
+									newAccountRequest(out, in);
+									break;
+								} else if (parsed[1].equals("1")) {
+									String address = nextRequest.substring(nextRequest.indexOf("http"), nextRequest.length());
+									startAccount(address);
+									break;
+
+								}
+							default:
+								log(out, in);
+								break;
 						}
-					default:
-						log(out, in);
-						break;
 					}
-				}
 					log(out, in);
 					Thread.sleep(1000);
+				}
 			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
+			catch (SocketTimeoutException e) {
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+				break;
+			}
+			catch (SocketException e) {
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+				Thread.sleep(5000);
+			}
+			catch (Exception e) {
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+				Thread.sleep(5000);
+			}
 		}
 	}
 
@@ -286,19 +297,19 @@ public class NexHelper {
 			System.out.println("No Account available atm. Try again in 5 minutes");
 		}
 	}
-	
+
 	private void sendUnlockedAcc(String[] accInfo, PrintWriter out, BufferedReader in) throws IOException {
-		
+
 		String email = accInfo[1];
 		Logger.log(email);
 		String newPassword = accInfo[2];
-		out.println("unlocked_account:" + email + ":" + newPassword);
+		out.println("unlocked_account:" + email + ":" + newPassword + ":");
 		String res = in.readLine();
 		System.out.println("Successfully gave information about updated acc");
 	}
-	
+
 	private void sendIPCooldown(String[] ipInfo, PrintWriter out, BufferedReader in) throws IOException {
-		
+
 		String ip = ipInfo[1];
 		Logger.log(ip);
 		String cooldown = ipInfo[2];
@@ -307,7 +318,7 @@ public class NexHelper {
 		System.out.println("Successfully gave information about bad ip");
 	}
 	private void sendUnlockCooldown(String[] ipInfo, PrintWriter out, BufferedReader in) throws IOException {
-		
+
 		String ip = ipInfo[1];
 		Logger.log(ip);
 		String cooldown = ipInfo[2];
@@ -342,10 +353,10 @@ public class NexHelper {
 		RecoverThread accThread = new RecoverThread(username, login, password, new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort), address);
 		Thread thread = new Thread(accThread);
 		thread.start();
-		System.out.println("Started new create acc thread");
+		System.out.println("Started new recover thread");
 	}
 	private void startAccount(String address) {
-		
+
 		AccountLauncher.launchClient(address);
 
 	}

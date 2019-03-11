@@ -219,7 +219,7 @@ public class AccountCreator {
 
 	static boolean isNullOrEmpty(String str){
 		if(str == null) return  true;
-		if(str.length() < 3) return true;
+		if(str.trim().isEmpty()) return true;
 		return false;
 	}
 
@@ -245,7 +245,8 @@ public class AccountCreator {
 		
 		FirefoxProfile profile;
 		FirefoxOptions options;
-		if (proxy.username != null && proxy.username.length() > 3) {
+		if (proxy.host != null && proxy.host.length() > 3 &&
+			proxy.username != null && proxy.username.length() > 3) {
 			ProfilesIni ini = new ProfilesIni();
 			profile = ini.getProfile("default");
 			options = new FirefoxOptions();
@@ -255,12 +256,14 @@ public class AccountCreator {
 			profile = new FirefoxProfile();
 			profile.setPreference("network.proxy.type", 1);
 			profile.setPreference("network.proxy.socks", proxy.host);
-			profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
+			if(proxy.port.length() > 1)
+				profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
 		}
 		options.setProfile(profile);
-		WebDriver driver = new FirefoxDriver(options);
+		WebDriver driver = null;
 		boolean failed = false;
 		try {
+		 	driver = new FirefoxDriver(options);
 			driver.manage().window().maximize();
 
 			if(!ipIsRight(driver, proxy.host)) { //check if the proxy is actually set
@@ -338,6 +341,7 @@ public class AccountCreator {
 				TimeUnit.SECONDS.sleep(6);
 				jse.executeScript("onSubmit()");
 				//submit.sendKeys(Keys.ENTER);
+				//submit.click();
 				TimeUnit.SECONDS.sleep(6);	//added this for leaving the captcha too fast
 				waitForLoad(driver);
 				TimeUnit.SECONDS.sleep(20);	//added this for leaving the captcha too fast
@@ -345,6 +349,7 @@ public class AccountCreator {
 				Logger.log("Opening Captcha");
 
 				for(int i = 0; i < 10; i++) {
+					TimeUnit.SECONDS.sleep(1);
 					waitForLoad(driver);
 					if (driver.findElements(By.id("p-create-error")).size() != 0) {
 						Logger.log("Errooororo. lets send message timeout 10min");
@@ -361,12 +366,7 @@ public class AccountCreator {
 					} else if (driver.findElements(By.className("google-recaptcha-error")).size() != 0) {
 						Logger.log("Google Recaptcha Error");
 						captchaFailed = true;
-					}
-
-					waitForLoad(driver);
-					TimeUnit.SECONDS.sleep(1);
-
-					if (driver.findElements(By.id("p-account-created")).size() != 0) {
+					} else if (driver.findElements(By.id("p-account-created")).size() != 0) {
 						created = true;
 						System.out.println("Account Created");
 						String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port + ":" + proxy.username + ":"
@@ -388,9 +388,8 @@ public class AccountCreator {
 				if (driver != null)
 					driver.quit();
 			} catch (Exception e){ }
+			driver = null;
 		}
-		
-		
 		
 	}
 
