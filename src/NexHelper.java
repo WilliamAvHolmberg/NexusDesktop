@@ -1,14 +1,6 @@
 
 import java.io.*;
-<<<<<<< HEAD
 import java.net.*;
-=======
-import java.net.MalformedURLException;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
->>>>>>> upstream/master
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -107,8 +99,8 @@ public class NexHelper implements Runnable {
 		for(int i = 1; i < lines.length; i++){
 			System.out.println(lines[i]);
 		}
-			int nameOption = sc.nextInt();
-			String ip = lines[nameOption].split(":")[1];
+			int ipOption = sc.nextInt();
+			String ip = lines[ipOption].split(":")[1];
 
 		int port = 43594;
 		System.out.println("\r\nPlease choose which computer you want to use:");
@@ -125,7 +117,7 @@ public class NexHelper implements Runnable {
 			}
 		}
 		if(computerName == null) {
-			nameOption = sc.nextInt();
+			int nameOption = sc.nextInt();
 			computerName = lines[nameOption].split(":")[1];
 		}else{
 			System.out.println(computerName);

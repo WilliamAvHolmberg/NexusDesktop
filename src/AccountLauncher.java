@@ -17,7 +17,7 @@ public final class AccountLauncher {
 	public static enum OSType {
 		Windows, MacOS, Linux;
 	};
-	
+
 	public static String lastName = "";
 	public static long lastStartup = 0;
 
@@ -136,11 +136,7 @@ public final class AccountLauncher {
                 " ");
 	}
 	public static String getRSPeerJar(){
-<<<<<<< HEAD
-		if(running_processes.size() == 0)
-=======
 		//if(runningprocesses.size() == 0)
->>>>>>> upstream/master
 			return "./rspeer-launcher.jar";
 	//	JFileChooser fr = new JFileChooser();
 	//	FileSystemView fw = fr.getFileSystemView();
