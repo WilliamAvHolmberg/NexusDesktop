@@ -2,6 +2,8 @@
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;

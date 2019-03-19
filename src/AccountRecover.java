@@ -132,15 +132,12 @@ public class AccountRecover {
 			if (driver.findElements(By.id("p-account-recovery-reset-password")).size() == 0) {
 				if(retries > 2) return false;
 				Logger.log("Did not load page. lets try again");
-<<<<<<< HEAD
 				if(fails > 3) {
 					return false;
 				}
 				fails++;
 				setNewPassword(driver, ourPassword);
-=======
 				return setNewPassword(driver, ourPassword, retries + 1);
->>>>>>> dec9bcc660ad071b91b151605d1d9cf3e75e1822
 			}
 			WebElement password = driver.findElement(By.name("password"));
 			WebElement confirmPassword = driver.findElement(By.name("confirm"));
