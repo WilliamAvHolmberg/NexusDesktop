@@ -53,70 +53,49 @@ public class AccountCreator {
 	private static String CAPTCHA_SOLVER = "anticaptcha";
 	//private static String token = null;
 	private static int cooldown = 90;
+	public static final boolean CAPTCHA_FIRST = false;
 
-
-	boolean setProxy(PrivateProxy currentProxy) {
-
-		String proxySet = currentProxy.host.length() > 6 ? "true" : "false";
-		System.getProperties().put("proxySet", proxySet);
-		System.getProperties().put("socksProxyHost", currentProxy.host);
-		System.getProperties().put("socksProxyPort", currentProxy.port);
-		Authenticator.setDefault(new ProxyAuth(currentProxy.username, currentProxy.password));
-		URL whatismyip;
-		try {
-			whatismyip = new URL("http://checkip.amazonaws.com");
-			BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
-
-			String ip = in.readLine(); // you get the IP as a String
-			System.out.println(ip);
-			return true;
-		} catch (IOException e) {
-			System.out.println("Proxy " + currentProxy.host + " is bad");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-	public class ProxyAuth extends Authenticator {
-		private PasswordAuthentication auth;
-
-		private ProxyAuth(String user, String password) {
-			auth = new PasswordAuthentication(user, password == null ? new char[] {} : password.toCharArray());
-		}
-
-		protected PasswordAuthentication getPasswordAuthentication() {
-			return auth;
-		}
-	}
 
 	public boolean createAccount(String username, String email, String password, PrivateProxy proxy, String address) {
 		Logger.log("Waiting for captcha code... This might take a while...");
 		if (proxy != null && proxy.host.length() > 5) {
 			Logger.log("Connecting to Proxy " + proxy.host + ":" + proxy.port);
-			if(!setProxy(proxy))
+			if(!proxy.setSystemProxy())
 				return false;
 			Logger.log("Successfully connected");
 		}
+		String token = null;
+		if(CAPTCHA_FIRST)
+			token = getCaptcha();
+		try {
+			postForm(token, username, email, password, proxy, address);
+			return true;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+	static String getCaptcha(){
 		int attempts = 0;
 		boolean completed = false;
 		String token = null;
 		while (token == null) {
 			if (attempts < 5) {
 				switch (CAPTCHA_SOLVER) {
-				case "anticaptcha":
-					AntiCaptcha antiCaptcha = new AntiCaptcha();
-					try {
-						token = antiCaptcha.solveCaptcha(RUNESCAPE_URL);
-						completed = true;
-					} catch (MalformedURLException | InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					break;
-				case "twocaptcha":
-					// TODO: 2Captcha Support
-					break;
+					case "anticaptcha":
+						AntiCaptcha antiCaptcha = new AntiCaptcha();
+						try {
+							token = antiCaptcha.solveCaptcha(RUNESCAPE_URL);
+							completed = true;
+						} catch (MalformedURLException | InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						break;
+					case "twocaptcha":
+						// TODO: 2Captcha Support
+						break;
 				}
 				attempts++;
 			} else {
@@ -126,18 +105,7 @@ public class AccountCreator {
 			if(token == null)
 				try { Thread.sleep(2000); }catch (Exception ex){}
 		}
-		if (completed) {
-			try {
-				postForm(token, username, email, password, proxy, address);
-				return true;
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else{
-			System.out.println("Couldnt get captcha :(");
-		}
-		return false;
+		return token;
 	}
 
 	private static void waitForLoad(WebDriver driver) {
@@ -223,6 +191,23 @@ public class AccountCreator {
 		return false;
 	}
 
+	static synchronized void killLeftoverProcesses(){
+		if (activeAccountCreators == 0){
+			if (AccountLauncher.getOperatingSystemType() == AccountLauncher.OSType.Windows){
+				Runtime rt = Runtime.getRuntime();
+				final String[] processes = new String[] { "firefox.exe", "geckodriver.exe" };
+				for(String process : processes) {
+					try {
+						rt.exec("taskkill /F /IM " + process);
+					}catch (IOException e) {}
+				}
+			} else {
+//				rt.exec("kill -9 " + ....);
+			}
+		}
+	}
+
+	static int activeAccountCreators = 0;
 	public static void postForm(String gresponse, String username, String loginEmail, String loginPassword,
 			PrivateProxy proxy, String address) throws Exception {
 		// ChromeOptions options = new ChromeOptions();
@@ -241,24 +226,29 @@ public class AccountCreator {
 		 * 
 		 * options.setProfile(profile);
 		 */
+
+		killLeftoverProcesses();
+
+		activeAccountCreators++;
 		setFirefoxDriver();
 		
 		FirefoxProfile profile;
 		FirefoxOptions options;
-		if (proxy.host != null && proxy.host.length() > 3 &&
-			proxy.username != null && proxy.username.length() > 3) {
+//		if (proxy.host != null && proxy.host.length() > 3 &&
+//			proxy.username != null && proxy.username.length() > 3) {
 			ProfilesIni ini = new ProfilesIni();
 			profile = ini.getProfile("default");
 			options = new FirefoxOptions();
 			profile = copyProfileData(profile, proxy);
-		} else {
-			options = new FirefoxOptions();
-			profile = new FirefoxProfile();
-			profile.setPreference("network.proxy.type", 1);
-			profile.setPreference("network.proxy.socks", proxy.host);
-			if(proxy.port.length() > 1)
-				profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
-		}
+//		}
+//		else {
+//			options = new FirefoxOptions();
+//			profile = new FirefoxProfile();
+//			profile.setPreference("network.proxy.type", 1);
+//			profile.setPreference("network.proxy.socks", proxy.host);
+//			if(proxy.port.length() > 1)
+//				profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
+//		}
 		options.setProfile(profile);
 		WebDriver driver = null;
 		boolean failed = false;
@@ -273,13 +263,23 @@ public class AccountCreator {
 			boolean created = false;
 			boolean captchaFailed = false;
 			int attempts = 0;
-			while (!failed && !created && !captchaFailed) {
+			while (!failed && !created && !captchaFailed && attempts < 3) {
+				if(gresponse == null) {
+					gresponse = getCaptcha();
+					if(gresponse == null) {
+						System.out.println("Couldnt get captcha :(");
+						return;
+					}
+				}
+
+				attempts++;
 				driver.get(RUNESCAPE_URL);
 				Logger.log("Waiting for Page Load...");
 				waitForLoad(driver);
 				TimeUnit.SECONDS.sleep(1);
 
 				WebElement dobDay = null, dobMonth = null, dobYear = null, email = null, password = null, textarea = null, submit = null;
+				WebElement acceptCookies = null;
 				for (int i = 0; i < 3; i++) {
 					Logger.log("Page Loaded");
 					try {
@@ -291,6 +291,7 @@ public class AccountCreator {
 						password = driver.findElement(By.name("password1"));
 						textarea = driver.findElement(By.id("g-recaptcha-response"));
 						submit = driver.findElement(By.id("create-submit"));
+						acceptCookies = ((FirefoxDriver) driver).findElementByClassName("c-cookie-consent__dismiss");
 					}catch (Exception ex) {
 						Logger.log("ERROR MESSAGEE");
 						Logger.log("ERROR MESSAGEE");
@@ -321,6 +322,10 @@ public class AccountCreator {
 				email.sendKeys(loginEmail);
 				// displayname.sendKeys("williamsosos");
 				password.sendKeys(loginPassword);
+				try {
+					if(acceptCookies != null)
+						acceptCookies.click();
+				} catch (Exception ex){}
 
 				Logger.log("Form filled");
 				JavascriptExecutor jse = (JavascriptExecutor) driver;
@@ -344,17 +349,18 @@ public class AccountCreator {
 				//submit.click();
 				TimeUnit.SECONDS.sleep(6);	//added this for leaving the captcha too fast
 				waitForLoad(driver);
-				TimeUnit.SECONDS.sleep(20);	//added this for leaving the captcha too fast
+				TimeUnit.SECONDS.sleep(10);	//added this for leaving the captcha too fast
 
 				Logger.log("Opening Captcha");
 
-				for(int i = 0; i < 10; i++) {
+				for(int i = 0; i < 5; i++) {
 					TimeUnit.SECONDS.sleep(1);
 					waitForLoad(driver);
 					if (driver.findElements(By.id("p-create-error")).size() != 0) {
 						Logger.log("Errooororo. lets send message timeout 10min");
 						createIPCooldownMessage(proxy.host, 120);
 						TimeUnit.SECONDS.sleep(3);
+						failed = true;
 						break;
 					}else if (driver.findElements(By.className("m-character-name-alts__name")).size() != 0) {
 						System.out.println("Username In Use - Trying another");
@@ -363,27 +369,29 @@ public class AccountCreator {
 						waitForLoad(driver);
 						// submit.sendKeys(Keys.ENTER);
 						TimeUnit.SECONDS.sleep(3);
+						failed = true;
 					} else if (driver.findElements(By.className("google-recaptcha-error")).size() != 0) {
 						Logger.log("Google Recaptcha Error");
 						captchaFailed = true;
+						failed = true;
 					} else if (driver.findElements(By.id("p-account-created")).size() != 0) {
 						created = true;
 						System.out.println("Account Created");
 						String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port + ":" + proxy.username + ":"
 								+ proxy.password;
-						AccountLauncher.launchClient(address);
+						AccountRecover.createAccountUnlocked(loginEmail, loginPassword);
+						AccountLauncher.launchClient(username, address);
 					}
-					if(created)
+					if(created || failed)
 						break;
 				}
-				if (!created){
-					created = true;
-					
+				if (!created && !failed) {
+					gresponse = null;
+					continue;
 				}
-				
-				
 			}
-		}finally {
+		} finally {
+			activeAccountCreators--;
 			try {
 				if (driver != null)
 					driver.quit();
@@ -394,10 +402,19 @@ public class AccountCreator {
 	}
 
 	private static boolean ipIsRight(WebDriver driver, String host) {
+		if(host == null || host.length() < 5) return true;
 		driver.get("http://ipv4.plain-text-ip.com/");
 		waitForLoad(driver);
+		try {
+			AccountRecover.sleepUntilFindElement(driver, By.tagName("body"), 60);
+		}catch (InterruptedException e){}
 		String myIP = driver.findElement(By.tagName("body")).getText();
-		if(!myIP.contains(host)) {
+		if(myIP.contains("Error")) {
+			Logger.log("IP Service Error - Continuing anyway");
+			Logger.log("curr ip: " + myIP);
+			Logger.log("ip that should be: " + host);
+			return true;
+		} else if(!myIP.contains(host)) {
 			Logger.log("BAD IP. RETURN");
 			Logger.log("curr ip: " + myIP);
 			Logger.log("ip that should be: " + host);
