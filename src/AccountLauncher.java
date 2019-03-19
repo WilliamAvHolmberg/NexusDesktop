@@ -1,4 +1,7 @@
 
+import com.google.common.collect.ObjectArrays;
+import ui.frmRunningAccounts;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
@@ -14,7 +17,7 @@ public final class AccountLauncher {
 	public static enum OSType {
 		Windows, MacOS, Linux;
 	};
-	
+
 	public static String lastName = "";
 	public static long lastStartup = 0;
 
@@ -33,35 +36,47 @@ public final class AccountLauncher {
 		return detectedOS;
 	}
 
-	static HashMap<Process, Long> runningprocesses = new HashMap<>();
-	public static void launchClient(String address) {
+	static frmRunningAccounts ui;
+
+	static HashMap<Process, Long> running_processes = new HashMap<>();
+	static HashSet<Process> confirmed_running_rocesses = new HashSet<>();
+	public static void launchClient(String username, String address) {
 		cleanupExistingClients();
+		OSType operatingSystem = AccountLauncher.getOperatingSystemType();
+		if (ui == null && operatingSystem == OSType.Windows) {
+			ui = new ui.frmRunningAccounts();
+			ui.setVisible(true);
+		}
 
 		System.out.println(address);
 		if(!address.equals(lastName) || System.currentTimeMillis() > (lastStartup + 1000 * 120)) {
 			lastName = address;
 			lastStartup = System.currentTimeMillis();
 			System.out.println("Starting");
+			String jar = getRSPeerJar();
 			ProcessBuilder linuxBuilder = new ProcessBuilder("/bin/bash", "-c",
-					"java -jar " + getRSPeerJar() + " -qsArgs " + address);
+					"java -jar " + jar + " -qsArgs " + address);
 
-			ProcessBuilder windowsBuilder = new ProcessBuilder("cmd.exe", "/c",
-					"java -jar " + getRSPeerJar() + " -qsArgs " + address);
-			windowsBuilder.inheritIO();
+			ArrayList<String> args = new ArrayList(Arrays.asList(new String[]{"java", "-jar"}));
+			args.addAll(Arrays.asList(jar.split(" ")));
+			args.add("-qsArgs");
+			args.add(address);
+			ProcessBuilder windowsBuilder = new ProcessBuilder(args);
 
 			ProcessBuilder macBuilder = new ProcessBuilder("osascript", "-e",
 					"tell application \"Terminal\" to do script \"java -jar " + "./rspeer-launcher.jar" + " " + address);
 			Process p = null;
 			try {
 				//System.out.println(AccountLauncher.getOperatingSystemType());
-				switch (AccountLauncher.getOperatingSystemType()) {
+				switch (operatingSystem) {
 
 					case Windows:
 						int i = 1;
 						System.out.println("Start windows");
 						p = windowsBuilder.start();
+						if (ui != null && username.length() > 0)
+							ui.addAccount(p, username);
 						setOutputStream(p);
-
 						break;
 					case MacOS:
 						//Process p2 = macBuilder.start();
@@ -94,15 +109,26 @@ public final class AccountLauncher {
 
 	}
 	static void cleanupExistingClients(){
-		runningprocesses.entrySet().removeIf(entry ->
-						entry.getKey() == null ||
-						!entry.getKey().isAlive());
-//		for (Map.Entry<Process, Long> entry : runningprocesses.entrySet()) {
-//			if (System.currentTimeMillis() - entry.getValue() > (10 * 60 * 1000)){//10 minutes
-//				System.out.println("Killing process due to innactivity");
-//				entry.getKey().destroy();
-//			}
-//		}
+		running_processes.entrySet().removeIf(entry -> {
+			if(entry.getKey() == null || !entry.getKey().isAlive())
+			{
+				try {
+					if (ui != null) ui.removeAccount(entry.getKey());
+					confirmed_running_rocesses.remove(entry.getKey());
+				}catch (Exception ex){}
+				return true;
+			}
+			return false;
+		});
+		for (Map.Entry<Process, Long> entry : running_processes.entrySet()) {
+			if (System.currentTimeMillis() - entry.getValue() > (8 * 60 * 1000)){//5 minutes
+				if (!confirmed_running_rocesses.contains(entry.getKey())) {
+					System.out.println("Killing process due to innactivity");
+					entry.getKey().destroy();
+				}
+			}
+		}
+
 	}
 
 	public static String curDir(){
@@ -120,17 +146,21 @@ public final class AccountLauncher {
 	}
 
 	public static void setOutputStream(Process process) {
-
-		runningprocesses.put(process, System.currentTimeMillis());
+		running_processes.put(process, System.currentTimeMillis());
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				InputStream is = process.getInputStream();
+				String line = null;
+				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 				int c;
 				try {
-					while ((c = is.read()) >= 0) {
-						runningprocesses.put(process, System.currentTimeMillis());
-						//System.out.println(c);
+					while ((line = reader.readLine()) != null)
+					{
+						if(line.contains("Failed to dowload configuration")) process.destroy();
+						else if(line.contains("CONNECTED TO NEX")) {
+//							System.out.println("Confirmed");
+							confirmed_running_rocesses.add(process);
+						}
 					}
 				} catch (IOException e) {
 					e.printStackTrace();

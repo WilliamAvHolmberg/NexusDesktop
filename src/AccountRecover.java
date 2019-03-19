@@ -171,7 +171,7 @@ public class AccountRecover {
 		return true;
 	}
 
-	static List<WebElement> sleepUntilFindElement(WebDriver driver, By by, long timeoutSecs) throws InterruptedException {
+	public static List<WebElement> sleepUntilFindElement(WebDriver driver, By by, long timeoutSecs) throws InterruptedException {
 		long timeout = System.currentTimeMillis() + (timeoutSecs * 1000);
 		while (driver.findElements(by).size() == 0 && System.currentTimeMillis() < timeout) {
 			waitForLoad(driver);
@@ -179,7 +179,7 @@ public class AccountRecover {
 		}
 		return driver.findElements(by);
 	}
-	static boolean sleepWhileFindElement(WebDriver driver, By by, long timeoutSecs) throws InterruptedException {
+	public static boolean sleepWhileFindElement(WebDriver driver, By by, long timeoutSecs) throws InterruptedException {
 		long timeout = System.currentTimeMillis() + (timeoutSecs * 1000);
 		while (driver.findElements(by).size() > 0 && System.currentTimeMillis() < timeout) {
 			waitForLoad(driver);
@@ -510,10 +510,16 @@ public class AccountRecover {
 
 
 	private static boolean ipIsRight(WebDriver driver, String host) {
+		if(host == null || host.length() < 5) return true;
 		driver.get("http://ipv4.plain-text-ip.com/");
 		waitForLoad(driver);
 		String myIP = driver.findElement(By.tagName("body")).getText();
-		if (!myIP.contains(host)) {
+		if(myIP.contains("Error")) {
+			Logger.log("IP Service Error - Continuing anyway");
+			Logger.log("curr ip: " + myIP);
+			Logger.log("ip that should be: " + host);
+			return true;
+		} else if (!myIP.contains(host)) {
 			Logger.log("BAD IP. RETURN");
 			Logger.log("curr ip: " + myIP);
 			Logger.log("ip that should be: " + host);

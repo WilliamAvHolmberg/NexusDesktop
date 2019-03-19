@@ -1,10 +1,6 @@
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,21 +12,16 @@ import org.medusa.Utils.Logger;
 
 
 
-public class NexHelper {
+public class NexHelper implements Runnable {
 	public static Stack<String> messageQueue;
 	public static boolean UNLOCK_IS_READY = true;
 	long lastLog = 0;
 	private String respond = "none";
-	private String computerName;
+	public static String computerName;
 	private long lastStart = 0;
 	//private List<User> users;
 
-	public static void main(String[] args) throws IOException, InterruptedException {
-
-		new NexHelper();
-	}
-
-	String readFile(String filename){
+	static String readFile(String filename){
 		String content = null;
 		Scanner scanner = null;
 		try {
@@ -51,7 +42,7 @@ public class NexHelper {
 			e.printStackTrace();
 		}
 	}
-	public Integer tryParse(Object obj) {
+	public static Integer tryParse(Object obj) {
 		Integer retVal;
 		try {
 			retVal = Integer.parseInt((String) obj);
@@ -61,7 +52,12 @@ public class NexHelper {
 		return retVal;
 	}
 
-	public NexHelper() throws MalformedURLException, InterruptedException {
+	public static void main(String[] args) throws IOException, InterruptedException {
+
+		File[] files = new File(AccountLauncher.curDir()).listFiles((dir1, name) -> name.endsWith(".log"));
+		for (File file : files)
+			file.delete();
+
 		//TODO IN FUTURE createUsers();
 		System.out.println("started NexHelper 9.0 with multi-thread support, multiple host support");
 		messageQueue = new Stack<String>();
@@ -80,7 +76,10 @@ public class NexHelper {
 
 		if(System.getProperty("testfirefox", null) != null){
 			try {
-				AccountCreator.postForm(null, "", "", "", new PrivateProxy("craig343", "craig343", "12.164.246.97", "20000"), "");
+				PrivateProxy proxy = new PrivateProxy("craig343", "craig343", "12.164.246.98", "20000");
+				if(!proxy.setSystemProxy())
+					return;
+				AccountCreator.postForm(null, "", "", "", proxy, "http://ipchicken.com/");
 			}catch (Exception ex){ ex.printStackTrace(); }
 			return;
 		}
@@ -100,8 +99,8 @@ public class NexHelper {
 		for(int i = 1; i < lines.length; i++){
 			System.out.println(lines[i]);
 		}
-			int nameOption = sc.nextInt();
-			String ip = lines[nameOption].split(":")[1];
+			int ipOption = sc.nextInt();
+			String ip = lines[ipOption].split(":")[1];
 
 		int port = 43594;
 		System.out.println("\r\nPlease choose which computer you want to use:");
@@ -118,7 +117,7 @@ public class NexHelper {
 			}
 		}
 		if(computerName == null) {
-			nameOption = sc.nextInt();
+			int nameOption = sc.nextInt();
 			computerName = lines[nameOption].split(":")[1];
 		}else{
 			System.out.println(computerName);
@@ -139,19 +138,19 @@ public class NexHelper {
 		else
 			System.out.println(lowResourceOption);
 		switch (lowResourceOption) {
-		case 1:
-			AccountLauncher.allowOptions = " -allow norender,lowcpu,norandoms ";
-			break;
-		case 2:
-			AccountLauncher.allowOptions = " -allow norandoms ";
-			break;
-		case 3:
-			AccountLauncher.allowOptions = " -allow nointerface,norender,lowcpu,norandoms ";
-			break;
-		default:
-			System.out.println("Something went wrong");
-			System.exit(1);
-			break;
+			case 1:
+				AccountLauncher.allowOptions = " -allow norender,lowcpu,norandoms ";
+				break;
+			case 2:
+				AccountLauncher.allowOptions = " -allow norandoms ";
+				break;
+			case 3:
+				AccountLauncher.allowOptions = " -allow nointerface,norender,lowcpu,norandoms ";
+				break;
+			default:
+				System.out.println("Something went wrong");
+				System.exit(1);
+				break;
 		}
 
 		System.out.println("\r\nPlease choose your launch interval:");
@@ -164,89 +163,144 @@ public class NexHelper {
 		else
 			System.out.println(interval + "\r\n");
 
-		while(true) {
+		if(System.getProperties().containsKey("watchdog")) {
+			System.out.println("Beginning Watchdog...");
+			NexWatchdog.begin(computerName, lowResourceOption, interval);
+			return;
+		}
+
+		boolean launchruby = System.getProperties().containsKey("launchruby");
+
+		long lastGotMessage = 0;
+		int minute = 60 * 1000;
+		while (true) {
 			try {
-				Socket socket = new Socket(ip, port);
-				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-				initializeContactToSocket(out, in);
-
-				String nextRequest;
-				//AccountCreator.createIPCooldownMessage("50.237.102.215", 300);
-				while (true) {
-					if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + interval) {
-						lastStart = System.currentTimeMillis();
-						nextRequest = messageQueue.pop();
-						String[] parsed = nextRequest.split(":");
-						Logger.log(nextRequest);
-						Logger.log(parsed[0]);
-						switch (parsed[0]) {
-							case "unlocked_account":
-								sendUnlockedAcc(parsed, out, in);
-								Logger.log("SENT ACC UNLOCKED MESS");
-								break;
-							case "unlock_cooldown":
-								sendUnlockCooldown(parsed, out, in);
-								Logger.log("SENT UNLOCK COOLDOWN MESS");
-
-								break;
-							case "ip_cooldown":
-								sendIPCooldown(parsed, out, in);
-								Logger.log("SENT IP COOLDOWN MESS");
-								break;
-							case "unlock_account":
-								unlockAccount(parsed, nextRequest);
-								break;
-							case "create_account":
-								createAccount(parsed, nextRequest);
-								break;
-							case "account_request":
-								/*
-								 * Argument 0 == respond Argument 1 == 0 equals that we shall ask database for a
-								 * new account Argument 1 == 1 equals that we shall use provided details to
-								 * start a new client
-								 */
-								if (parsed[1].equals("0")) {
-									newAccountRequest(out, in);
-									break;
-								} else if (parsed[1].equals("1")) {
-									String address = nextRequest.substring(nextRequest.indexOf("http"), nextRequest.length());
-									startAccount(address);
-									break;
-
-								}
-							default:
-								log(out, in);
-								break;
-						}
+				NexHelper nexHelper = new NexHelper(ip, port, interval);
+				Thread thread = new Thread(nexHelper, "NexHelper");
+				thread.start();
+				while (thread.isAlive()) {
+					try {
+						thread.join(minute);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
-					log(out, in);
-					Thread.sleep(1000);
+					lastGotMessage = nexHelper.lastGotMessage;
+					long now = System.currentTimeMillis();
+					if (now - nexHelper.lastGotMessage > minute) {
+						thread.interrupt();
+						if(launchruby)
+							NexWatchdog.killProc("ruby");
+					}
 				}
+				if (System.currentTimeMillis() - lastGotMessage > minute) {
+					if(launchruby) {
+						NexWatchdog.killProc("ruby");
+
+					}
+				}
+			} catch (Exception ex){ ex.printStackTrace(); }
+		}
+	}
+
+	public String ip;
+	public int port;
+	int launchInterval;
+	public NexHelper(String ip, int port, int launchInterval) {
+		this.ip = ip;
+		this.port = port;
+		this.launchInterval = launchInterval;
+	}
+
+	public long lastSentMessage = 0;
+	public long lastGotMessage = 0;
+
+	@Override
+	public void run() {
+		try {
+			System.out.println("Connecting...");
+			Socket socket = new Socket(ip, port);
+			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+			initializeContactToSocket(out, in);
+
+			String nextRequest;
+			//AccountCreator.createIPCooldownMessage("50.237.102.215", 300);
+			while (true) {
+				if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + launchInterval) {
+					lastStart = System.currentTimeMillis();
+					nextRequest = messageQueue.pop();
+					String[] parsed = nextRequest.split(":");
+					Logger.log(nextRequest);
+					Logger.log(parsed[0]);
+					switch (parsed[0]) {
+						case "unlocked_account":
+							sendUnlockedAcc(parsed, out, in);
+							Logger.log("SENT ACC UNLOCKED MESS");
+							break;
+						case "unlock_cooldown":
+							sendUnlockCooldown(parsed, out, in);
+							Logger.log("SENT UNLOCK COOLDOWN MESS");
+
+							break;
+						case "ip_cooldown":
+							sendIPCooldown(parsed, out, in);
+							Logger.log("SENT IP COOLDOWN MESS");
+							break;
+						case "unlock_account":
+							unlockAccount(parsed, nextRequest);
+							break;
+						case "create_account":
+							createAccount(parsed, nextRequest);
+							break;
+						case "account_request":
+							/*
+							 * Argument 0 == respond Argument 1 == 0 equals that we shall ask database for a
+							 * new account Argument 1 == 1 equals that we shall use provided details to
+							 * start a new client
+							 */
+							if (parsed[1].equals("0")) {
+								newAccountRequest(out, in);
+								break;
+							} else if (parsed[1].equals("1")) {
+								String address = nextRequest.substring(nextRequest.indexOf("http"), nextRequest.length());
+								startAccount(parsed[2], address);
+								break;
+
+							}
+						default:
+							log(out, in);
+							break;
+					}
+				}
+				log(out, in);
+				Thread.sleep(1000);
 			}
-			catch (SocketTimeoutException e) {
-				System.out.println(e.getMessage());
-				e.printStackTrace();
-				break;
-			}
-			catch (SocketException e) {
-				System.out.println(e.getMessage());
-				e.printStackTrace();
-				Thread.sleep(5000);
-			}
-			catch (Exception e) {
-				System.out.println(e.getMessage());
-				e.printStackTrace();
-				Thread.sleep(5000);
-			}
+		}
+		catch (SocketTimeoutException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+		catch (SocketException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+		System.out.println("Retrying in 5 secs...");
+		try {
+			Thread.sleep(5000);
+		}catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 
 
-
 	private void log(PrintWriter out, BufferedReader in) throws InterruptedException, IOException {
 		if (System.currentTimeMillis() - lastLog > 5000) { // only log every 5 sec
+			lastSentMessage = System.currentTimeMillis();
 			out.println("log:0");
 			respond = in.readLine();
 			// standard message is 'logged:fine'
@@ -256,9 +310,10 @@ public class NexHelper {
 				System.out.println("we got a new instructionToQueue:" + respond);
 				messageQueue.push(respond);
 			}
+			if(respond != null)
+				lastGotMessage = System.currentTimeMillis();
 			lastLog = System.currentTimeMillis();
 		}
-
 	}
 
 	private void initializeContactToSocket(PrintWriter out, BufferedReader in) throws IOException {
@@ -294,7 +349,7 @@ public class NexHelper {
 		String[] respond = res.split(":");
 		if (respond[0].equals("account_request") && respond[1].equals("1")) {
 			String address = res.substring(res.indexOf("http"), res.length());
-			startAccount(address);
+			startAccount(respond[2], address);
 		} else {
 			System.out.println("No Account available atm. Try again in 5 minutes");
 		}
@@ -357,9 +412,9 @@ public class NexHelper {
 		thread.start();
 		System.out.println("Started new recover thread");
 	}
-	private void startAccount(String address) {
+	private void startAccount(String username, String address) {
 
-		AccountLauncher.launchClient(address);
+		AccountLauncher.launchClient(username, address);
 
 	}
 }
