@@ -17,7 +17,7 @@ public final class AccountLauncher {
 	public static enum OSType {
 		Windows, MacOS, Linux;
 	};
-
+	
 	public static String lastName = "";
 	public static long lastStartup = 0;
 
@@ -132,17 +132,20 @@ public final class AccountLauncher {
 	}
 
 	public static String curDir(){
-		return new File(ClassLoader.getSystemClassLoader().getResource(".").getPath()).getAbsolutePath().replace("%20",
-                " ");
+		try {
+			return new File(NexHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath();
+		}catch (URISyntaxException e){
+			e.printStackTrace();
+		}
+		return "";
 	}
 	public static String getRSPeerJar(){
-		//if(runningprocesses.size() == 0)
+		if(running_processes.size() == 0)
 			return "./rspeer-launcher.jar";
-	//	JFileChooser fr = new JFileChooser();
-	//	FileSystemView fw = fr.getFileSystemView();
-	//	System.out.println(Paths.get(fw.getDefaultDirectory().toString().replaceAll("%20", " "), "RSPeer", "cache", "rspeer.jar"));
-	//	return "-Xmx384m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -Xss2m -Dsun.java2d.noddraw=true -Xincgc " +
-	//			Paths.get(fw.getDefaultDirectory().toString().replaceAll("%20", " "), "RSPeer", "cache", "rspeer.jar").toString();
+		JFileChooser fr = new JFileChooser();
+		FileSystemView fw = fr.getFileSystemView();
+		return "-Xmx384m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -Xss2m -Dsun.java2d.noddraw=true -Xincgc " +
+				Paths.get(fw.getDefaultDirectory().toString(), "RSPeer", "cache", "rspeer.jar").toString();
 	}
 
 	public static void setOutputStream(Process process) {

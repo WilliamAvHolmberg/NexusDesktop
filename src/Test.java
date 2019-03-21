@@ -26,8 +26,18 @@ import org.openqa.selenium.json.JsonException;
 public class Test {
 
 	public static void main(String[] args) {
+
+		double cpu;
+		while (true){
+			try {
+				cpu = NexHelper.getProcessCpuLoad();
+				System.out.println(cpu);
+				Thread.sleep(200);
+			}catch (Exception ex){}
+		}
+
 //		Test.TestWatchdog();
-		Test.TestLaunching();
+//		Test.TestLaunching();
 	}
 
 	public static void TestWatchdog() {
