@@ -57,7 +57,6 @@ public class AccountCreator {
 
 
 	public boolean createAccount(String username, String email, String password, PrivateProxy proxy, String address) {
-		Logger.log("Waiting for captcha code... This might take a while...");
 		if (proxy != null && proxy.host.length() > 5) {
 			Logger.log("Connecting to Proxy " + proxy.host + ":" + proxy.port);
 			if(!proxy.setSystemProxy())
@@ -86,6 +85,7 @@ public class AccountCreator {
 					case "anticaptcha":
 						AntiCaptcha antiCaptcha = new AntiCaptcha();
 						try {
+							Logger.log("Waiting for captcha code... This might take a while...");
 							token = antiCaptcha.solveCaptcha(RUNESCAPE_URL);
 							completed = true;
 						} catch (MalformedURLException | InterruptedException e) {

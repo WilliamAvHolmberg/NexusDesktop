@@ -1,5 +1,6 @@
 
 import java.io.*;
+import java.lang.management.ManagementFactory;
 import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +11,7 @@ import java.util.Stack;
 
 import org.medusa.Utils.Logger;
 
+import javax.management.*;
 
 
 public class NexHelper implements Runnable {
@@ -90,7 +92,7 @@ public class NexHelper implements Runnable {
 		String serverData = readFile("server.txt");
 		if (serverData == null){
 			System.out.println("server.txt was missing. Lets create it");
-			serverData = "0:oxnetserver.ddns.net\r\n1:oxnetdebug.ddns.net\r\n1:Brandon\r\n2:Suicide\r\n3:VPS\r\n4:MINIMAC\r\n5:ACCOUNT\r\n6:BATCH1\r\n7:BATCH2\r\n8:BATCH3\r\n9:BATCH4\r\n11:BATCH5\r\n12:William";
+			serverData = "oxnetserver.ddns.net\r\n1:William\r\n2:Brandon\r\n3:Suicide\r\n4:VPS\r\n5:MINIMAC\r\n6:ACCOUNT\r\n7:BATCH1\r\n8:BATCH2\r\n9:BATCH3\r\n10:BATCH4r\\n10:BATCH5";
 			writeFile("server.txt", serverData);
 		}
 
@@ -169,7 +171,7 @@ public class NexHelper implements Runnable {
 			return;
 		}
 
-		boolean launchruby = System.getProperties().containsKey("launchruby");
+		boolean dieOnFail = System.getProperties().containsKey("dieonfail");
 
 		long lastGotMessage = 0;
 		int minute = 60 * 1000;
@@ -186,16 +188,15 @@ public class NexHelper implements Runnable {
 					}
 					lastGotMessage = nexHelper.lastGotMessage;
 					long now = System.currentTimeMillis();
-					if (now - nexHelper.lastGotMessage > minute) {
+					if (now - nexHelper.lastGotMessage > minute) {//If we crash or disconnect, then we have connected within a minute. If we fail to connect, then nah.
 						thread.interrupt();
-						if(launchruby)
-							NexWatchdog.killProc("ruby");
+						if(dieOnFail)
+							System.exit(1);
 					}
 				}
 				if (System.currentTimeMillis() - lastGotMessage > minute) {
-					if(launchruby) {
-						NexWatchdog.killProc("ruby");
-
+					if(dieOnFail) {
+						System.exit(1);
 					}
 				}
 			} catch (Exception ex){ ex.printStackTrace(); }
@@ -214,6 +215,22 @@ public class NexHelper implements Runnable {
 	public long lastSentMessage = 0;
 	public long lastGotMessage = 0;
 
+	public static double getProcessCpuLoad() throws MalformedObjectNameException, ReflectionException, InstanceNotFoundException {
+		MBeanServer mbs    = ManagementFactory.getPlatformMBeanServer();
+		ObjectName name    = ObjectName.getInstance("java.lang:type=OperatingSystem");
+		AttributeList list = mbs.getAttributes(name, new String[]{ "SystemCpuLoad" });
+
+		if (list.isEmpty()) return 100;
+
+		Attribute att = (Attribute)list.get(0);
+		Double value  = (Double)att.getValue();
+
+		// usually takes a couple of seconds before we get real values
+		if (value == -1.0) return 100;
+		// returns a percentage value with 1 decimal point precision
+		return ((int)(value * 1000) / 10.0);
+	}
+
 	@Override
 	public void run() {
 		try {
@@ -227,7 +244,9 @@ public class NexHelper implements Runnable {
 			String nextRequest;
 			//AccountCreator.createIPCooldownMessage("50.237.102.215", 300);
 			while (true) {
-				if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + launchInterval) {
+				int tmp_interval = launchInterval;
+				if (getProcessCpuLoad() < 80) tmp_interval = 0;
+				if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + tmp_interval) {
 					lastStart = System.currentTimeMillis();
 					nextRequest = messageQueue.pop();
 					String[] parsed = nextRequest.split(":");
