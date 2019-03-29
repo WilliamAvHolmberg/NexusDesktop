@@ -21,12 +21,16 @@ public class NexWatchdog {
         Process rails_server_proc = null;
         Process nexus_rb_proc = null;
         Process nexus_jar_proc = null;
+        int attempt = 0;
         while (true) {
             try {
                 if(nexus_jar_proc != null && !nexus_jar_proc.isAlive()){
-                    System.out.println("Killing Ruby");
-                    nexus_rb_proc.destroy();
-                    sleep(3000);
+                    attempt++;
+                    if(attempt >= 2) {
+                        System.out.println("Killing Ruby");
+                        nexus_rb_proc.destroy();
+                        sleep(3000);
+                    }
                 }
 
 //                if (rails_server_proc == null || !rails_server_proc.isAlive()) {
@@ -39,6 +43,7 @@ public class NexWatchdog {
                     System.out.println("Starting Nexus Ruby");
                     nexus_rb_proc = nexus_rb.start();
                     sleep(12000);
+                    attempt = 0;
                 }
 
                 if (nexus_jar_proc == null || !nexus_jar_proc.isAlive()) {
