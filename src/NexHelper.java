@@ -78,7 +78,7 @@ public class NexHelper implements Runnable {
 
 		if(System.getProperty("testfirefox", null) != null){
 			try {
-				PrivateProxy proxy = new PrivateProxy("craig343", "craig343", "12.164.246.98", "20000");
+				PrivateProxy proxy = new PrivateProxy("NHTzq7", "mxxdZy", "195.158.193.81", "8000");
 				if(!proxy.setSystemProxy())
 					return;
 				AccountCreator.postForm(null, "", "", "", proxy, "http://ipchicken.com/");
@@ -245,7 +245,7 @@ public class NexHelper implements Runnable {
 			//AccountCreator.createIPCooldownMessage("50.237.102.215", 300);
 			while (true) {
 				int tmp_interval = launchInterval;
-				if (getProcessCpuLoad() < 80) tmp_interval = 0;
+				if (getProcessCpuLoad() < 80) tmp_interval /= 2;
 				if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + tmp_interval) {
 					lastStart = System.currentTimeMillis();
 					nextRequest = messageQueue.pop();
