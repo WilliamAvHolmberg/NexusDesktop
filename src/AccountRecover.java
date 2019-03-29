@@ -75,49 +75,50 @@ public class AccountRecover {
 	}
 
 
+	public static int activeAccountRecoveries = 0;
 	public void recoverAccount(PrivateProxy proxy, String username, String password, String address) throws InterruptedException {
 		 setFirefoxDriver();
 			// hardcoded
 
 			FirefoxProfile profile;
 			FirefoxOptions options;
-			if (proxy.username != null && proxy.username.length() > 3) {
+//			if (proxy.username != null && proxy.username.length() > 3) {
 				ProfilesIni ini = new ProfilesIni();
 				profile = ini.getProfile("default");
 				options = new FirefoxOptions();
 				profile = copyProfileData(profile, proxy);
-			} else {
-				options = new FirefoxOptions();
-				profile = new FirefoxProfile();
-				profile.setPreference("network.proxy.type", 1);
-				profile.setPreference("network.proxy.socks", proxy.host);
-				profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
-			}
+//			} else {
+//				options = new FirefoxOptions();
+//				profile = new FirefoxProfile();
+//				profile.setPreference("network.proxy.type", 1);
+//				profile.setPreference("network.proxy.socks", proxy.host);
+//				profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
+//			}
 			options.setProfile(profile);
-		WebDriver driver;
-		String gResponse = getCaptchaResponse();
-		if (gResponse != null) {
-		 	driver = new FirefoxDriver(options);
-			logIntoRunescape(driver, gResponse, proxy, username, password);
-		}else {
-		 	Logger.log("Response == null");
-		 	return;
-		}
 
-		if (!failed && doEmailLogin(driver, username)) {
-			doEmailCheck(driver);
-		}
-		if (!failed && OUR_MAIL_LINK != null) {
-			Logger.log(OUR_MAIL_LINK);
-			getPasswordLink(driver);
-		}
+		WebDriver driver = null;
+		try {
+			activeAccountRecoveries++;
+			driver = new FirefoxDriver(options);
+			logIntoRunescape(driver, proxy, username, password);
 
-		if (!failed && SET_PASSWORD_URL != null) {
-			setNewPassword(driver, newPassword);
+			if (!failed && doEmailLogin(driver, username)) {
+				doEmailCheck(driver);
+			}
+			if (!failed && OUR_MAIL_LINK != null) {
+				Logger.log(OUR_MAIL_LINK);
+				getPasswordLink(driver);
+			}
+
+			if (!failed && SET_PASSWORD_URL != null) {
+				setNewPassword(driver, newPassword);
+			}
+		} finally {
+			activeAccountRecoveries--;
+			if(driver != null)
+				driver.close();
+			driver = null;
 		}
-		Logger.log("not logged in");
-		driver.close();
-		driver = null;
 	}
 
 	private int fails = 0;
@@ -214,13 +215,13 @@ public class AccountRecover {
 		return true;
 	}
 
-	public void logIntoRunescape(WebDriver driver, String gResponse, PrivateProxy proxy, String username, String password) {
+	public void logIntoRunescape(WebDriver driver, PrivateProxy proxy, String username, String password) {
 
 		failed = true;
 		try {
 			driver.manage().window().maximize();
 
-			if (!ipIsRight(driver, proxy.host)) { // check if the proxy is actually set
+			if (!AccountCreator.ipIsRight(driver, proxy.host)) { // check if the proxy is actually set
 				return;
 			}
 
@@ -238,6 +239,8 @@ public class AccountRecover {
 				Logger.log("Form filled");
 				JavascriptExecutor jse = (JavascriptExecutor) driver;
 
+
+				String gResponse = getCaptchaResponse();
 				jse.executeScript("arguments[0].style.display = 'block';", textarea);
 				if (gResponse != null && textarea != null) {
 					Logger.log("Filled in g-recaptcha-response text-area");
@@ -461,37 +464,42 @@ public class AccountRecover {
 		// driver = new ChromeDriver();
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
 	}
-
-	static FirefoxProfile copyProfileData(FirefoxProfile profile, PrivateProxy proxy) {
-		try {
+	
+	static FirefoxProfile copyProfileData(FirefoxProfile profile, PrivateProxy proxy){
+		try
+		{
+			System.out.println("CurDir: " + AccountLauncher.curDir());
 			Field profileFolderVal = profile.getClass().getDeclaredField("model");
 			profileFolderVal.setAccessible(true);
-			File profileFolder = (File) profileFolderVal.get(profile);
-			File extensionsDir = new File(AccountLauncher.curDir(), "extension");
+			File profileFolder = (File)profileFolderVal.get(profile);
+			File extensionsDir = new File(AccountLauncher.curDir(),"extension");
 			File localProfileFolder = new File(extensionsDir.toString(), "profile");
 
 			File[] files = extensionsDir.listFiles((dir1, name) -> name.endsWith(".xpi"));
 			for (File file : files)
 				profile.addExtension(file);
 
+			System.out.println("Copying profile data to: " + profileFolder);
 			try {
 				FileUtils.copyDirectory(localProfileFolder, profileFolder);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
-			Path proxySwitchSett = Paths.get(profileFolder.getPath(),
-					"browser-extension-data/{0c3ab5c8-57ac-4ad8-9dd1-ee331517884d}/storage.js");
-			if (Files.exists(proxySwitchSett)) {
+			Path proxySwitchSett = Paths.get(profileFolder.getPath(), "browser-extension-data/{0c3ab5c8-57ac-4ad8-9dd1-ee331517884d}/storage.js");
+			if(Files.exists(proxySwitchSett)){
 				Charset charset = StandardCharsets.UTF_8;
 				String content = new String(Files.readAllBytes(proxySwitchSett), charset);
-				content = content.replaceAll("%HOST%", proxy.host).replaceAll("%PORT%", proxy.port)
-						.replaceAll("%USERNAME%", proxy.username).replaceAll("%PASSWORD%", proxy.password);
+				content = content.replaceAll("%HOST%", proxy.host)
+						.replaceAll("%PORT%", proxy.port)
+						.replaceAll("%USERNAME%", proxy.username)
+						.replaceAll("%PASSWORD%", proxy.password);
 				Files.write(proxySwitchSett, content.getBytes(charset));
 			}
 
 			profile.setPreference("extensions.pendingOperations", true);
 			profile.setPreference("services.sync.globalScore", 606);
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			return null;
@@ -508,25 +516,6 @@ public class AccountRecover {
 	}
 
 
-
-	private static boolean ipIsRight(WebDriver driver, String host) {
-		if(host == null || host.length() < 5) return true;
-		driver.get("http://ipv4.plain-text-ip.com/");
-		waitForLoad(driver);
-		String myIP = driver.findElement(By.tagName("body")).getText();
-		if(myIP.contains("Error")) {
-			Logger.log("IP Service Error - Continuing anyway");
-			Logger.log("curr ip: " + myIP);
-			Logger.log("ip that should be: " + host);
-			return true;
-		} else if (!myIP.contains(host)) {
-			Logger.log("BAD IP. RETURN");
-			Logger.log("curr ip: " + myIP);
-			Logger.log("ip that should be: " + host);
-			return false;
-		}
-		return true;
-	}
 
 	private static String getDriverNameFirefox() {
 		switch (AccountLauncher.getOperatingSystemType()) {

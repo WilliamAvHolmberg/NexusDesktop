@@ -10,6 +10,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.http.HttpEntity;
@@ -21,13 +22,55 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.medusa.Utils.Logger;
 import org.openqa.selenium.json.JsonException;
 
 public class Test {
 
-	public static void main(String[] args) {
-//		Test.TestWatchdog();
-		Test.TestLaunching();
+	public static void main(String[] args) throws InterruptedException {
+
+
+		while (true){
+			Logger.log(generateRandomString());
+			Thread.sleep(1000);
+		}
+
+//		TestWatchdog();
+//		TestLaunching();
+	}
+
+	public static String generateRandomString(){
+		StringBuilder sb = new StringBuilder();
+		int length = RandomnextInt(8, 12);
+		char lastChar = ' ';
+		for(int i = 0; i < length; ) {
+			char ascii;
+			if(isVowel(lastChar) || lastChar == ' ')
+				ascii = (char)RandomnextInt('_', 'z');
+			else
+				ascii = "aeiou ".charAt(RandomnextInt(0, 6));
+			if (ascii < 'a')
+				ascii = ' ';
+			if((i < 2 || i >= length - 2) && ascii == ' ')
+				continue;
+			if (lastChar == ' ') {
+				if(ascii == ' ') continue;
+				else ascii += 'A' - 'a';
+			} else if (ascii == ' ' && sb.charAt(i - 2) == ' ')
+				continue;
+			sb.append(ascii);
+			lastChar = ascii;
+			i++;
+		}
+		return sb.toString();
+	}
+	public static boolean isVowel(char c) {
+		return "AEIOUaeiou".indexOf(c) != -1;
+	}
+
+	static Random random = new Random();
+	static int RandomnextInt(int min, int max){
+		return (int)((random.nextDouble() * (max - min)) + min);
 	}
 
 	public static void TestWatchdog() {

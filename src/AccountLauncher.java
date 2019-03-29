@@ -133,9 +133,13 @@ public final class AccountLauncher {
 
 	}
 
-	public static String curDir() {
-		return new File(ClassLoader.getSystemClassLoader().getResource(".").getPath()).getAbsolutePath().replace("%20",
-				" ");
+	public static String curDir(){
+		try {
+			return new File(NexHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath();
+		}catch (URISyntaxException e){
+			e.printStackTrace();
+		}
+		return "";
 	}
 
 	public static String getRSPeerJar(){
@@ -143,15 +147,8 @@ public final class AccountLauncher {
 			return "./rspeer-launcher.jar";
 		JFileChooser fr = new JFileChooser();
 		FileSystemView fw = fr.getFileSystemView();
-		String path = "-Xmx384m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -Xss2m -Dsun.java2d.noddraw=true -Xincgc " + 
-				Paths.get(fw.getDefaultDirectory().toString(), "RSPeer", "cache", "rspeer.jar").toString().replace("%20",
-		                " ");
-		
-		//quickfix for my home desktop which contains space in name.
-		if(path.contains(" ")) {
-			return "./rspeer.jar";
-		}
-		return path;
+		return "-Xmx384m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -Xss2m -Dsun.java2d.noddraw=true -Xincgc " +
+				Paths.get(fw.getDefaultDirectory().toString(), "RSPeer", "cache", "rspeer.jar").toString();
 	}
 
 	public static void setOutputStream(Process process) {

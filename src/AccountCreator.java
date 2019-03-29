@@ -47,6 +47,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class AccountCreator {
 
+	private static final String RUNESCAPE_HOME_URL = "https://runescape.com";
 	private static final String RUNESCAPE_URL = "https://secure.runescape.com/m=account-creation/create_account";
 	private static final String RANDGEN_URL = "https://randomuser.me/api/?nat=gb";
 	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0";
@@ -57,7 +58,6 @@ public class AccountCreator {
 
 
 	public boolean createAccount(String username, String email, String password, PrivateProxy proxy, String address) {
-		Logger.log("Waiting for captcha code... This might take a while...");
 		if (proxy != null && proxy.host.length() > 5) {
 			Logger.log("Connecting to Proxy " + proxy.host + ":" + proxy.port);
 			if(!proxy.setSystemProxy())
@@ -86,6 +86,7 @@ public class AccountCreator {
 					case "anticaptcha":
 						AntiCaptcha antiCaptcha = new AntiCaptcha();
 						try {
+							Logger.log("Waiting for captcha code... This might take a while...");
 							token = antiCaptcha.solveCaptcha(RUNESCAPE_URL);
 							completed = true;
 						} catch (MalformedURLException | InterruptedException e) {
@@ -146,7 +147,7 @@ public class AccountCreator {
 		// driver = new ChromeDriver();
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
 	}
-	
+
 	static FirefoxProfile copyProfileData(FirefoxProfile profile, PrivateProxy proxy){
 		try
 		{
@@ -192,7 +193,7 @@ public class AccountCreator {
 	}
 
 	static synchronized void killLeftoverProcesses(){
-		if (activeAccountCreators == 0){
+		if (activeAccountCreators == 0 && AccountRecover.activeAccountRecoveries == 0){
 			if (AccountLauncher.getOperatingSystemType() == AccountLauncher.OSType.Windows){
 				Runtime rt = Runtime.getRuntime();
 				final String[] processes = new String[] { "firefox.exe", "geckodriver.exe" };
@@ -223,7 +224,7 @@ public class AccountCreator {
 		 * profile.setPreference("network.proxy.type", 1);
 		 * profile.setPreference("network.proxy.socks", proxy.host);
 		 * profile.setPreference("network.proxy.socks_port", proxy.port);
-		 * 
+		 *
 		 * options.setProfile(profile);
 		 */
 
@@ -231,7 +232,7 @@ public class AccountCreator {
 
 		activeAccountCreators++;
 		setFirefoxDriver();
-		
+
 		FirefoxProfile profile;
 		FirefoxOptions options;
 //		if (proxy.host != null && proxy.host.length() > 3 &&
@@ -259,7 +260,15 @@ public class AccountCreator {
 			if(!ipIsRight(driver, proxy.host)) { //check if the proxy is actually set
 				return;
 			}
-			
+
+//			driver.get(RUNESCAPE_HOME_URL);
+//			waitForLoad(driver);
+
+			boolean created = false;
+			boolean captchaFailed = false;
+			int attempts = 0;
+			while (!failed && !created && !captchaFailed && attempts < 3) {
+				attempts++;
 				driver.get(RUNESCAPE_URL);
 				Logger.log("Waiting for Page Load...");
 				waitForLoad(driver);
@@ -289,7 +298,6 @@ public class AccountCreator {
 						Logger.log("ERROR MESSAGEE");
 						cooldown = 60;
 						createIPCooldownMessage(proxy.host, cooldown);
-						
 					}
 					if (dobDay == null || dobMonth == null || dobYear == null || email == null || password == null || textarea == null || submit == null) {
 						TimeUnit.MILLISECONDS.sleep(2000);
@@ -297,7 +305,7 @@ public class AccountCreator {
 					}
 					break;
 				}
-				
+
 				boolean created = false;
 				boolean captchaFailed = false;
 				int attempts = 0;
@@ -323,13 +331,22 @@ public class AccountCreator {
 				email.sendKeys(loginEmail);
 				// displayname.sendKeys("williamsosos");
 				password.sendKeys(loginPassword);
-				try {
-					if(acceptCookies != null)
-						acceptCookies.click();
-				} catch (Exception ex){}
+//				try {
+//					if(acceptCookies != null)
+//						acceptCookies.click();
+//				} catch (Exception ex){}
+
 
 				Logger.log("Form filled");
 				JavascriptExecutor jse = (JavascriptExecutor) driver;
+
+				if(gresponse == null) {
+					gresponse = getCaptcha();
+					if(gresponse == null) {
+						System.out.println("Couldnt get captcha :(");
+						return;
+					}
+				}
 
 				TimeUnit.SECONDS.sleep(2);
 
@@ -344,13 +361,14 @@ public class AccountCreator {
 				Logger.log("Scrolling");
 				driver.switchTo().defaultContent();
 				jse.executeScript("window.scrollBy(0,250)", "");
-				TimeUnit.SECONDS.sleep(6);
+				TimeUnit.SECONDS.sleep(1);
+
 				jse.executeScript("onSubmit()");
 				//submit.sendKeys(Keys.ENTER);
 				//submit.click();
-				TimeUnit.SECONDS.sleep(6);	//added this for leaving the captcha too fast
+				TimeUnit.SECONDS.sleep(1);	//added this for leaving the captcha too fast
 				waitForLoad(driver);
-				TimeUnit.SECONDS.sleep(10);	//added this for leaving the captcha too fast
+				TimeUnit.SECONDS.sleep(3);	//added this for leaving the captcha too fast
 
 				Logger.log("Opening Captcha");
 
@@ -399,29 +417,39 @@ public class AccountCreator {
 			} catch (Exception e){ }
 			driver = null;
 		}
-		
+
 	}
 
-	private static boolean ipIsRight(WebDriver driver, String host) {
+	public static boolean ipIsRight(WebDriver driver, String host) {
 		if(host == null || host.length() < 5) return true;
-		driver.get("http://ipv4.plain-text-ip.com/");
-		waitForLoad(driver);
-		try {
-			AccountRecover.sleepUntilFindElement(driver, By.tagName("body"), 60);
-		}catch (InterruptedException e){}
-		String myIP = driver.findElement(By.tagName("body")).getText();
-		if(myIP.contains("Error")) {
-			Logger.log("IP Service Error - Continuing anyway");
-			Logger.log("curr ip: " + myIP);
-			Logger.log("ip that should be: " + host);
-			return true;
-		} else if(!myIP.contains(host)) {
-			Logger.log("BAD IP. RETURN");
-			Logger.log("curr ip: " + myIP);
-			Logger.log("ip that should be: " + host);
-			return false;
+		boolean success = false;
+		for (int i = 0; i < 3; i++) {
+			driver.get("http://ipv4.plain-text-ip.com/");
+			waitForLoad(driver);
+			try {
+				AccountRecover.sleepUntilFindElement(driver, By.tagName("body"), 60);
+			} catch (InterruptedException e) {
+			}
+			String myIP = driver.findElement(By.tagName("body")).getText();
+			if (myIP.contains("Error")) {
+				Logger.log("IP Service Error - Continuing anyway");
+				Logger.log("curr ip: " + myIP);
+				Logger.log("ip that should be: " + host);
+				success = true;
+			} else if (!myIP.contains(host)) {
+				Logger.log("BAD IP. RETURN");
+				Logger.log("curr ip: " + myIP);
+				Logger.log("ip that should be: " + host);
+				try {
+					Thread.sleep(1000);
+					Logger.log("Re-checking IP Address...");
+				}catch (InterruptedException ex){}
+				success = false;
+			}else{
+				return true;
+			}
 		}
-		return true;
+		return success;
 	}
 
 	private static String getDriverNameFirefox() {
@@ -438,7 +466,7 @@ public class AccountCreator {
 		}
 		return null;
 	}
-	
+
 	public static void createIPCooldownMessage(String host, int time) {
 		Logger.log("CREATED BAD IP COOLDOWNMESS");
 		NexHelper.messageQueue.push("ip_cooldown:" + host + ":" + time);
