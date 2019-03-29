@@ -260,19 +260,6 @@ public class AccountCreator {
 				return;
 			}
 			
-			boolean created = false;
-			boolean captchaFailed = false;
-			int attempts = 0;
-			while (!failed && !created && !captchaFailed && attempts < 3) {
-				if(gresponse == null) {
-					gresponse = getCaptcha();
-					if(gresponse == null) {
-						System.out.println("Couldnt get captcha :(");
-						return;
-					}
-				}
-
-				attempts++;
 				driver.get(RUNESCAPE_URL);
 				Logger.log("Waiting for Page Load...");
 				waitForLoad(driver);
@@ -310,6 +297,20 @@ public class AccountCreator {
 					}
 					break;
 				}
+				
+				boolean created = false;
+				boolean captchaFailed = false;
+				int attempts = 0;
+				while (!failed && !created && !captchaFailed && attempts < 3) {
+					if(gresponse == null) {
+						gresponse = getCaptcha();
+						if(gresponse == null) {
+							System.out.println("Couldnt get captcha :(");
+							return;
+						}
+					}
+
+					attempts++;
 
 				Random r = new Random();
 				String year = (1980 + (int)(r.nextDouble() * 20)) + "";
