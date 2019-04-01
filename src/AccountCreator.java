@@ -306,9 +306,7 @@ public class AccountCreator {
 					break;
 				}
 
-				boolean created = false;
-				boolean captchaFailed = false;
-				int attempts = 0;
+
 				while (!failed && !created && !captchaFailed && attempts < 3) {
 					if(gresponse == null) {
 						gresponse = getCaptcha();
@@ -409,7 +407,9 @@ public class AccountCreator {
 					continue;
 				}
 			}
-		} finally {
+		
+			}
+			} finally {
 			activeAccountCreators--;
 			try {
 				if (driver != null)

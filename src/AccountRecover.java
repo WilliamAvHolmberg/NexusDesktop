@@ -67,10 +67,11 @@ public class AccountRecover {
 	}
 	*/
 	public AccountRecover(PrivateProxy proxy, String username, String password, String address) throws InterruptedException {
+		Random rand = new Random();
 		this.proxy = proxy;
 		this.address = address;
 		this.username = username;
-		this.newPassword = password + "1";
+		this.newPassword = password + rand.nextInt(300);
 		recoverAccount(proxy, username, password, address);
 	}
 
@@ -140,22 +141,33 @@ public class AccountRecover {
 				setNewPassword(driver, ourPassword);
 				return setNewPassword(driver, ourPassword, retries + 1);
 			}
+			try {
+			WebElement dismissButton = driver.findElement(By.linkText("Got it"));
+			if(dismissButton != null && dismissButton.isDisplayed()) {
+				dismissButton.click();
+				TimeUnit.SECONDS.sleep(6);
+			}
+			}catch(Exception e) {
+				Logger.log("NO COOKIE CLICK TO DISMISS");
+			}
 			WebElement password = driver.findElement(By.name("password"));
 			WebElement confirmPassword = driver.findElement(By.name("confirm"));
 			WebElement submitButton = driver.findElement(By.name("submit"));
 			// send recovery
-			if (password != null) {
+			if (password != null && submitButton != null) {
 				password.sendKeys(ourPassword);
 				confirmPassword.sendKeys(ourPassword);
 				TimeUnit.SECONDS.sleep(6);
 				Logger.log("Form filled");
 				submitButton.click();
+				Thread.sleep(4000);
 			} else {
 				Logger.log("Page failed to load..");
 			}
 
 			sleepUntilFindElement(driver, By.id("p-account-recovery-tracking-result"), 200);
 			// check if recovery was successful
+			Thread.sleep(10000);
 			if (driver.findElements(By.id("p-account-recovery-tracking-result")).size() != 0) {
 				Logger.log("Successfully set password");
 				Logger.log("lets check mail");
@@ -231,7 +243,11 @@ public class AccountRecover {
 			Logger.log("Site loaded.. Lets fill in username details");
 			WebElement formUsername = driver.findElement(By.name("email"));
 			WebElement textarea = driver.findElement(By.id("g-recaptcha-response"));
-
+			WebElement dismissButton = driver.findElement(By.linkText("Got it"));
+			if(dismissButton != null && dismissButton.isDisplayed()) {
+				dismissButton.click();
+				TimeUnit.SECONDS.sleep(6);
+			}
 			// send recovery
 			if (formUsername != null) {
 				formUsername.sendKeys(username);
@@ -346,7 +362,7 @@ public class AccountRecover {
 		String initialMail = initialMailLabel.getText();
 
 		String firstHalf = loginEmail.substring(0, loginEmail.indexOf('@'));
-		String secondHalf = loginEmail.substring(loginEmail.indexOf('@')).substring(0, 2);
+		String secondHalf = loginEmail.substring(loginEmail.indexOf('@'));
 		inputMail.sendKeys(firstHalf);
 		Logger.log(secondHalf);
 		TimeUnit.SECONDS.sleep(6);
