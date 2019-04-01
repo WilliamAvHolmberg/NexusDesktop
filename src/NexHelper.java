@@ -167,7 +167,7 @@ public class NexHelper implements Runnable {
 
 		if(System.getProperties().containsKey("watchdog")) {
 			System.out.println("Beginning Watchdog...");
-			NexWatchdog.begin(computerName, lowResourceOption, interval);
+			//NexWatchdog.begin(computerName, lowResourceOption, interval);
 			return;
 		}
 
@@ -248,7 +248,7 @@ public class NexHelper implements Runnable {
 				if (getProcessCpuLoad() < 80) tmp_interval /= 2;
 				if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + tmp_interval) {
 					lastStart = System.currentTimeMillis();
-					nextRequest = messageQueue.pop();
+					nextRequest = getMessage(messageQueue);
 					String[] parsed = nextRequest.split(":");
 					Logger.log(nextRequest);
 					Logger.log(parsed[0]);
@@ -317,6 +317,16 @@ public class NexHelper implements Runnable {
 	}
 
 
+	private String getMessage(Stack<String> messageQueue) {
+		for(String message: messageQueue) {
+			if(message.contains("unlock")) {
+				String respond = message.toString();
+				messageQueue.remove(message);
+				return respond;
+			}
+		}
+		return messageQueue.pop();
+	}
 	private void log(PrintWriter out, BufferedReader in) throws InterruptedException, IOException {
 		if (System.currentTimeMillis() - lastLog > 5000) { // only log every 5 sec
 			lastSentMessage = System.currentTimeMillis();
