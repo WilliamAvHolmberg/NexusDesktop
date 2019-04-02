@@ -346,7 +346,7 @@ public class AccountRecover {
 		String initialMail = initialMailLabel.getText();
 
 		String firstHalf = loginEmail.substring(0, loginEmail.indexOf('@'));
-		String secondHalf = loginEmail.substring(loginEmail.indexOf('@')).substring(0, 2);
+		String secondHalf = loginEmail.substring(loginEmail.indexOf('@'));
 		inputMail.sendKeys(firstHalf);
 		Logger.log(secondHalf);
 		TimeUnit.SECONDS.sleep(6);
