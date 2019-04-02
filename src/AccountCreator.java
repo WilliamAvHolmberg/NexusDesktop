@@ -147,7 +147,7 @@ public class AccountCreator {
 		// driver = new ChromeDriver();
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
 	}
-	
+
 	static FirefoxProfile copyProfileData(FirefoxProfile profile, PrivateProxy proxy){
 		try
 		{
@@ -224,7 +224,7 @@ public class AccountCreator {
 		 * profile.setPreference("network.proxy.type", 1);
 		 * profile.setPreference("network.proxy.socks", proxy.host);
 		 * profile.setPreference("network.proxy.socks_port", proxy.port);
-		 * 
+		 *
 		 * options.setProfile(profile);
 		 */
 
@@ -232,7 +232,7 @@ public class AccountCreator {
 
 		activeAccountCreators++;
 		setFirefoxDriver();
-		
+
 		FirefoxProfile profile;
 		FirefoxOptions options;
 //		if (proxy.host != null && proxy.host.length() > 3 &&
@@ -305,6 +305,18 @@ public class AccountCreator {
 					}
 					break;
 				}
+
+
+				while (!failed && !created && !captchaFailed && attempts < 3) {
+					if(gresponse == null) {
+						gresponse = getCaptcha();
+						if(gresponse == null) {
+							System.out.println("Couldnt get captcha :(");
+							return;
+						}
+					}
+
+					attempts++;
 
 				Random r = new Random();
 				String year = (1980 + (int)(r.nextDouble() * 20)) + "";
@@ -395,7 +407,9 @@ public class AccountCreator {
 					continue;
 				}
 			}
-		} finally {
+		
+			}
+			} finally {
 			activeAccountCreators--;
 			try {
 				if (driver != null)
@@ -403,7 +417,7 @@ public class AccountCreator {
 			} catch (Exception e){ }
 			driver = null;
 		}
-		
+
 	}
 
 	public static boolean ipIsRight(WebDriver driver, String host) {
@@ -452,7 +466,7 @@ public class AccountCreator {
 		}
 		return null;
 	}
-	
+
 	public static void createIPCooldownMessage(String host, int time) {
 		Logger.log("CREATED BAD IP COOLDOWNMESS");
 		NexHelper.messageQueue.push("ip_cooldown:" + host + ":" + time);
