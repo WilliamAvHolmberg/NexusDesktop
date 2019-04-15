@@ -81,7 +81,7 @@ public class NexHelper implements Runnable {
 				PrivateProxy proxy = new PrivateProxy("NHTzq7", "mxxdZy", "195.158.193.81", "8000");
 				if(!proxy.setSystemProxy())
 					return;
-				AccountCreator.postForm(null, "", "", "", proxy, "http://ipchicken.com/");
+				//AccountCreator.postForm(null, "", "", "", proxy, "http://ipchicken.com/");
 			}catch (Exception ex){ ex.printStackTrace(); }
 			return;
 		}
@@ -245,7 +245,12 @@ public class NexHelper implements Runnable {
 			//AccountCreator.createIPCooldownMessage("50.237.102.215", 300);
 			while (true) {
 				int tmp_interval = launchInterval;
-				if (getProcessCpuLoad() < 80) tmp_interval /= 2;
+				if(getProcessCpuLoad() > 90) {
+					Logger.log("HIGH CPU LOAD... wait 10 sec");
+					tmp_interval = 30000;
+				}else if (getProcessCpuLoad() > 70) {
+					tmp_interval = 15000;
+				}
 				if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + tmp_interval) {
 					lastStart = System.currentTimeMillis();
 					nextRequest = getMessage(messageQueue);
@@ -292,6 +297,7 @@ public class NexHelper implements Runnable {
 							break;
 					}
 				}
+				Logger.log("LOOP");
 				log(out, in);
 				Thread.sleep(1000);
 			}
@@ -314,6 +320,7 @@ public class NexHelper implements Runnable {
 		}catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		Logger.log("NEX HELPER IS OUT");
 	}
 
 

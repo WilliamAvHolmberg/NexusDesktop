@@ -5,6 +5,8 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 
+import org.medusa.Utils.Logger;
+
 public class PrivateProxy {
 	public String username;
 	public String password;
@@ -31,9 +33,9 @@ public class PrivateProxy {
 		try {
 			whatismyip = new URL("http://checkip.amazonaws.com");
 			BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
-
+			
 			String ip = in.readLine(); // you get the IP as a String
-			System.out.println(ip);
+			Logger.log("IP IS GOOD?" + ip);
 			return true;
 		} catch (IOException e) {
 			System.out.println("Proxy " + host + " is bad");

@@ -12,7 +12,7 @@ import java.util.*;
 public final class AccountLauncher {
 
 	public static String allowOptions = " -allow norender,lowcpu,norandoms ";
-
+	public static boolean firstRun = true;
 	public static enum OSType {
 		Windows, MacOS, Linux;
 	};
@@ -37,11 +37,10 @@ public final class AccountLauncher {
 
 	// static frmRunningAccounts ui;
 
-	static HashMap<Process, Long> running_processes = new HashMap<>();
-	static HashSet<Process> confirmed_running_rocesses = new HashSet<>();
+	//static HashMap<Process, Long> running_processes = new HashMap<>();
+	//static HashSet<Process> confirmed_running_rocesses = new HashSet<>();
 
 	public static void launchClient(String username, String address) {
-		cleanupExistingClients();
 		OSType operatingSystem = AccountLauncher.getOperatingSystemType();
 		// if (ui == null && operatingSystem == OSType.Windows) {
 		// ui = new ui.frmRunningAccounts();
@@ -77,12 +76,10 @@ public final class AccountLauncher {
 					p = windowsBuilder.start();
 					// if (ui != null && username.length() > 0)
 					// ui.addAccount(p, username);
-					setOutputStream(p);
 					break;
 				case MacOS:
 					// Process p2 = macBuilder.start();
 					p = Runtime.getRuntime().exec("java -jar rspeer-launcher.jar " + address);
-					setOutputStream(p);
 					break;
 				case Linux:
 					System.out.println("lets go linux");
@@ -95,7 +92,6 @@ public final class AccountLauncher {
 						} catch (Exception ex) {
 						}
 					}
-					setOutputStream(p);
 					break;
 				}
 			} catch (Exception ex) {
@@ -110,7 +106,7 @@ public final class AccountLauncher {
 
 	}
 
-	static void cleanupExistingClients() {
+	/*static void cleanupExistingClients() {
 		running_processes.entrySet().removeIf(entry -> {
 			if (entry.getKey() == null || !entry.getKey().isAlive()) {
 				try {
@@ -130,9 +126,11 @@ public final class AccountLauncher {
 				}
 			}
 		}
+		}
+		*/
+	
 
-	}
-
+	
 	public static String curDir(){
 		try {
 			return new File(NexHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath();
@@ -143,39 +141,17 @@ public final class AccountLauncher {
 	}
 
 	public static String getRSPeerJar(){
-		if(running_processes.size() == 0)
+		if(firstRun) {
+			firstRun = false;
 			return "./rspeer-launcher.jar";
+		}
 		JFileChooser fr = new JFileChooser();
 		FileSystemView fw = fr.getFileSystemView();
 		return "-Xmx384m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -Xss2m -Dsun.java2d.noddraw=true -Xincgc " +
 				Paths.get(fw.getDefaultDirectory().toString(), "RSPeer", "cache", "rspeer.jar").toString();
 	}
 
-	public static void setOutputStream(Process process) {
-		running_processes.put(process, System.currentTimeMillis());
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				String line = null;
-				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-				int c;
-				try {
-					while ((line = reader.readLine()) != null) {
-						if (line.contains("Failed to dowload configuration"))
-							process.destroy();
-						else if (line.contains("CONNECTED TO NEX")) {
-//							System.out.println("Confirmed");
-							confirmed_running_rocesses.add(process);
-						}
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 
-			}
-		}).start();
-
-	}
 }
 
 // Your proxy string will have to include " -proxy ip:port", I did it like that

@@ -52,6 +52,7 @@ public class AccountRecover {
 	private String address;
 	private String username;
 	private boolean failed = false;
+	private boolean completed = false;
 
 	/*
 	 *
@@ -63,10 +64,11 @@ public class AccountRecover {
 	 */
 	public AccountRecover(PrivateProxy proxy, String username, String password, String address)
 			throws InterruptedException {
+		Random rand = new Random();
 		this.proxy = proxy;
 		this.address = address;
 		this.username = username;
-		this.newPassword = password + rand.nextInt(300);
+		this.newPassword = "bran" + rand.nextInt(10) + "asp" + rand.nextInt(10);
 		recoverAccount(proxy, username, password, address);
 	}
 
@@ -123,6 +125,9 @@ public class AccountRecover {
 			}
 		} finally {
 			activeAccountRecoveries--;
+			if(!completed) {
+				createUnlockCooldownMessage(proxy.host, 1000);
+			}
 			if (driver != null)
 				driver.close();
 			driver = null;
@@ -140,16 +145,9 @@ public class AccountRecover {
 			driver.get(SET_PASSWORD_URL);
 			Logger.log("Waiting for Page Load...");
 			waitForLoad(driver);
+			Thread.sleep(10000);
 			if (driver.findElements(By.id("p-account-recovery-reset-password")).size() == 0) {
-				if (retries > 2)
-					return false;
-				Logger.log("Did not load page. lets try again");
-				if (fails > 3) {
-					return false;
-				}
-				fails++;
-				setNewPassword(driver, ourPassword);
-				return setNewPassword(driver, ourPassword, retries + 1);
+				return false;
 			}
 			try {
 			WebElement dismissButton = driver.findElement(By.linkText("Got it"));
@@ -162,14 +160,29 @@ public class AccountRecover {
 			}
 			WebElement password = driver.findElement(By.name("password"));
 			WebElement confirmPassword = driver.findElement(By.name("confirm"));
-			WebElement submitButton = driver.findElement(By.name("submit"));
 			// send recovery
-			if (password != null && submitButton != null) {
+			if (password != null) {
 				password.sendKeys(ourPassword);
 				confirmPassword.sendKeys(ourPassword);
 				TimeUnit.SECONDS.sleep(6);
 				Logger.log("Form filled");
-				submitButton.click();
+				try {
+					
+					TimeUnit.SECONDS.sleep(1);
+					//WebElement submitButton = driver.findElement(By.name("submit"));
+					//submitButton.click();
+					password.submit();
+				
+				}catch(Exception e) {
+					Logger.log("SUBMITBUTTON GOT FUCKED UP");
+					try {
+						WebElement submitButton = driver.findElement(By.linkText("Change Password"));
+						submitButton.click();
+					}catch(Exception ee) {
+						Logger.log("OTHER SUBMITBUTTON GOT FUCKED UP ASWELL");
+					}
+				}
+				
 				Thread.sleep(4000);
 			} else {
 				Logger.log("Page failed to load..");
@@ -183,10 +196,11 @@ public class AccountRecover {
 				Logger.log("lets check mail");
 				// send message - account is unlocked
 				createAccountUnlocked(username, newPassword);
+				completed = true;
 
 			} else {
 				Logger.log("something went wrong");
-				// send message - account is not unlocked
+				createUnlockCooldownMessage(proxy.host,100);
 			}
 		} catch (Exception e) {
 			Logger.log("we failed");
@@ -233,7 +247,7 @@ public class AccountRecover {
 			}
 			if (setPasswordUrl != null)
 				break;
-			TimeUnit.SECONDS.sleep(3);
+			Thread.sleep(3);
 		}
 		SET_PASSWORD_URL = setPasswordUrl;
 		return true;
@@ -253,13 +267,19 @@ public class AccountRecover {
 			Logger.log("Waiting for Page Load...");
 			waitForLoad(driver);
 			Logger.log("Site loaded.. Lets fill in username details");
-			WebElement formUsername = driver.findElement(By.name("email"));
-			WebElement textarea = driver.findElement(By.id("g-recaptcha-response"));
-			WebElement dismissButton = driver.findElement(By.linkText("Got it"));
+			Thread.sleep(5000);
+			try {
+				WebElement dismissButton = driver.findElement(By.linkText("Got it"));
 			if(dismissButton != null && dismissButton.isDisplayed()) {
 				dismissButton.click();
 				TimeUnit.SECONDS.sleep(6);
 			}
+			}catch(Exception e) {
+				Logger.log("NO COOKIE CLICK TO DISMISS");
+			}
+			WebElement formUsername = driver.findElement(By.name("email"));
+			WebElement textarea = driver.findElement(By.id("g-recaptcha-response"));
+		
 			// send recovery
 			if (formUsername != null) {
 				formUsername.sendKeys(username);
@@ -276,16 +296,15 @@ public class AccountRecover {
 					Logger.log("Could not find g-recaptcha-response text-area");
 				}
 
-				Logger.log("Scrolling");
+
 				driver.switchTo().defaultContent();
-				jse.executeScript("window.scrollBy(0,250)", "");
 				TimeUnit.SECONDS.sleep(6);
 				jse.executeScript("onSubmit()");
 				// submit.sendKeys(Keys.ENTER);
 			} else {
 				Logger.log("Page failed to load..");
 			}
-
+			/*
 			if (sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 50).size() == 0) {
 				WebElement tryAgainLink = driver.findElement(By.cssSelector("a[data-test='try-again-link']"));
 				if (tryAgainLink != null) {
@@ -300,11 +319,9 @@ public class AccountRecover {
 					waitForLoad(driver);
 					sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 50);
 				}
-			}
+			}*/
 
-			waitForLoad(driver);
-			TimeUnit.SECONDS.sleep(5);
-			waitForLoad(driver);
+			Thread.sleep(15000);
 
 			// check if recovery was successful
 			if (driver.findElements(By.id("p-account-recovery-pre-confirmation")).size() > 0
@@ -322,7 +339,7 @@ public class AccountRecover {
 		}
 		if (failed) {
 			Logger.log("something went wrong");
-			createUnlockCooldownMessage(proxy.host, 1000);
+			
 		}
 
 		NexHelper.UNLOCK_IS_READY = true;
@@ -352,7 +369,7 @@ public class AccountRecover {
 	private boolean doEmailLogin(WebDriver driver, String loginEmail) throws InterruptedException {
 		driver.get(EMAIL_SET_URL);
 		Logger.log("Waiting for Page Load...");
-		waitForLoad(driver);
+		Thread.sleep(10000);
 
 		WebElement inputMail = null, inputDomain = null, submit = null;
 		for (int i = 0; i < 3; i++) {
@@ -379,12 +396,12 @@ public class AccountRecover {
 		String secondHalf = loginEmail.substring(loginEmail.indexOf('@'));
 		inputMail.sendKeys(firstHalf);
 		Logger.log(secondHalf);
-		TimeUnit.SECONDS.sleep(6);
+		Thread.sleep(10000);
 		Select dropdown = new Select(inputDomain);
 		dropdown.selectByVisibleText(secondHalf);
-		TimeUnit.SECONDS.sleep(6);
+		Thread.sleep(6000);
 		submit.click();
-		TimeUnit.SECONDS.sleep(6);
+		Thread.sleep(6000);
 		sleepUntilFindElement(driver, By.className("alert-success"), 200);
 
 		return true;
@@ -489,7 +506,6 @@ public class AccountRecover {
 			}
 		}
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
-		// driver = new ChromeDriver();
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
 	}
 
