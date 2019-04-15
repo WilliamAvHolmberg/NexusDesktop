@@ -1,14 +1,18 @@
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class NexWatchdog {
     public static void begin(String computerName, int lowResourceOption, int interval){
+
         String bash = "bash.exe";
         if(AccountLauncher.getOperatingSystemType() == AccountLauncher.OSType.Linux)
             bash = "/bin/bash";
-        ProcessBuilder rails_server = new ProcessBuilder(bash, "-i", "-c", "rails server");
+
+        //ProcessBuilder rails_server = new ProcessBuilder(bash, "-i", "-c", "rails server");
         //rails_server.inheritIO();
-        ProcessBuilder nexus_rb = new ProcessBuilder(bash, "-i", "-c", "ruby app/nexus.rb");
-        nexus_rb.inheritIO();
+
         // java -jar -Xmx1024M -Dcomputer=SERVER -Dresources=1 -Dinterval=8000 "C:\oxnet\NexusDesktop.jar"
         ProcessBuilder nexus_jar = new ProcessBuilder("java", "-jar", "-Xmx1024M",
                 "-Dcomputer=" + computerName,
@@ -19,17 +23,22 @@ public class NexWatchdog {
         nexus_jar.inheritIO();
 
         Process rails_server_proc = null;
-        Process nexus_rb_proc = null;
+        //ProcessBuilder[] nexus_rb = new ProcessBuilder[3];
+        Process[] nexus_rb_proc = new Process[3];
         Process nexus_jar_proc = null;
         int attempt = 0;
         while (true) {
             try {
                 if(nexus_jar_proc != null && !nexus_jar_proc.isAlive()){
                     attempt++;
-                    if(attempt >= 2) {
+                    if(attempt >= 10) {
                         System.out.println("Killing Ruby");
-                        nexus_rb_proc.destroy();
-                        sleep(3000);
+                        for(int i = 0; i < nexus_rb_proc.length; i++)
+                            if(nexus_rb_proc[i] != null)
+                                nexus_rb_proc[i].destroy();
+                        try {
+                            Thread.sleep(3000);
+                        } catch (InterruptedException e){break;}
                     }
                 }
 
@@ -39,29 +48,55 @@ public class NexWatchdog {
 //                    sleep(5000);
 //                }
 
-                if (nexus_rb_proc == null || !nexus_rb_proc.isAlive()) {
-                    System.out.println("Starting Nexus Ruby");
-                    nexus_rb_proc = nexus_rb.start();
-                    sleep(12000);
-                    attempt = 0;
+                boolean wait = false;
+                for(int i = 0; i < nexus_rb_proc.length; i++) {
+                    Process process = nexus_rb_proc[i];
+                    if (process == null || !process.isAlive()) {
+
+                        ProcessBuilder pb;
+                        pb = new ProcessBuilder(bash, "-i", "-c", "ruby app/nexus.rb -port " + i);
+                        pb.inheritIO();
+
+                        System.out.println("Starting Nexus Ruby " + i);
+                        process = pb.start();
+                        nexus_rb_proc[i] = process;
+                        attempt = 0;
+                        wait = true;
+                        try {
+                            Thread.sleep(1000);
+                        }catch (InterruptedException e){break;}
+                    }
+                }
+                if (wait) {
+                    try {
+                        Thread.sleep(12000);
+                    }catch (InterruptedException e){break;}
                 }
 
                 if (nexus_jar_proc == null || !nexus_jar_proc.isAlive()) {
                     System.out.println("Starting Nexus Helper");
                     nexus_jar_proc = nexus_jar.start();
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 ex.printStackTrace();
             }
-            sleep(1000);
+            try {
+                Thread.sleep(1000);
+            }catch (InterruptedException e){break;}
         }
+        for (Process proc : nexus_rb_proc) {
+            if(proc != null && proc.isAlive()) {
+                proc.destroy();
+            }
+        }
+        try {
+            Thread.sleep(1000);
+        }catch (InterruptedException e){}
+        if(nexus_jar_proc != null && nexus_jar_proc.isAlive())
+            AccountLauncher.killProcess(nexus_jar_proc);
     }
 
-    static void sleep(int millis){
-        try {
-            Thread.sleep(millis);
-        }catch (Exception ex){}
-    }
     public static void killProc(String...processes){
         if (AccountLauncher.getOperatingSystemType() == AccountLauncher.OSType.Windows){
             Runtime rt = Runtime.getRuntime();
