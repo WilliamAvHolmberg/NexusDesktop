@@ -160,7 +160,7 @@ public class AccountRecover {
 				TimeUnit.SECONDS.sleep(6);
 				Logger.log("Form filled");
 				submitButton.click();
-				Thread.sleep(4000);
+				Thread.sleep(1000);
 			} else {
 				Logger.log("Page failed to load..");
 			}

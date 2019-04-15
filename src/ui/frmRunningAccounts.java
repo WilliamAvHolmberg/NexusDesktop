@@ -57,9 +57,10 @@ public class frmRunningAccounts extends JFrame {
         resetModel();
     }
     void resetModel(){
-        model.removeAllElements();
+        model = new javax.swing.DefaultListModel<>();
         for (ProcessLink x : list)
             model.addElement(x);
+        lstAccounts.setModel(model);
     }
 
 //    public void sortList(JList list) {

@@ -1,5 +1,9 @@
 
 import com.google.common.collect.ObjectArrays;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import ui.ProcessLink;
+import ui.frmRunningAccounts;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
@@ -12,11 +16,10 @@ import java.util.*;
 public final class AccountLauncher {
 
 	public static String allowOptions = " -allow norender,lowcpu,norandoms ";
-
 	public static enum OSType {
 		Windows, MacOS, Linux;
 	};
-
+	
 	public static String lastName = "";
 	public static long lastStartup = 0;
 
@@ -35,18 +38,17 @@ public final class AccountLauncher {
 		return detectedOS;
 	}
 
-	// static frmRunningAccounts ui;
+	static frmRunningAccounts ui;
 
 	static HashMap<Process, Long> running_processes = new HashMap<>();
 	static HashSet<Process> confirmed_running_rocesses = new HashSet<>();
-
 	public static void launchClient(String username, String address) {
 		cleanupExistingClients();
 		OSType operatingSystem = AccountLauncher.getOperatingSystemType();
-		// if (ui == null && operatingSystem == OSType.Windows) {
-		// ui = new ui.frmRunningAccounts();
-		// ui.setVisible(true);
-		// }
+		if (ui == null && operatingSystem == OSType.Windows) {
+			ui = new ui.frmRunningAccounts();
+			ui.setVisible(true);
+		}
 
 		System.out.println(address);
 		if (!address.equals(lastName) || System.currentTimeMillis() > (lastStartup + 1000 * 120)) {
@@ -71,38 +73,38 @@ public final class AccountLauncher {
 				// System.out.println(AccountLauncher.getOperatingSystemType());
 				switch (operatingSystem) {
 
-				case Windows:
-					int i = 1;
-					System.out.println("Start windows");
-					p = windowsBuilder.start();
-					// if (ui != null && username.length() > 0)
-					// ui.addAccount(p, username);
-					setOutputStream(p);
-					break;
-				case MacOS:
-					// Process p2 = macBuilder.start();
-					p = Runtime.getRuntime().exec("java -jar rspeer-launcher.jar " + address);
-					setOutputStream(p);
-					break;
-				case Linux:
-					System.out.println("lets go linux");
-					p = linuxBuilder.start();
-					if (new File(curDir() + "/layout.sh").exists()) {
-						try {
-							Thread.sleep(1000);
-							String[] cmd = new String[] { "/bin/sh", curDir() + "/layout.sh" };
-							Process pr = Runtime.getRuntime().exec(cmd);
-						} catch (Exception ex) {
+					case Windows:
+						int i = 1;
+						System.out.println("Start windows");
+						p = windowsBuilder.start();
+						if (ui != null && username.length() > 0)
+							ui.addAccount(p, username);
+						setOutputStream(p);
+						break;
+					case MacOS:
+						//Process p2 = macBuilder.start();
+						p = Runtime.getRuntime().exec("java -jar rspeer-launcher.jar " + address);
+						setOutputStream(p);
+						break;
+					case Linux:
+						System.out.println("lets go linux");
+						p = linuxBuilder.start();
+						if (new File(curDir() + "/layout.sh").exists()) {
+							try {
+								Thread.sleep(1000);
+								String[] cmd = new String[]{"/bin/sh", curDir() + "/layout.sh"};
+								Process pr = Runtime.getRuntime().exec(cmd);
+							} catch (Exception ex) {
+							}
 						}
-					}
-					setOutputStream(p);
-					break;
+						setOutputStream(p);
+						break;
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				if (p != null && p.isAlive()) {
 					System.out.println("DESTROYYYYYY");
-					p.destroy();
+					killProcess(p);
 				}
 				System.out.println(ex.getMessage());
 			}
@@ -114,8 +116,8 @@ public final class AccountLauncher {
 		running_processes.entrySet().removeIf(entry -> {
 			if (entry.getKey() == null || !entry.getKey().isAlive()) {
 				try {
-					// if (ui != null) ui.removeAccount(entry.getKey());
-					// confirmed_running_rocesses.remove(entry.getKey());
+					confirmed_running_rocesses.remove(entry.getKey());
+					if (ui != null) ui.removeAccount(entry.getKey());
 				} catch (Exception ex) {
 				}
 				return true;
@@ -123,14 +125,30 @@ public final class AccountLauncher {
 			return false;
 		});
 		for (Map.Entry<Process, Long> entry : running_processes.entrySet()) {
-			if (System.currentTimeMillis() - entry.getValue() > (8 * 60 * 1000)) {// 5 minutes
+			if (System.currentTimeMillis() - entry.getValue() > (6 * 60 * 1000)) {// 5 minutes
 				if (!confirmed_running_rocesses.contains(entry.getKey())) {
 					System.out.println("Killing process due to innactivity");
-					entry.getKey().destroy();
+					killProcess(entry.getKey());
 				}
 			}
 		}
+	}
 
+	static Boolean killerExists = null;
+	public static void killProcess(Process process){
+		if (killerExists == null)
+			killerExists = getOperatingSystemType() == OSType.Windows && new File("KillProcess.exe").exists();
+		if(killerExists) {
+			long pid = ProcessLink.getProcessID(process);
+			if (pid != -1) {
+				ProcessBuilder killer = new ProcessBuilder("KillProcess.exe", pid + "");
+				try {
+					killer.start();
+					return;
+				}catch (IOException ex){}
+			}
+		}
+		process.destroy();
 	}
 
 	public static String curDir(){
@@ -161,8 +179,10 @@ public final class AccountLauncher {
 				int c;
 				try {
 					while ((line = reader.readLine()) != null) {
-						if (line.contains("Failed to dowload configuration"))
-							process.destroy();
+						if (line.contains("Failed to download configuration")) {
+							killProcess(process);
+							return;
+						}
 						else if (line.contains("CONNECTED TO NEX")) {
 //							System.out.println("Confirmed");
 							confirmed_running_rocesses.add(process);

@@ -31,11 +31,14 @@ public class NexWatchdog {
             try {
                 if(nexus_jar_proc != null && !nexus_jar_proc.isAlive()){
                     attempt++;
-                    if(attempt >= 2) {
+                    if(attempt >= 10) {
                         System.out.println("Killing Ruby");
                         for(int i = 0; i < nexus_rb_proc.length; i++)
-                            if(nexus_rb_proc[i] != null) nexus_rb_proc[i].destroy();
-                        sleep(3000);
+                            if(nexus_rb_proc[i] != null)
+                                nexus_rb_proc[i].destroy();
+                        try {
+                            Thread.sleep(3000);
+                        } catch (InterruptedException e){break;}
                     }
                 }
 
@@ -59,11 +62,16 @@ public class NexWatchdog {
                         nexus_rb_proc[i] = process;
                         attempt = 0;
                         wait = true;
-                        sleep(1000);
+                        try {
+                            Thread.sleep(1000);
+                        }catch (InterruptedException e){break;}
                     }
                 }
-                if (wait)
-                    sleep(12000);
+                if (wait) {
+                    try {
+                        Thread.sleep(12000);
+                    }catch (InterruptedException e){break;}
+                }
 
                 if (nexus_jar_proc == null || !nexus_jar_proc.isAlive()) {
                     System.out.println("Starting Nexus Helper");
@@ -73,15 +81,22 @@ public class NexWatchdog {
             catch (Exception ex) {
                 ex.printStackTrace();
             }
-            sleep(1000);
+            try {
+                Thread.sleep(1000);
+            }catch (InterruptedException e){break;}
         }
+        for (Process proc : nexus_rb_proc) {
+            if(proc != null && proc.isAlive()) {
+                proc.destroy();
+            }
+        }
+        try {
+            Thread.sleep(1000);
+        }catch (InterruptedException e){}
+        if(nexus_jar_proc != null && nexus_jar_proc.isAlive())
+            AccountLauncher.killProcess(nexus_jar_proc);
     }
 
-    static void sleep(int millis){
-        try {
-            Thread.sleep(millis);
-        }catch (Exception ex){}
-    }
     public static void killProc(String...processes){
         if (AccountLauncher.getOperatingSystemType() == AccountLauncher.OSType.Windows){
             Runtime rt = Runtime.getRuntime();

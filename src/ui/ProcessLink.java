@@ -202,7 +202,7 @@ public class ProcessLink implements Comparable<ProcessLink> {
 //        childCache.put(pid, processIDs);
 //        return processIDs;
 //    }
-    static long getProcessID(Process p)
+    public static long getProcessID(Process p)
     {
         long result = -1;
         try

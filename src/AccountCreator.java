@@ -26,6 +26,8 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
@@ -58,12 +60,12 @@ public class AccountCreator {
 
 
 	public boolean createAccount(String username, String email, String password, PrivateProxy proxy, String address) {
-		if (proxy != null && proxy.host.length() > 5) {
-			Logger.log("Connecting to Proxy " + proxy.host + ":" + proxy.port);
-			if(!proxy.setSystemProxy())
-				return false;
-			Logger.log("Successfully connected");
-		}
+//		if (proxy != null && proxy.host.length() > 5) {
+//			Logger.log("Connecting to Proxy " + proxy.host + ":" + proxy.port);
+//			if(!proxy.setSystemProxy())
+//				return false;
+//			Logger.log("Successfully connected");
+//		}
 		String token = null;
 		if(CAPTCHA_FIRST)
 			token = getCaptcha();
@@ -235,21 +237,23 @@ public class AccountCreator {
 
 		FirefoxProfile profile;
 		FirefoxOptions options;
-//		if (proxy.host != null && proxy.host.length() > 3 &&
-//			proxy.username != null && proxy.username.length() > 3) {
+		if (proxy.host != null && proxy.host.length() > 3 &&
+			proxy.username != null && proxy.username.length() > 3) {
 			ProfilesIni ini = new ProfilesIni();
 			profile = ini.getProfile("default");
 			options = new FirefoxOptions();
 			profile = copyProfileData(profile, proxy);
-//		}
-//		else {
-//			options = new FirefoxOptions();
-//			profile = new FirefoxProfile();
-//			profile.setPreference("network.proxy.type", 1);
-//			profile.setPreference("network.proxy.socks", proxy.host);
-//			if(proxy.port.length() > 1)
-//				profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
-//		}
+		}
+		else {
+			options = new FirefoxOptions();
+			profile = new FirefoxProfile();
+			profile.setPreference("network.proxy.type", 1);
+			profile.setPreference("network.proxy.socks", proxy.host);
+			if(proxy.port.length() > 1)
+				profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port.trim()));
+			else
+				profile.setPreference("network.proxy.socks_port", "0");
+		}
 		options.setProfile(profile);
 		WebDriver driver = null;
 		boolean failed = false;
@@ -305,18 +309,6 @@ public class AccountCreator {
 					}
 					break;
 				}
-
-
-				while (!failed && !created && !captchaFailed && attempts < 3) {
-					if(gresponse == null) {
-						gresponse = getCaptcha();
-						if(gresponse == null) {
-							System.out.println("Couldnt get captcha :(");
-							return;
-						}
-					}
-
-					attempts++;
 
 				Random r = new Random();
 				String year = (1980 + (int)(r.nextDouble() * 20)) + "";
@@ -407,9 +399,7 @@ public class AccountCreator {
 					continue;
 				}
 			}
-		
-			}
-			} finally {
+		} finally {
 			activeAccountCreators--;
 			try {
 				if (driver != null)
@@ -417,7 +407,7 @@ public class AccountCreator {
 			} catch (Exception e){ }
 			driver = null;
 		}
-
+		
 	}
 
 	public static boolean ipIsRight(WebDriver driver, String host) {
@@ -430,13 +420,15 @@ public class AccountCreator {
 				AccountRecover.sleepUntilFindElement(driver, By.tagName("body"), 60);
 			} catch (InterruptedException e) {
 			}
+			if(host.equals(NexHelper.LOCAL_IP))
+				return true;
 			String myIP = driver.findElement(By.tagName("body")).getText();
 			if (myIP.contains("Error")) {
 				Logger.log("IP Service Error - Continuing anyway");
 				Logger.log("curr ip: " + myIP);
 				Logger.log("ip that should be: " + host);
 				success = true;
-			} else if (!myIP.contains(host)) {
+			} else if (myIP.contains(NexHelper.LOCAL_IP)) {
 				Logger.log("BAD IP. RETURN");
 				Logger.log("curr ip: " + myIP);
 				Logger.log("ip that should be: " + host);
@@ -450,6 +442,17 @@ public class AccountCreator {
 			}
 		}
 		return success;
+	}
+	static String findIPInString(String ipString){
+		String IPADDRESS_PATTERN = "\\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\\b";
+		Pattern pattern = Pattern.compile(IPADDRESS_PATTERN);
+		Matcher matcher = pattern.matcher(ipString);
+		if (matcher.find()) {
+			return matcher.group();
+		}
+		else{
+			return "0.0.0.0";
+		}
 	}
 
 	private static String getDriverNameFirefox() {
@@ -466,7 +469,7 @@ public class AccountCreator {
 		}
 		return null;
 	}
-
+	
 	public static void createIPCooldownMessage(String host, int time) {
 		Logger.log("CREATED BAD IP COOLDOWNMESS");
 		NexHelper.messageQueue.push("ip_cooldown:" + host + ":" + time);
