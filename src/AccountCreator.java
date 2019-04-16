@@ -39,7 +39,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
@@ -49,14 +48,14 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class AccountCreator {
 
-	private static final String RUNESCAPE_HOME_URL = "https://runescape.com";
-	private static final String RUNESCAPE_URL = "https://secure.runescape.com/m=account-creation/create_account";
-	private static final String RANDGEN_URL = "https://randomuser.me/api/?nat=gb";
-	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0";
-	private static String CAPTCHA_SOLVER = "anticaptcha";
+	private final String RUNESCAPE_HOME_URL = "https://runescape.com";
+	private final String RUNESCAPE_URL = "https://secure.runescape.com/m=account-creation/create_account";
+	private final String RANDGEN_URL = "https://randomuser.me/api/?nat=gb";
+	private final String USER_AGENT = "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0";
+	private String CAPTCHA_SOLVER = "anticaptcha";
 	//private static String token = null;
 	private static int cooldown = 90;
-	public static final boolean CAPTCHA_FIRST = false;
+	public final boolean CAPTCHA_FIRST = false;
 
 
 	public boolean createAccount(String username, String email, String password, PrivateProxy proxy, String address) {
@@ -78,7 +77,7 @@ public class AccountCreator {
 		}
 		return false;
 	}
-	static String getCaptcha(){
+	String getCaptcha(){
 		int attempts = 0;
 		boolean completed = false;
 		String token = null;
@@ -111,6 +110,9 @@ public class AccountCreator {
 		return token;
 	}
 
+
+
+
 	private static void waitForLoad(WebDriver driver) {
 		ExpectedCondition<Boolean> pageLoadCondition = new ExpectedCondition<Boolean>() {
 			public Boolean apply(WebDriver driver) {
@@ -121,7 +123,7 @@ public class AccountCreator {
 		wait.until(pageLoadCondition);
 	}
 
-	private static void setFirefoxDriver() {
+	private void setFirefoxDriver() {
 		ClassLoader classLoader = AccountCreator.class.getClassLoader();
 		URL resource = classLoader.getResource("drivers/" + getDriverNameFirefox());
 		//System.out.println(resource);
@@ -146,11 +148,10 @@ public class AccountCreator {
 			}
 		}
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
-		// driver = new ChromeDriver();
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
 	}
 
-	static FirefoxProfile copyProfileData(FirefoxProfile profile, PrivateProxy proxy){
+	FirefoxProfile copyProfileData(FirefoxProfile profile, PrivateProxy proxy){
 		try
 		{
 			System.out.println("CurDir: " + AccountLauncher.curDir());
@@ -188,13 +189,13 @@ public class AccountCreator {
 		return profile;
 	}
 
-	static boolean isNullOrEmpty(String str){
+	boolean isNullOrEmpty(String str){
 		if(str == null) return  true;
 		if(str.trim().isEmpty()) return true;
 		return false;
 	}
 
-	static synchronized void killLeftoverProcesses(){
+	 synchronized void killLeftoverProcesses(){
 		if (activeAccountCreators == 0 && AccountRecover.activeAccountRecoveries == 0){
 			if (AccountLauncher.getOperatingSystemType() == AccountLauncher.OSType.Windows){
 				Runtime rt = Runtime.getRuntime();
@@ -211,26 +212,9 @@ public class AccountCreator {
 	}
 
 	static int activeAccountCreators = 0;
-	public static void postForm(String gresponse, String username, String loginEmail, String loginPassword,
+	public void postForm(String gresponse, String username, String loginEmail, String loginPassword,
 			PrivateProxy proxy, String address) throws Exception {
-		// ChromeOptions options = new ChromeOptions();
-		// setting headless mode to true.. so there isn't any ui
-		// options.setHeadless(true);
 
-		// Create a new instance of the Chrome driver
-		// WebDriver driver = new ChromeDriver(options);
-
-		/*
-		 * System.out.println("lets get path"); FirefoxOptions options = new
-		 * FirefoxOptions(); FirefoxProfile profile = new FirefoxProfile();
-		 * profile.setPreference("network.proxy.type", 1);
-		 * profile.setPreference("network.proxy.socks", proxy.host);
-		 * profile.setPreference("network.proxy.socks_port", proxy.port);
-		 *
-		 * options.setProfile(profile);
-		 */
-
-		killLeftoverProcesses();
 
 		activeAccountCreators++;
 		setFirefoxDriver();
@@ -270,17 +254,13 @@ public class AccountCreator {
 
 			boolean created = false;
 			boolean captchaFailed = false;
-			int attempts = 0;
-			while (!failed && !created && !captchaFailed && attempts < 3) {
-				attempts++;
 				driver.get(RUNESCAPE_URL);
 				Logger.log("Waiting for Page Load...");
-				waitForLoad(driver);
-				TimeUnit.SECONDS.sleep(1);
+				Thread.sleep(15000);
 
 				WebElement dobDay = null, dobMonth = null, dobYear = null, email = null, password = null, textarea = null, submit = null;
 				WebElement acceptCookies = null;
-				for (int i = 0; i < 3; i++) {
+
 					Logger.log("Page Loaded");
 					try {
 						dobDay = driver.findElement(By.name("day"));
@@ -291,7 +271,6 @@ public class AccountCreator {
 						password = driver.findElement(By.name("password1"));
 						textarea = driver.findElement(By.id("g-recaptcha-response"));
 						submit = driver.findElement(By.id("create-submit"));
-						acceptCookies = ((FirefoxDriver) driver).findElementByClassName("c-cookie-consent__dismiss");
 					}catch (Exception ex) {
 						Logger.log("ERROR MESSAGEE");
 						Logger.log("ERROR MESSAGEE");
@@ -300,15 +279,16 @@ public class AccountCreator {
 						Logger.log("ERROR MESSAGEE");
 						Logger.log("ERROR MESSAGEE");
 						Logger.log("ERROR MESSAGEE");
-						cooldown = 60;
-						createIPCooldownMessage(proxy.host, cooldown);
+						Logger.log(ex.getMessage());
+
+						if (driver != null) {
+								driver.quit();
+								driver = null;
+								return;
+						}
+
+
 					}
-					if (dobDay == null || dobMonth == null || dobYear == null || email == null || password == null || textarea == null || submit == null) {
-						TimeUnit.MILLISECONDS.sleep(2000);
-						continue;
-					}
-					break;
-				}
 
 				Random r = new Random();
 				String year = (1980 + (int)(r.nextDouble() * 20)) + "";
@@ -334,11 +314,15 @@ public class AccountCreator {
 					gresponse = getCaptcha();
 					if(gresponse == null) {
 						System.out.println("Couldnt get captcha :(");
+						if (driver != null) {
+							driver.quit();
+							driver = null;
+							return;
+						}
 						return;
 					}
 				}
 
-				TimeUnit.SECONDS.sleep(2);
 
 				jse.executeScript("arguments[0].style.display = 'block';", textarea);
 				if(gresponse != null && textarea != null) {
@@ -346,60 +330,42 @@ public class AccountCreator {
 					textarea.sendKeys(gresponse);
 				}else{
 					Logger.log("Could not find g-recaptcha-response text-area");
+					return;
 				}
-
-				Logger.log("Scrolling");
-				driver.switchTo().defaultContent();
-				jse.executeScript("window.scrollBy(0,250)", "");
-				TimeUnit.SECONDS.sleep(1);
-
+				Thread.sleep(15000);
 				jse.executeScript("onSubmit()");
-				//submit.sendKeys(Keys.ENTER);
-				//submit.click();
-				TimeUnit.SECONDS.sleep(1);	//added this for leaving the captcha too fast
-				waitForLoad(driver);
-				TimeUnit.SECONDS.sleep(3);	//added this for leaving the captcha too fast
-
+				Thread.sleep(15000);
 				Logger.log("Opening Captcha");
+			if (driver.findElements(By.id("p-create-error")).size() != 0) {
+				Logger.log("Errooororo. lets send message timeout 10min");
+				createIPCooldownMessage(proxy.host, 120);
+				TimeUnit.SECONDS.sleep(3);
+				failed = true;
+			} else if (driver.findElements(By.className("m-character-name-alts__name")).size() != 0) {
+				System.out.println("Username In Use - Trying another");
+				WebElement newUsername = driver.findElement(By.className("m-character-name-alts__name"));
+				newUsername.click();
+				// submit.sendKeys(Keys.ENTER);
+				TimeUnit.SECONDS.sleep(3);
+				failed = true;
+			} else if (driver.findElements(By.className("google-recaptcha-error")).size() != 0) {
+				Logger.log("Google Recaptcha Error");
+				captchaFailed = true;
+				failed = true;
+			} else if (driver.findElements(By.id("p-account-created")).size() != 0) {
+				created = true;
+				System.out.println("Account Created");
+				String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port + ":" + proxy.username + ":"
+						+ proxy.password;
+				AccountRecover.createAccountUnlocked(loginEmail, loginPassword);
+				AccountLauncher.launchClient(username, address);
 
-				for(int i = 0; i < 5; i++) {
-					TimeUnit.SECONDS.sleep(1);
-					waitForLoad(driver);
-					if (driver.findElements(By.id("p-create-error")).size() != 0) {
-						Logger.log("Errooororo. lets send message timeout 10min");
-						createIPCooldownMessage(proxy.host, 120);
-						TimeUnit.SECONDS.sleep(3);
-						failed = true;
-						break;
-					}else if (driver.findElements(By.className("m-character-name-alts__name")).size() != 0) {
-						System.out.println("Username In Use - Trying another");
-						WebElement newUsername = driver.findElement(By.className("m-character-name-alts__name"));
-						newUsername.click();
-						waitForLoad(driver);
-						// submit.sendKeys(Keys.ENTER);
-						TimeUnit.SECONDS.sleep(3);
-						failed = true;
-					} else if (driver.findElements(By.className("google-recaptcha-error")).size() != 0) {
-						Logger.log("Google Recaptcha Error");
-						captchaFailed = true;
-						failed = true;
-					} else if (driver.findElements(By.id("p-account-created")).size() != 0) {
-						created = true;
-						System.out.println("Account Created");
-						String parsedProxy = "-proxy " + proxy.host + ":" + proxy.port + ":" + proxy.username + ":"
-								+ proxy.password;
-						AccountRecover.createAccountUnlocked(loginEmail, loginPassword);
-						AccountLauncher.launchClient(username, address);
-					}
-					if(created || failed)
-						break;
-				}
-				if (!created && !failed) {
-					gresponse = null;
-					continue;
-				}
 			}
-		} finally {
+
+
+
+
+			} finally {
 			activeAccountCreators--;
 			try {
 				if (driver != null)
@@ -407,7 +373,7 @@ public class AccountCreator {
 			} catch (Exception e){ }
 			driver = null;
 		}
-		
+
 	}
 
 	public static boolean ipIsRight(WebDriver driver, String host) {
@@ -469,7 +435,7 @@ public class AccountCreator {
 		}
 		return null;
 	}
-	
+
 	public static void createIPCooldownMessage(String host, int time) {
 		Logger.log("CREATED BAD IP COOLDOWNMESS");
 		NexHelper.messageQueue.push("ip_cooldown:" + host + ":" + time);

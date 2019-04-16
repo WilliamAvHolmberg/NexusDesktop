@@ -47,62 +47,58 @@ public class AccountRecover {
 	private String CAPTCHA_SOLVER = "anticaptcha";
 	// private static String token = null;
 	private int cooldown = 90;
-	private String newPassword = "ugot00wned4" ; //hardcoded :)
+	private String newPassword = "ugot00wned4"; // hardcoded :)
 	private PrivateProxy proxy;
 	private String address;
 	private String username;
 	private boolean failed = false;
-	/*
+	private boolean completed = false;
 
-	public static void main(String[]args) {
-		PrivateProxy proxy = new PrivateProxy("","", "92.32.69.103", "8888");
-		String username = "BlueArmaBr@weave.email";
-		String password = "ugot00wned2";
-		try {
-			new AccountRecover(proxy, username, password);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	*/
-	public AccountRecover(PrivateProxy proxy, String username, String password, String address) throws InterruptedException {
+	/*
+	 *
+	 * public static void main(String[]args) { PrivateProxy proxy = new
+	 * PrivateProxy("","", "92.32.69.103", "8888"); String username =
+	 * "BlueArmaBr@weave.email"; String password = "ugot00wned2"; try { new
+	 * AccountRecover(proxy, username, password); } catch (InterruptedException e) {
+	 * // TODO Auto-generated catch block e.printStackTrace(); } }
+	 */
+	public AccountRecover(PrivateProxy proxy, String username, String password, String address)
+			throws InterruptedException {
 		Random rand = new Random();
 		this.proxy = proxy;
 		this.address = address;
 		this.username = username;
-		this.newPassword = password + rand.nextInt(300);
+		this.newPassword = "bran" + rand.nextInt(10) + "asp" + rand.nextInt(10);
 		recoverAccount(proxy, username, password, address);
 	}
 
-
 	public static int activeAccountRecoveries = 0;
-	public void recoverAccount(PrivateProxy proxy, String username, String password, String address) throws InterruptedException {
-		 setFirefoxDriver();
-			// hardcoded
 
-			FirefoxProfile profile;
-			FirefoxOptions options;
+	public void recoverAccount(PrivateProxy proxy, String username, String password, String address)
+			throws InterruptedException {
+		setFirefoxDriver();
+		// hardcoded
+
+		FirefoxProfile profile;
+		FirefoxOptions options;
 //			if (proxy.username != null && proxy.username.length() > 3) {
-				ProfilesIni ini = new ProfilesIni();
-				profile = ini.getProfile("default");
-				options = new FirefoxOptions();
-				profile = copyProfileData(profile, proxy);
-//			} else {
+		ProfilesIni ini = new ProfilesIni();
+		profile = ini.getProfile("default");
+		options = new FirefoxOptions();
+		profile = copyProfileData(profile, proxy);
+//		} else {
 //				options = new FirefoxOptions();
 //				profile = new FirefoxProfile();
 //				profile.setPreference("network.proxy.type", 1);
 //				profile.setPreference("network.proxy.socks", proxy.host);
 //				profile.setPreference("network.proxy.socks_port", Integer.parseInt(proxy.port));
-//			}
-			options.setProfile(profile);
+//		}
+		options.setProfile(profile);
 
 		WebDriver driver = null;
 		try {
 			activeAccountRecoveries++;
 			driver = new FirefoxDriver(options);
-			logIntoRunescape(driver, proxy, username, password);
-
 			if (!failed && doEmailLogin(driver, username)) {
 				doEmailCheck(driver);
 			}
@@ -111,35 +107,47 @@ public class AccountRecover {
 				getPasswordLink(driver);
 			}
 
+			if (!failed && SET_PASSWORD_URL == null) {
+
+				logIntoRunescape(driver, proxy, username, password);
+
+				if (!failed && doEmailLogin(driver, username)) {
+					doEmailCheck(driver);
+				}
+				if (!failed && OUR_MAIL_LINK != null) {
+					Logger.log(OUR_MAIL_LINK);
+					getPasswordLink(driver);
+				}
+			}
+
 			if (!failed && SET_PASSWORD_URL != null) {
 				setNewPassword(driver, newPassword);
 			}
 		} finally {
 			activeAccountRecoveries--;
-			if(driver != null)
+			if(!completed) {
+				createUnlockCooldownMessage(proxy.host, 1000);
+			}
+			if (driver != null)
 				driver.close();
 			driver = null;
 		}
 	}
 
 	private int fails = 0;
+
 	public boolean setNewPassword(WebDriver driver, String ourPassword) {
 		return setNewPassword(driver, ourPassword, 0);
 	}
+
 	public boolean setNewPassword(WebDriver driver, String ourPassword, int retries) {
 		try {
 			driver.get(SET_PASSWORD_URL);
 			Logger.log("Waiting for Page Load...");
 			waitForLoad(driver);
+			Thread.sleep(10000);
 			if (driver.findElements(By.id("p-account-recovery-reset-password")).size() == 0) {
-				if(retries > 2) return false;
-				Logger.log("Did not load page. lets try again");
-				if(fails > 3) {
-					return false;
-				}
-				fails++;
-				setNewPassword(driver, ourPassword);
-				return setNewPassword(driver, ourPassword, retries + 1);
+				return false;
 			}
 			try {
 			WebElement dismissButton = driver.findElement(By.linkText("Got it"));
@@ -152,15 +160,30 @@ public class AccountRecover {
 			}
 			WebElement password = driver.findElement(By.name("password"));
 			WebElement confirmPassword = driver.findElement(By.name("confirm"));
-			WebElement submitButton = driver.findElement(By.name("submit"));
 			// send recovery
-			if (password != null && submitButton != null) {
+			if (password != null) {
 				password.sendKeys(ourPassword);
 				confirmPassword.sendKeys(ourPassword);
 				TimeUnit.SECONDS.sleep(6);
 				Logger.log("Form filled");
-				submitButton.click();
-				Thread.sleep(1000);
+				try {
+
+					TimeUnit.SECONDS.sleep(1);
+					//WebElement submitButton = driver.findElement(By.name("submit"));
+					//submitButton.click();
+					password.submit();
+
+				}catch(Exception e) {
+					Logger.log("SUBMITBUTTON GOT FUCKED UP");
+					try {
+						WebElement submitButton = driver.findElement(By.linkText("Change Password"));
+						submitButton.click();
+					}catch(Exception ee) {
+						Logger.log("OTHER SUBMITBUTTON GOT FUCKED UP ASWELL");
+					}
+				}
+
+				Thread.sleep(4000);
 			} else {
 				Logger.log("Page failed to load..");
 			}
@@ -171,12 +194,13 @@ public class AccountRecover {
 			if (driver.findElements(By.id("p-account-recovery-tracking-result")).size() != 0) {
 				Logger.log("Successfully set password");
 				Logger.log("lets check mail");
-				//send message - account is unlocked
+				// send message - account is unlocked
 				createAccountUnlocked(username, newPassword);
+				completed = true;
 
 			} else {
 				Logger.log("something went wrong");
-				//send message - account is not unlocked
+				createUnlockCooldownMessage(proxy.host,100);
 			}
 		} catch (Exception e) {
 			Logger.log("we failed");
@@ -184,7 +208,8 @@ public class AccountRecover {
 		return true;
 	}
 
-	public static List<WebElement> sleepUntilFindElement(WebDriver driver, By by, long timeoutSecs) throws InterruptedException {
+	public static List<WebElement> sleepUntilFindElement(WebDriver driver, By by, long timeoutSecs)
+			throws InterruptedException {
 		long timeout = System.currentTimeMillis() + (timeoutSecs * 1000);
 		while (driver.findElements(by).size() == 0 && System.currentTimeMillis() < timeout) {
 			waitForLoad(driver);
@@ -192,6 +217,7 @@ public class AccountRecover {
 		}
 		return driver.findElements(by);
 	}
+
 	public static boolean sleepWhileFindElement(WebDriver driver, By by, long timeoutSecs) throws InterruptedException {
 		long timeout = System.currentTimeMillis() + (timeoutSecs * 1000);
 		while (driver.findElements(by).size() > 0 && System.currentTimeMillis() < timeout) {
@@ -207,7 +233,7 @@ public class AccountRecover {
 		waitForLoad(driver);
 
 		String setPasswordUrl = null;
-		for(int i= 0; i < 10; i++) {
+		for (int i = 0; i < 10; i++) {
 			List<WebElement> elements = driver.findElements(By.tagName("a"));
 			for (WebElement element : elements) {
 				String text = element.getText();
@@ -219,9 +245,9 @@ public class AccountRecover {
 					}
 				}
 			}
-			if(setPasswordUrl != null)
+			if (setPasswordUrl != null)
 				break;
-			TimeUnit.SECONDS.sleep(3);
+			Thread.sleep(3);
 		}
 		SET_PASSWORD_URL = setPasswordUrl;
 		return true;
@@ -241,20 +267,25 @@ public class AccountRecover {
 			Logger.log("Waiting for Page Load...");
 			waitForLoad(driver);
 			Logger.log("Site loaded.. Lets fill in username details");
-			WebElement formUsername = driver.findElement(By.name("email"));
-			WebElement textarea = driver.findElement(By.id("g-recaptcha-response"));
-			WebElement dismissButton = driver.findElement(By.linkText("Got it"));
+			Thread.sleep(5000);
+			try {
+				WebElement dismissButton = driver.findElement(By.linkText("Got it"));
 			if(dismissButton != null && dismissButton.isDisplayed()) {
 				dismissButton.click();
 				TimeUnit.SECONDS.sleep(6);
 			}
+			}catch(Exception e) {
+				Logger.log("NO COOKIE CLICK TO DISMISS");
+			}
+			WebElement formUsername = driver.findElement(By.name("email"));
+			WebElement textarea = driver.findElement(By.id("g-recaptcha-response"));
+
 			// send recovery
 			if (formUsername != null) {
 				formUsername.sendKeys(username);
 				TimeUnit.SECONDS.sleep(6);
 				Logger.log("Form filled");
 				JavascriptExecutor jse = (JavascriptExecutor) driver;
-
 
 				String gResponse = getCaptchaResponse();
 				jse.executeScript("arguments[0].style.display = 'block';", textarea);
@@ -265,36 +296,36 @@ public class AccountRecover {
 					Logger.log("Could not find g-recaptcha-response text-area");
 				}
 
-				Logger.log("Scrolling");
+
 				driver.switchTo().defaultContent();
-				jse.executeScript("window.scrollBy(0,250)", "");
 				TimeUnit.SECONDS.sleep(6);
 				jse.executeScript("onSubmit()");
 				// submit.sendKeys(Keys.ENTER);
 			} else {
 				Logger.log("Page failed to load..");
 			}
-
-			if(sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 50).size() == 0) {
+			/*
+			if (sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 50).size() == 0) {
 				WebElement tryAgainLink = driver.findElement(By.cssSelector("a[data-test='try-again-link']"));
 				if (tryAgainLink != null) {
 					try {
 						String url = tryAgainLink.getAttribute("href");
-						if(url != null)
+						if (url != null)
 							driver.get(url);
-					} catch (Exception ex) { ex.printStackTrace(); }
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
 					TimeUnit.SECONDS.sleep(1);
 					waitForLoad(driver);
 					sleepUntilFindElement(driver, By.id("p-account-recovery-pre-confirmation"), 50);
 				}
-			}
+			}*/
 
-			waitForLoad(driver);
-			TimeUnit.SECONDS.sleep(5);
-			waitForLoad(driver);
+			Thread.sleep(15000);
 
 			// check if recovery was successful
-			if (driver.findElements(By.id("p-account-recovery-pre-confirmation")).size() > 0 || driver.findElements(By.className("uc-game-stats")).size() > 0) {
+			if (driver.findElements(By.id("p-account-recovery-pre-confirmation")).size() > 0
+					|| driver.findElements(By.className("uc-game-stats")).size() > 0) {
 				Logger.log("Successfully sent recovery");
 				Logger.log("lets check mail");
 				failed = false;
@@ -306,9 +337,9 @@ public class AccountRecover {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if(failed) {
+		if (failed) {
 			Logger.log("something went wrong");
-			createUnlockCooldownMessage(proxy.host, 1000);
+
 		}
 
 		NexHelper.UNLOCK_IS_READY = true;
@@ -335,10 +366,10 @@ public class AccountRecover {
 		return true;
 	}
 
-	private  boolean doEmailLogin(WebDriver driver, String loginEmail) throws InterruptedException {
+	private boolean doEmailLogin(WebDriver driver, String loginEmail) throws InterruptedException {
 		driver.get(EMAIL_SET_URL);
 		Logger.log("Waiting for Page Load...");
-		waitForLoad(driver);
+		Thread.sleep(10000);
 
 		WebElement inputMail = null, inputDomain = null, submit = null;
 		for (int i = 0; i < 3; i++) {
@@ -365,12 +396,12 @@ public class AccountRecover {
 		String secondHalf = loginEmail.substring(loginEmail.indexOf('@'));
 		inputMail.sendKeys(firstHalf);
 		Logger.log(secondHalf);
-		TimeUnit.SECONDS.sleep(6);
+		Thread.sleep(10000);
 		Select dropdown = new Select(inputDomain);
 		dropdown.selectByVisibleText(secondHalf);
-		TimeUnit.SECONDS.sleep(6);
+		Thread.sleep(6000);
 		submit.click();
-		TimeUnit.SECONDS.sleep(6);
+		Thread.sleep(6000);
 		sleepUntilFindElement(driver, By.className("alert-success"), 200);
 
 		return true;
@@ -440,8 +471,6 @@ public class AccountRecover {
 		}
 	}
 
-
-
 	private static void waitForLoad(WebDriver driver) {
 		ExpectedCondition<Boolean> pageLoadCondition = new ExpectedCondition<Boolean>() {
 			public Boolean apply(WebDriver driver) {
@@ -477,18 +506,16 @@ public class AccountRecover {
 			}
 		}
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
-		// driver = new ChromeDriver();
 		System.setProperty("webdriver.gecko.driver", driver.getAbsolutePath());
 	}
-	
-	static FirefoxProfile copyProfileData(FirefoxProfile profile, PrivateProxy proxy){
-		try
-		{
+
+	static FirefoxProfile copyProfileData(FirefoxProfile profile, PrivateProxy proxy) {
+		try {
 			System.out.println("CurDir: " + AccountLauncher.curDir());
 			Field profileFolderVal = profile.getClass().getDeclaredField("model");
 			profileFolderVal.setAccessible(true);
-			File profileFolder = (File)profileFolderVal.get(profile);
-			File extensionsDir = new File(AccountLauncher.curDir(),"extension");
+			File profileFolder = (File) profileFolderVal.get(profile);
+			File extensionsDir = new File(AccountLauncher.curDir(), "extension");
 			File localProfileFolder = new File(extensionsDir.toString(), "profile");
 
 			File[] files = extensionsDir.listFiles((dir1, name) -> name.endsWith(".xpi"));
@@ -502,14 +529,13 @@ public class AccountRecover {
 				e.printStackTrace();
 			}
 
-			Path proxySwitchSett = Paths.get(profileFolder.getPath(), "browser-extension-data/{0c3ab5c8-57ac-4ad8-9dd1-ee331517884d}/storage.js");
-			if(Files.exists(proxySwitchSett)){
+			Path proxySwitchSett = Paths.get(profileFolder.getPath(),
+					"browser-extension-data/{0c3ab5c8-57ac-4ad8-9dd1-ee331517884d}/storage.js");
+			if (Files.exists(proxySwitchSett)) {
 				Charset charset = StandardCharsets.UTF_8;
 				String content = new String(Files.readAllBytes(proxySwitchSett), charset);
-				content = content.replaceAll("%HOST%", proxy.host)
-						.replaceAll("%PORT%", proxy.port)
-						.replaceAll("%USERNAME%", proxy.username)
-						.replaceAll("%PASSWORD%", proxy.password);
+				content = content.replaceAll("%HOST%", proxy.host).replaceAll("%PORT%", proxy.port)
+						.replaceAll("%USERNAME%", proxy.username).replaceAll("%PASSWORD%", proxy.password);
 				Files.write(proxySwitchSett, content.getBytes(charset));
 			}
 
@@ -530,8 +556,6 @@ public class AccountRecover {
 			return true;
 		return false;
 	}
-
-
 
 	private static String getDriverNameFirefox() {
 		switch (AccountLauncher.getOperatingSystemType()) {
@@ -557,6 +581,5 @@ public class AccountRecover {
 		Logger.log("CREATED unlock COOLDOWNMESS");
 		NexHelper.messageQueue.push("unlock_cooldown:" + host + ":" + time);
 	}
-
 
 }

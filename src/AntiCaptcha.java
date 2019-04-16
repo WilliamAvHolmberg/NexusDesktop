@@ -8,7 +8,7 @@ import com.anti_captcha.Api.NoCaptchaProxyless;
 
 public class AntiCaptcha {
 
-    private static String ANTICAPTCHA_KEY = "01bd2a7839593708e019c567485f8c61";
+    private static String ANTICAPTCHA_KEY = "0ed783b4f28df5bbf166e3db012e412d";
     private String token = null;
 
     public String solveCaptcha(String RUNESCAPE_URL) throws MalformedURLException, InterruptedException {

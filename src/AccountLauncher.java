@@ -16,10 +16,11 @@ import java.util.*;
 public final class AccountLauncher {
 
 	public static String allowOptions = " -allow norender,lowcpu,norandoms ";
+	public static boolean firstRun = true;
 	public static enum OSType {
 		Windows, MacOS, Linux;
 	};
-	
+
 	public static String lastName = "";
 	public static long lastStartup = 0;
 
@@ -43,7 +44,6 @@ public final class AccountLauncher {
 	static HashMap<Process, Long> running_processes = new HashMap<>();
 	static HashSet<Process> confirmed_running_rocesses = new HashSet<>();
 	public static void launchClient(String username, String address) {
-		cleanupExistingClients();
 		OSType operatingSystem = AccountLauncher.getOperatingSystemType();
 		if (ui == null && operatingSystem == OSType.Windows) {
 			ui = new ui.frmRunningAccounts();
@@ -73,32 +73,29 @@ public final class AccountLauncher {
 				// System.out.println(AccountLauncher.getOperatingSystemType());
 				switch (operatingSystem) {
 
-					case Windows:
-						int i = 1;
-						System.out.println("Start windows");
-						p = windowsBuilder.start();
-						if (ui != null && username.length() > 0)
-							ui.addAccount(p, username);
-						setOutputStream(p);
-						break;
-					case MacOS:
-						//Process p2 = macBuilder.start();
-						p = Runtime.getRuntime().exec("java -jar rspeer-launcher.jar " + address);
-						setOutputStream(p);
-						break;
-					case Linux:
-						System.out.println("lets go linux");
-						p = linuxBuilder.start();
-						if (new File(curDir() + "/layout.sh").exists()) {
-							try {
-								Thread.sleep(1000);
-								String[] cmd = new String[]{"/bin/sh", curDir() + "/layout.sh"};
-								Process pr = Runtime.getRuntime().exec(cmd);
-							} catch (Exception ex) {
-							}
+				case Windows:
+					int i = 1;
+					System.out.println("Start windows");
+					p = windowsBuilder.start();
+					// if (ui != null && username.length() > 0)
+					// ui.addAccount(p, username);
+					break;
+				case MacOS:
+					// Process p2 = macBuilder.start();
+					p = Runtime.getRuntime().exec("java -jar rspeer-launcher.jar " + address);
+					break;
+				case Linux:
+					System.out.println("lets go linux");
+					p = linuxBuilder.start();
+					if (new File(curDir() + "/layout.sh").exists()) {
+						try {
+							Thread.sleep(1000);
+							String[] cmd = new String[] { "/bin/sh", curDir() + "/layout.sh" };
+							Process pr = Runtime.getRuntime().exec(cmd);
+						} catch (Exception ex) {
 						}
-						setOutputStream(p);
-						break;
+					}
+					break;
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -112,7 +109,7 @@ public final class AccountLauncher {
 
 	}
 
-	static void cleanupExistingClients() {
+	/*static void cleanupExistingClients() {
 		running_processes.entrySet().removeIf(entry -> {
 			if (entry.getKey() == null || !entry.getKey().isAlive()) {
 				try {
@@ -132,24 +129,10 @@ public final class AccountLauncher {
 				}
 			}
 		}
-	}
-
-	static Boolean killerExists = null;
-	public static void killProcess(Process process){
-		if (killerExists == null)
-			killerExists = getOperatingSystemType() == OSType.Windows && new File("KillProcess.exe").exists();
-		if(killerExists) {
-			long pid = ProcessLink.getProcessID(process);
-			if (pid != -1) {
-				ProcessBuilder killer = new ProcessBuilder("KillProcess.exe", pid + "");
-				try {
-					killer.start();
-					return;
-				}catch (IOException ex){}
-			}
 		}
-		process.destroy();
-	}
+		*/
+
+
 
 	public static String curDir(){
 		try {
@@ -161,41 +144,17 @@ public final class AccountLauncher {
 	}
 
 	public static String getRSPeerJar(){
-		if(running_processes.size() == 0)
+		if(firstRun) {
+			firstRun = false;
 			return "./rspeer-launcher.jar";
+		}
 		JFileChooser fr = new JFileChooser();
 		FileSystemView fw = fr.getFileSystemView();
 		return "-Xmx384m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -Xss2m -Dsun.java2d.noddraw=true -Xincgc " +
 				Paths.get(fw.getDefaultDirectory().toString(), "RSPeer", "cache", "rspeer.jar").toString();
 	}
 
-	public static void setOutputStream(Process process) {
-		running_processes.put(process, System.currentTimeMillis());
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				String line = null;
-				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-				int c;
-				try {
-					while ((line = reader.readLine()) != null) {
-						if (line.contains("Failed to download configuration")) {
-							killProcess(process);
-							return;
-						}
-						else if (line.contains("CONNECTED TO NEX")) {
-//							System.out.println("Confirmed");
-							confirmed_running_rocesses.add(process);
-						}
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 
-			}
-		}).start();
-
-	}
 }
 
 // Your proxy string will have to include " -proxy ip:port", I did it like that
