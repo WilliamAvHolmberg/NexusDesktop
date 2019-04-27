@@ -78,7 +78,15 @@ public class NexHelper implements Runnable {
 		}
 		Scanner sc = new Scanner(System.in);
 
-	
+		if(System.getProperty("testfirefox", null) != null){
+			try {
+				PrivateProxy proxy = new PrivateProxy("NHTzq7", "mxxdZy", "195.158.193.81", "8000");
+				if(!proxy.setSystemProxy())
+					return;
+				//AccountCreator.postForm(null, "", "", "", proxy, "http://ipchicken.com/");
+			}catch (Exception ex){ ex.printStackTrace(); }
+			return;
+		}
 
 		String dir = AccountLauncher.curDir();
 		System.out.println(dir);
@@ -242,7 +250,7 @@ public class NexHelper implements Runnable {
 				if(getProcessCpuLoad() > 80) {
 					Logger.log("HIGH CPU LOAD... wait 10 sec");
 					tmp_interval = 30000;
-					
+
 				}else if (getProcessCpuLoad() > 60) {
 					tmp_interval = 15000;
 				}
@@ -305,7 +313,7 @@ public class NexHelper implements Runnable {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
-	
+
 		catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();

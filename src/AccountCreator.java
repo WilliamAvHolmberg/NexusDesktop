@@ -113,6 +113,9 @@ public class AccountCreator {
 		return token;
 	}
 
+
+
+
 	private static void waitForLoad(WebDriver driver) {
 		ExpectedCondition<Boolean> pageLoadCondition = new ExpectedCondition<Boolean>() {
 			public Boolean apply(WebDriver driver) {
@@ -260,49 +263,49 @@ public class AccountCreator {
 			Logger.log("Waiting for Page Load...");
 			Thread.sleep(15000);
 
-			WebElement dobDay = null, dobMonth = null, dobYear = null, email = null, password = null, textarea = null,
-					submit = null;
-			WebElement acceptCookies = null;
+				WebElement dobDay = null, dobMonth = null, dobYear = null, email = null, password = null, textarea = null, submit = null;
+				WebElement acceptCookies = null;
 
-			Logger.log("Page Loaded");
-			try {
-				dobDay = driver.findElement(By.name("day"));
-				dobMonth = driver.findElement(By.name("month"));
-				dobYear = driver.findElement(By.name("year"));
-				email = driver.findElement(By.name("email1"));
-				// WebElement displayname = driver.findElement(By.name("displayname"));
-				password = driver.findElement(By.name("password1"));
-				textarea = driver.findElement(By.id("g-recaptcha-response"));
-				submit = driver.findElement(By.id("create-submit"));
-			} catch (Exception ex) {
-				Logger.log("ERROR MESSAGEE");
-				Logger.log("ERROR MESSAGEE");
-				Logger.log("ERROR MESSAGEE");
-				Logger.log("ERROR MESSAGEE");
-				Logger.log("ERROR MESSAGEE");
-				Logger.log("ERROR MESSAGEE");
-				Logger.log("ERROR MESSAGEE");
-				Logger.log(ex.getMessage());
+					Logger.log("Page Loaded");
+					try {
+						dobDay = driver.findElement(By.name("day"));
+						dobMonth = driver.findElement(By.name("month"));
+						dobYear = driver.findElement(By.name("year"));
+						email = driver.findElement(By.name("email1"));
+						// WebElement displayname = driver.findElement(By.name("displayname"));
+						password = driver.findElement(By.name("password1"));
+						textarea = driver.findElement(By.id("g-recaptcha-response"));
+						submit = driver.findElement(By.id("create-submit"));
+					}catch (Exception ex) {
+						Logger.log("ERROR MESSAGEE");
+						Logger.log("ERROR MESSAGEE");
+						Logger.log("ERROR MESSAGEE");
+						Logger.log("ERROR MESSAGEE");
+						Logger.log("ERROR MESSAGEE");
+						Logger.log("ERROR MESSAGEE");
+						Logger.log("ERROR MESSAGEE");
+						Logger.log(ex.getMessage());
 
-				if (driver != null) {
-					driver.quit();
-					driver = null;
-					return;
-				}
+						if (driver != null) {
+								driver.quit();
+								driver = null;
+								return;
+						}
 
-			}
 
-			Random r = new Random();
-			String year = (1980 + (int) (r.nextDouble() * 20)) + "";
-			String month = (1 + (int) (r.nextDouble() * 10)) + "";
-			String day = (1 + (int) (r.nextDouble() * 26)) + "";
-			Logger.log("Elements found");
-			dobDay.sendKeys(day);
-			dobMonth.sendKeys(month);
-			dobYear.sendKeys(year);
-			email.sendKeys(loginEmail);
-			// displayname.sendKeys("williamsosos");
-			password.sendKeys(loginPassword);
+					}
+
+				Random r = new Random();
+				String year = (1980 + (int)(r.nextDouble() * 20)) + "";
+				String month = (1 + (int)(r.nextDouble() * 10)) + "";
+				String day = (1 + (int)(r.nextDouble() * 26)) + "";
+				Logger.log("Elements found");
+				dobDay.sendKeys(day);
+				dobMonth.sendKeys(month);
+				dobYear.sendKeys(year);
+				email.sendKeys(loginEmail);
+				// displayname.sendKeys("williamsosos");
+				password.sendKeys(loginPassword);
 //				try {
 //					if(acceptCookies != null)
 //						acceptCookies.click();
@@ -407,46 +410,6 @@ public class AccountCreator {
 			}
 			driver = null;
 		}
-
-	}
-
-	private boolean fillTextArea(String gresponse, WebElement textarea, JavascriptExecutor jse, WebDriver driver) {
-		jse.executeScript("arguments[0].style.display = 'block';", textarea);
-		String filledArea = "";
-		if (gresponse != null && textarea != null) {
-			Logger.log("Filled in g-recaptcha-response text-area");
-
-			Logger.log("NOT FILLED TEXTAREA TEXT::::::::::" + textarea.getText());
-			Logger.log("NOT FILLED TEXTAREA TEXT::::::::::" + textarea.getAttribute("value"));
-			textarea = driver.findElement(By.id("g-recaptcha-response"));
-			Logger.log("FILLED TEXTAREA TEXT::::::::::" + textarea.getText());
-			filledArea = textarea.getAttribute("value");
-			Logger.log("FILLED TEXTAREA TEXT::::::::::" + textarea.getAttribute("value"));
-			textarea.sendKeys(gresponse);
-		}
-		
-		for (int i = 0; i < 10; i++) {
-			try {
-				Thread.sleep(1000);
-				Logger.log("SLEEP AND WAIT");
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			String filledArea2 = textarea.getAttribute("value");
-			if (gresponse.equals(filledArea2)) {
-				Logger.log("GOOD");
-				break;
-			}
-		}
-		
-		filledArea = textarea.getAttribute("value");
-		if (gresponse.equals(filledArea)) {
-			Logger.log("SUCCESSFULLY SET GRESPONSE");
-			return true;
-		}
-		Logger.log("FAILED TO SET TEXT: TRY AGAIN");
-		return false;
 
 	}
 

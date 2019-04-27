@@ -16,7 +16,6 @@ public final class AccountLauncher {
 
 	public static String allowOptions = " -allow norender,lowcpu,norandoms ";
 	public static boolean firstRun = true;
-
 	public static enum OSType {
 		Windows, MacOS, Linux;
 	};
@@ -43,7 +42,6 @@ public final class AccountLauncher {
 
 	static HashMap<Process, Long> running_processes = new HashMap<>();
 	static HashSet<Process> confirmed_running_rocesses = new HashSet<>();
-
 	public static void launchClient(String username, String address) {
 		OSType operatingSystem = AccountLauncher.getOperatingSystemType();
 		if (ui == null && operatingSystem == OSType.Windows) {
@@ -134,28 +132,12 @@ public final class AccountLauncher {
 				}
 			}
 		}
-	}
-
-	static Boolean killerExists = null;
-
-	public static void killProcess(Process process) {
-		if (killerExists == null)
-			killerExists = getOperatingSystemType() == OSType.Windows && new File("KillProcess.exe").exists();
-		if (killerExists) {
-			long pid = ProcessLink.getProcessID(process);
-			if (pid != -1) {
-				ProcessBuilder killer = new ProcessBuilder("KillProcess.exe", pid + "");
-				try {
-					killer.start();
-					return;
-				} catch (IOException ex) {
-				}
-			}
 		}
-		process.destroy();
-	}
+		*/
 
-	public static String curDir() {
+
+
+	public static String curDir(){
 		try {
 			return new File(NexHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile()
 					.getPath();
@@ -176,32 +158,6 @@ public final class AccountLauncher {
 				+ Paths.get(fw.getDefaultDirectory().toString(), "RSPeer", "cache", "rspeer.jar").toString();
 	}
 
-	public static void setOutputStream(Process process) {
-		running_processes.put(process, System.currentTimeMillis());
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				String line = null;
-				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-				int c;
-				try {
-					while ((line = reader.readLine()) != null) {
-						if (line.contains("Failed to download configuration")) {
-							killProcess(process);
-							return;
-						} else if (line.contains("CONNECTED TO NEX")) {
-//							System.out.println("Confirmed");
-							confirmed_running_rocesses.add(process);
-						}
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-			}
-		}).start();
-
-	}
 
 }
 
