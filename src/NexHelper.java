@@ -79,10 +79,11 @@ public class NexHelper implements Runnable {
 
 		if(System.getProperty("testfirefox", null) != null){
 			try {
-				PrivateProxy proxy = new PrivateProxy("NHTzq7", "mxxdZy", "195.158.193.81", "8000");
-				if(!proxy.setSystemProxy())
-					return;
-				//AccountCreator.postForm(null, "", "", "", proxy, "http://ipchicken.com/");
+				PrivateProxy proxy = new PrivateProxy("oPob2V", "aabDVp", "195.158.194.77", "8000");
+//				if(!proxy.setSystemProxy())
+//					return;
+				AccountCreator accountCreator = new AccountCreator();
+				accountCreator.postForm(null, "", "", "", proxy, "http://ipchicken.com/");
 			}catch (Exception ex){ ex.printStackTrace(); }
 			return;
 		}
