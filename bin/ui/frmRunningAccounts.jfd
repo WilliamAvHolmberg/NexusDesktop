@@ -24,3 +24,511 @@ new FormModel {
 		} )
 	}
 }
+
+
+Connecting to Proxy 92.32.68.149:8888
+IP IS GOOD?92.32.68.149
+Successfully connected
+Waiting for captcha code... This might take a while...
+IN POST. asdasdsad
+Day: 2
+Month: 10
+Year: 1966
+Key: 0ed783b4f28df5bbf166e3db012e412d
+
+
+
+
+     <!doctype html>
+    <html class='no-js' lang='en'>
+    <head>
+        <meta charset='UTF-8'>
+        <title>Create Your Account - RuneScape | Old School RuneScape</title>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <meta name='description' content="Sign up now and start playing RuneScape or Old School RuneScape.">
+        <meta name='author' content='Jagex'>
+        <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+        <link rel='dns-prefetch' href='//www.google-analytics.com'>
+        <link rel='dns-prefetch' href='//ajax.googleapis.com'>
+        <link rel='dns-prefetch' href='//connect.facebook.net'>
+                <link rel='stylesheet' href='https://www.runescape.com/css/c/responsive/dual/vendor-127.css' />
+                <link rel='stylesheet' href='https://www.runescape.com/css/c/responsive/dual/site-127.css' />
+        <meta name='format-detection' content='telephone=no' />
+        <meta name='theme-color' content='#1C2C34' />
+        <meta name='msapplication-navbutton-color' content='#1C2C34'>
+        <meta name='apple-mobile-web-app-capable' content='yes'>
+        <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent'>
+        <link rel='apple-touch-icon' sizes='57x57' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-57.png' />
+        <link rel='apple-touch-icon' sizes='60x60' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-60.png' />
+        <link rel='apple-touch-icon' sizes='72x72' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-72.png' />
+        <link rel='apple-touch-icon' sizes='76x76' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-76.png' />
+        <link rel='apple-touch-icon' sizes='114x114' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-114.png' />
+        <link rel='apple-touch-icon' sizes='120x120' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-120.png' />
+        <link rel='apple-touch-icon' sizes='144x144' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-144.png' />
+        <link rel='apple-touch-icon' sizes='152x152' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-152.png' />
+        <link rel='apple-touch-icon' sizes='180x180' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-180.png' />
+        <link rel='icon' type='image/png' sizes='192x192' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-192.png' />
+        <link rel='icon' type='image/png' sizes='32x32' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-32.png' />
+        <link rel='icon' type='image/png' sizes='96x96' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-96.png' />
+        <link rel='icon' type='image/png' sizes='16x16' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-16.png' />
+        <meta name='msapplication-TileColor' content='#ffffff' />
+        <meta name='msapplication-TileImage' content='https://www.runescape.com/img/responsive/runescape/icons/runescape-144.png' />
+        <meta property='og:title' content='Create Your Account - RuneScape | Old School RuneScape'>
+        <meta property='og:site_name' content='RuneScape'>
+        <meta property='og:image' content='https://www.runescape.com/img/responsive/runescape/social-share/social-share-fb.jpg?1'>
+        <meta property='og:url' content='https://secure.runescape.com/m=account-creation/create_account'>
+        <meta property='og:description' content='Sign up now and start playing RuneScape or Old School RuneScape.'>
+        <meta name='twitter:domain' content='RuneScape.com'>
+        <meta name='twitter:url' content='https://secure.runescape.com/m=account-creation/create_account'>
+        <meta name='twitter:title' content='Create Your Account - RuneScape | Old School RuneScape'>
+        <meta name='twitter:description' content='Sign up now and start playing RuneScape or Old School RuneScape.'>
+        <meta name='twitter:image:src' content='https://www.runescape.com/img/responsive/runescape/social-share/social-share-fb.jpg?1'>
+        <meta name='twitter:site' content='@RuneScape'>
+        <meta name='google-site-verification' content='pUwl5KYHKSZ6tbbgsR2wYNv1kbVmsYral3iFmijHTWM' />
+        <link rel='manifest' href='https://www.runescape.com/manifest.json' />
+	<script>
+	var _vis_opt_cookieDays = 1,
+	_vwo_code=(function(){
+	var account_id=54596,
+	settings_tolerance=2000,
+	library_tolerance=2500,
+	use_existing_jquery=false,
+	f=false,d=document;return{use_existing_jquery:function(){return use_existing_jquery;},library_tolerance:function(){return library_tolerance;},finish:function(){if(!f){f=true;var a=d.getElementById('_vis_opt_path_hides');if(a)a.parentNode.removeChild(a);}},finished:function(){return f;},load:function(a){var b=d.createElement('script');b.src=a;b.type='text/javascript';b.innerText;b.onerror=function(){_vwo_code.finish();};d.getElementsByTagName('head')[0].appendChild(b);},init:function(){settings_timer=setTimeout('_vwo_code.finish()',settings_tolerance);this.load('//dev.visualwebsiteoptimizer.com/j.php?a='+account_id+'&u='+encodeURIComponent(d.URL)+'&r='+Math.random());var a=d.createElement('style'),b='body{opacity:0 !important;filter:alpha(opacity=0) !important;background:none !important;}',h=d.getElementsByTagName('head')[0];a.setAttribute('id','_vis_opt_path_hides');a.setAttribute('type','text/css');if(a.styleSheet)a.styleSheet.cssText=b;else a.appendChild(d.createTextNode(b));h.appendChild(a);return settings_timer;}};}());_vwo_settings_timer=_vwo_code.init();
+	</script>
+        <script>
+            var CM = {lib:{}},
+                DU = DU || {};
+            DU.components = {};
+            DU.constant = {
+                url: {
+                    home: 'https://www.runescape.com/'
+                }
+            };
+            document.domain = 'runescape.com';
+        </script>
+    </head>
+    <body class=' p-account-creation' id='p-create-account'>
+    <main class='l-vista ' data-value='200'>
+        <div class='l-vista__central'>
+            <div class='l-vista__container ' id='l-vista__container'>
+                <div class='l-vista__logo'>
+        <a href='https://oldschool.runescape.com/' id='os-logo-home' class='a-logo' target='_self' data-test='product-logo-os'>
+    <img src='https://www.runescape.com/img/responsive/common/logos/oldschool.png' data-interchange='[https://www.runescape.com/img/responsive/common/logos/oldschool.png, small], [https://www.runescape.com/img/responsive/common/logos/oldschool@2x.png, retina]' alt="Old School RuneScape Logo" title="Old School RuneScape" data-test='product-logo-img-os' />
+        </a>
+        <a href='https://www.runescape.com/' id='rs-logo-home' class='a-logo' target='_self' data-test='product-logo-rs'>
+    <img src='https://www.runescape.com/img/responsive/common/logos/runescape.png' data-interchange='[https://www.runescape.com/img/responsive/common/logos/runescape.png, small], [https://www.runescape.com/img/responsive/common/logos/runescape@2x.png, retina]' alt=" RuneScape Logo" title=" RuneScape" data-test='product-logo-img-rs' />
+        </a>
+                </div>
+    <h1>Sign up with your email</h1>
+    <form method='post' action='create_account' id='create-email-form' accept-charset='UTF-8' data-abide novalidate>
+        <input type='hidden' name='theme' value='dual' />
+        <label>Email:
+            <input type='email' name='email1' id='create-email' maxlength='200' value='HobSarzd@yahoo.com' tabindex='1' autofocus autocomplete='email' required />
+            <input type='hidden' name='onlyOneEmail' value='1' />
+            <span class='form-error'>Please enter a valid email address</span>
+        </label>
+    <label>Password:
+        <input type='password' name='password1' id='create-password' pattern='.{5,20}' maxlength='20' tabindex='2' autocomplete='new-password' required />
+        <span class='m-show-password m-show-password--type-no-top'>
+            <span class='form-error m-show-password__error'>Please enter a valid password between 5 &amp; 20 characters long</span>
+            <label class='m-show-password__check-holder'>Show Password: <input class='m-show-password__check' type='checkbox' data-show-password='create-password' /></label>
+        </span>
+            <input type='hidden' name='onlyOnePassword' value='1' />
+    </label>
+    <fieldset class='m-date-entry' data-js-date-entry>
+            <legend>Date of Birth:</legend>
+        <div class='m-date-entry__inner'>
+            <label class='m-date-entry__date-label'><span class='m-date-entry__field-label'>Day:</span>
+                <input class='m-date-entry__day-field' type='number' name='day' min='1' max='31' pattern='\b^(0?[1-9]|[1-2][0-9]|3[0-1])$\b' value='02' placeholder="DD" required data-date data-date-day data-test='date-entry-day' tabindex='4' autocomplete='bday-day'  />
+            </label>
+            <label class='m-date-entry__date-label'><span class='m-date-entry__field-label'>Month:</span>
+                <input class='m-date-entry__month-field' type='number' name='month' min='1' max='12' pattern='\b^(0?[1-9]|[0][1-9]|1[0-2])$\b' value='10' placeholder="MM" required data-date data-date-month data-test='date-entry-month' tabindex='4' autocomplete='bday-month' />
+            </label>
+            <label class='m-date-entry__date-label'><span class='m-date-entry__field-label'>Year:</span>
+                <input class='m-date-entry__year-field' type='number' name='year' min='1900' pattern='\b^(19|[2-9][0-9])\d{2}$' max='2019' value='1966' placeholder="YYYY" required  data-date data-date-year data-test='date-entry-year' tabindex='4' autocomplete='bday-year' />
+            </label>
+        </div>
+        <span class='form-error m-date-entry__error' data-js-date-entry-error>Please enter a valid date</span>
+    </fieldset>
+        <label class='m-checkbox' for='create-news'>
+            <input id='create-news' type='checkbox' name='agree_email' value='1'   tabindex='7' /> Send me offers, news, and updates about Jagex games
+        </label>
+        <label class='m-checkbox' for='third-party'>
+            <input id='third-party' type='checkbox' name='agree_email_third_party' value='1'  tabindex='8' /> See more relevant content by sharing my data with third parties
+        </label>
+        <small>
+            You can change your preferences at any time
+        </small>
+    <script>
+        var onSubmit = function() {
+                $('#create-email-form').submit();
+        };
+
+        var onloadCallback = function() {
+            grecaptcha.render('create-submit', {
+                'sitekey' : '6Lcsv3oUAAAAAGFhlKrkRb029OHio098bbeyi_Hv',
+                'callback' : onSubmit
+            });
+        };
+    </script>
+    <script src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=en' async defer></script>
+        <small class='create-terms'>By clicking 'Play Now' I agree to the <a href='https://www.jagex.com/g=runescape/terms' target='_blank' rel='noopener'>Terms &amp; Conditions</a> &amp; <a href='https://www.jagex.com/g=runescape/terms/privacy' target='_blank' rel='noopener'>Privacy Policy</a></small>
+        <input type='hidden' name='create-submit' value='create' />
+        <button class='a-button a-button--size-full a-button--style-no-margin' id='create-submit' type='submit' tabindex='10'>Play Now</button>
+    </form>
+            </div>
+        </div>
+    </main>
+             <footer class='c-footer'>
+            <div class='c-footer__wrapper'>
+                <div class='c-footer__jagex'>
+                    <a class='c-footer__jagex-link' href='http://www.jagex.com/g=runescape/'><img class='c-footer__jagex-img' src='https://www.runescape.com/img/responsive/common/logos/jagex.svg' alt="Jagex company logo" title="Jagex" /></a>
+                </div>
+                <div class='c-footer__content'>
+                    <p class='c-footer__copy'>Copyright &copy; 1999 - 2019 Jagex Ltd. 220 Science Park, Cambridge, CB4 0WA, United Kingdom</p>
+                    <p class='c-footer__copy'>
+                        Use of this website is subject to our <a class='c-footer__link' href='http://www.jagex.com/g=runescape/terms/terms.ws' target='_blank' rel='noopener'>Terms &amp; Conditions</a>,
+                        <a class='c-footer__link' href='http://www.jagex.com/g=runescape/privacy/privacy.ws' target='_blank' rel='noopener'>Privacy Policy</a> and
+                        <a class='c-footer__link' href='http://www.jagex.com/g=runescape/terms/cookies.ws' target='_blank' rel='noopener'>Cookie Policy</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+<script>
+    var accountCreationUrl="https://secure.runescape.com/m=account-creation",
+        emailTakenError = false,
+        track = new Image();
+
+    track.src = 'https://tags.w55c.net/rs?id=2561062dd29e42c6ab5b81e46bdc23a4&t=cart&sku=RuneScape';
+</script>
+
+
+
+    <script>
+        window.cookieconsent_options = {
+            message: "We use cookies to make our site work correctly, to help understand how it is used and to provide more relevant ads on Jagex websites and others. By continuing to use the site you consent to the use of first and third-party cookies and other similar technologies. To learn more please visit our  <a href='https://www.jagex.com/g=runescape/terms/privacy' target='_blank'>privacy policy</a> and our <a href='https://www.jagex.com/g=runescape/terms/cookies' target='_blank'>cookie policy</a>.",
+            dismiss: "Got it",
+            link: 'https://www.jagex.com/g=runescape/terms/cookies',
+            showLink: true,
+            theme: false,
+            markup: '<div class="c-cookie-consent"><p class="c-cookie-consent__copy">[[options.message]]</p><div class="c-cookie-consent__options"><a href="#null" data-cc-event="click:dismiss" target="_blank" class="a-button c-cookie-consent__dismiss">[[options.dismiss]]</a></div></div>'
+        }
+    </script>
+
+ 
+            <script src='https://www.runescape.com/js/c/responsive/vendor-128.js'></script>
+
+	<script>
+        var gtmSite = 'dual';
+
+            var gtmUser = {
+                language: 0,
+                isLoggedIn: 0
+            };
+
+        if (typeof(dataLayer) !== 'undefined'){
+            dataLayer[0].user = gtmUser;
+        } else {
+            var dataLayer = [{
+                'user': gtmUser
+            }];
+        }
+
+        if (typeof(Cookies.get('JXFRONTUID')) !== 'undefined') {
+            if (typeof(dataLayer) !== 'undefined'){
+                dataLayer[0].JXFRONTUID = Cookies.get('JXFRONTUID');
+            } else {
+                var dataLayer = [{
+                    'JXFRONTUID': Cookies.get('JXFRONTUID')
+                }];
+            }
+        }
+
+        if (typeof(Cookies.get('bidalgouid')) !== 'undefined') {
+            if (typeof(dataLayer) !== 'undefined'){
+                dataLayer[0].bidalgouid = Cookies.get('bidalgouid');
+            } else {
+                var dataLayer = [{
+                    'bidalgouid': Cookies.get('bidalgouid')
+                }];
+            }
+        }
+
+		(function(w,d,s,l,i){
+			w[l]=w[l]||[];
+			w[l].push({
+				'gtm.start': new Date().getTime(),
+				event:'gtm.js',
+				site: gtmSite
+			});
+			var f=d.getElementsByTagName(s)[0],
+				j=d.createElement(s),
+				dl=l!='dataLayer'?'&l='+l:'';
+
+			j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+			f.parentNode.insertBefore(j,f);
+		})(window,document,'script','dataLayer','GTM-NRKJSQ');
+	</script>
+
+            <script src="https://www.runescape.com/js/rs3/cookie_consent-128.js"></script>
+            <script src="https://www.runescape.com/js/c/responsive/theme-dual-128.js"></script>
+</body>
+</html>
+
+ATTEMPT: 0
+Creation failed...lets try again. No error
+IN POST. asdasdsad
+Day: 26
+Month: 5
+Year: 1969
+Key: 0ed783b4f28df5bbf166e3db012e412d
+
+
+
+
+     <!doctype html>
+    <html class='no-js' lang='en'>
+    <head>
+        <meta charset='UTF-8'>
+        <title>Create Your Account - RuneScape | Old School RuneScape</title>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <meta name='description' content="Sign up now and start playing RuneScape or Old School RuneScape.">
+        <meta name='author' content='Jagex'>
+        <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+        <link rel='dns-prefetch' href='//www.google-analytics.com'>
+        <link rel='dns-prefetch' href='//ajax.googleapis.com'>
+        <link rel='dns-prefetch' href='//connect.facebook.net'>
+                <link rel='stylesheet' href='https://www.runescape.com/css/c/responsive/dual/vendor-127.css' />
+                <link rel='stylesheet' href='https://www.runescape.com/css/c/responsive/dual/site-127.css' />
+        <meta name='format-detection' content='telephone=no' />
+        <meta name='theme-color' content='#1C2C34' />
+        <meta name='msapplication-navbutton-color' content='#1C2C34'>
+        <meta name='apple-mobile-web-app-capable' content='yes'>
+        <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent'>
+        <link rel='apple-touch-icon' sizes='57x57' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-57.png' />
+        <link rel='apple-touch-icon' sizes='60x60' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-60.png' />
+        <link rel='apple-touch-icon' sizes='72x72' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-72.png' />
+        <link rel='apple-touch-icon' sizes='76x76' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-76.png' />
+        <link rel='apple-touch-icon' sizes='114x114' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-114.png' />
+        <link rel='apple-touch-icon' sizes='120x120' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-120.png' />
+        <link rel='apple-touch-icon' sizes='144x144' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-144.png' />
+        <link rel='apple-touch-icon' sizes='152x152' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-152.png' />
+        <link rel='apple-touch-icon' sizes='180x180' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-180.png' />
+        <link rel='icon' type='image/png' sizes='192x192' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-192.png' />
+        <link rel='icon' type='image/png' sizes='32x32' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-32.png' />
+        <link rel='icon' type='image/png' sizes='96x96' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-96.png' />
+        <link rel='icon' type='image/png' sizes='16x16' href='https://www.runescape.com/img/responsive/runescape/icons/runescape-16.png' />
+        <meta name='msapplication-TileColor' content='#ffffff' />
+        <meta name='msapplication-TileImage' content='https://www.runescape.com/img/responsive/runescape/icons/runescape-144.png' />
+        <meta property='og:title' content='Create Your Account - RuneScape | Old School RuneScape'>
+        <meta property='og:site_name' content='RuneScape'>
+        <meta property='og:image' content='https://www.runescape.com/img/responsive/runescape/social-share/social-share-fb.jpg?1'>
+        <meta property='og:url' content='https://secure.runescape.com/m=account-creation/create_account'>
+        <meta property='og:description' content='Sign up now and start playing RuneScape or Old School RuneScape.'>
+        <meta name='twitter:domain' content='RuneScape.com'>
+        <meta name='twitter:url' content='https://secure.runescape.com/m=account-creation/create_account'>
+        <meta name='twitter:title' content='Create Your Account - RuneScape | Old School RuneScape'>
+        <meta name='twitter:description' content='Sign up now and start playing RuneScape or Old School RuneScape.'>
+        <meta name='twitter:image:src' content='https://www.runescape.com/img/responsive/runescape/social-share/social-share-fb.jpg?1'>
+        <meta name='twitter:site' content='@RuneScape'>
+        <meta name='google-site-verification' content='pUwl5KYHKSZ6tbbgsR2wYNv1kbVmsYral3iFmijHTWM' />
+        <link rel='manifest' href='https://www.runescape.com/manifest.json' />
+	<script>
+	var _vis_opt_cookieDays = 1,
+	_vwo_code=(function(){
+	var account_id=54596,
+	settings_tolerance=2000,
+	library_tolerance=2500,
+	use_existing_jquery=false,
+	f=false,d=document;return{use_existing_jquery:function(){return use_existing_jquery;},library_tolerance:function(){return library_tolerance;},finish:function(){if(!f){f=true;var a=d.getElementById('_vis_opt_path_hides');if(a)a.parentNode.removeChild(a);}},finished:function(){return f;},load:function(a){var b=d.createElement('script');b.src=a;b.type='text/javascript';b.innerText;b.onerror=function(){_vwo_code.finish();};d.getElementsByTagName('head')[0].appendChild(b);},init:function(){settings_timer=setTimeout('_vwo_code.finish()',settings_tolerance);this.load('//dev.visualwebsiteoptimizer.com/j.php?a='+account_id+'&u='+encodeURIComponent(d.URL)+'&r='+Math.random());var a=d.createElement('style'),b='body{opacity:0 !important;filter:alpha(opacity=0) !important;background:none !important;}',h=d.getElementsByTagName('head')[0];a.setAttribute('id','_vis_opt_path_hides');a.setAttribute('type','text/css');if(a.styleSheet)a.styleSheet.cssText=b;else a.appendChild(d.createTextNode(b));h.appendChild(a);return settings_timer;}};}());_vwo_settings_timer=_vwo_code.init();
+	</script>
+        <script>
+            var CM = {lib:{}},
+                DU = DU || {};
+            DU.components = {};
+            DU.constant = {
+                url: {
+                    home: 'https://www.runescape.com/'
+                }
+            };
+            document.domain = 'runescape.com';
+        </script>
+    </head>
+    <body class=' p-account-creation' id='p-create-account'>
+    <main class='l-vista ' data-value='200'>
+        <div class='l-vista__central'>
+            <div class='l-vista__container ' id='l-vista__container'>
+                <div class='l-vista__logo'>
+        <a href='https://oldschool.runescape.com/' id='os-logo-home' class='a-logo' target='_self' data-test='product-logo-os'>
+    <img src='https://www.runescape.com/img/responsive/common/logos/oldschool.png' data-interchange='[https://www.runescape.com/img/responsive/common/logos/oldschool.png, small], [https://www.runescape.com/img/responsive/common/logos/oldschool@2x.png, retina]' alt="Old School RuneScape Logo" title="Old School RuneScape" data-test='product-logo-img-os' />
+        </a>
+        <a href='https://www.runescape.com/' id='rs-logo-home' class='a-logo' target='_self' data-test='product-logo-rs'>
+    <img src='https://www.runescape.com/img/responsive/common/logos/runescape.png' data-interchange='[https://www.runescape.com/img/responsive/common/logos/runescape.png, small], [https://www.runescape.com/img/responsive/common/logos/runescape@2x.png, retina]' alt=" RuneScape Logo" title=" RuneScape" data-test='product-logo-img-rs' />
+        </a>
+                </div>
+    <h1>Sign up with your email</h1>
+    <form method='post' action='create_account' id='create-email-form' accept-charset='UTF-8' data-abide novalidate>
+        <input type='hidden' name='theme' value='dual' />
+        <label>Email:
+            <input type='email' name='email1' id='create-email' maxlength='200' value='HobSarzd@yahoo.com' tabindex='1' autofocus autocomplete='email' required />
+            <input type='hidden' name='onlyOneEmail' value='1' />
+            <span class='form-error'>Please enter a valid email address</span>
+        </label>
+    <label>Password:
+        <input type='password' name='password1' id='create-password' pattern='.{5,20}' maxlength='20' tabindex='2' autocomplete='new-password' required />
+        <span class='m-show-password m-show-password--type-no-top'>
+            <span class='form-error m-show-password__error'>Please enter a valid password between 5 &amp; 20 characters long</span>
+            <label class='m-show-password__check-holder'>Show Password: <input class='m-show-password__check' type='checkbox' data-show-password='create-password' /></label>
+        </span>
+            <input type='hidden' name='onlyOnePassword' value='1' />
+    </label>
+    <fieldset class='m-date-entry' data-js-date-entry>
+            <legend>Date of Birth:</legend>
+        <div class='m-date-entry__inner'>
+            <label class='m-date-entry__date-label'><span class='m-date-entry__field-label'>Day:</span>
+                <input class='m-date-entry__day-field' type='number' name='day' min='1' max='31' pattern='\b^(0?[1-9]|[1-2][0-9]|3[0-1])$\b' value='26' placeholder="DD" required data-date data-date-day data-test='date-entry-day' tabindex='4' autocomplete='bday-day'  />
+            </label>
+            <label class='m-date-entry__date-label'><span class='m-date-entry__field-label'>Month:</span>
+                <input class='m-date-entry__month-field' type='number' name='month' min='1' max='12' pattern='\b^(0?[1-9]|[0][1-9]|1[0-2])$\b' value='05' placeholder="MM" required data-date data-date-month data-test='date-entry-month' tabindex='4' autocomplete='bday-month' />
+            </label>
+            <label class='m-date-entry__date-label'><span class='m-date-entry__field-label'>Year:</span>
+                <input class='m-date-entry__year-field' type='number' name='year' min='1900' pattern='\b^(19|[2-9][0-9])\d{2}$' max='2019' value='1969' placeholder="YYYY" required  data-date data-date-year data-test='date-entry-year' tabindex='4' autocomplete='bday-year' />
+            </label>
+        </div>
+        <span class='form-error m-date-entry__error' data-js-date-entry-error>Please enter a valid date</span>
+    </fieldset>
+        <label class='m-checkbox' for='create-news'>
+            <input id='create-news' type='checkbox' name='agree_email' value='1'   tabindex='7' /> Send me offers, news, and updates about Jagex games
+        </label>
+        <label class='m-checkbox' for='third-party'>
+            <input id='third-party' type='checkbox' name='agree_email_third_party' value='1'  tabindex='8' /> See more relevant content by sharing my data with third parties
+        </label>
+        <small>
+            You can change your preferences at any time
+        </small>
+    <script>
+        var onSubmit = function() {
+                $('#create-email-form').submit();
+        };
+
+        var onloadCallback = function() {
+            grecaptcha.render('create-submit', {
+                'sitekey' : '6Lcsv3oUAAAAAGFhlKrkRb029OHio098bbeyi_Hv',
+                'callback' : onSubmit
+            });
+        };
+    </script>
+    <script src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=en' async defer></script>
+        <small class='create-terms'>By clicking 'Play Now' I agree to the <a href='https://www.jagex.com/g=runescape/terms' target='_blank' rel='noopener'>Terms &amp; Conditions</a> &amp; <a href='https://www.jagex.com/g=runescape/terms/privacy' target='_blank' rel='noopener'>Privacy Policy</a></small>
+        <input type='hidden' name='create-submit' value='create' />
+        <button class='a-button a-button--size-full a-button--style-no-margin' id='create-submit' type='submit' tabindex='10'>Play Now</button>
+    </form>
+            </div>
+        </div>
+    </main>
+             <footer class='c-footer'>
+            <div class='c-footer__wrapper'>
+                <div class='c-footer__jagex'>
+                    <a class='c-footer__jagex-link' href='http://www.jagex.com/g=runescape/'><img class='c-footer__jagex-img' src='https://www.runescape.com/img/responsive/common/logos/jagex.svg' alt="Jagex company logo" title="Jagex" /></a>
+                </div>
+                <div class='c-footer__content'>
+                    <p class='c-footer__copy'>Copyright &copy; 1999 - 2019 Jagex Ltd. 220 Science Park, Cambridge, CB4 0WA, United Kingdom</p>
+                    <p class='c-footer__copy'>
+                        Use of this website is subject to our <a class='c-footer__link' href='http://www.jagex.com/g=runescape/terms/terms.ws' target='_blank' rel='noopener'>Terms &amp; Conditions</a>,
+                        <a class='c-footer__link' href='http://www.jagex.com/g=runescape/privacy/privacy.ws' target='_blank' rel='noopener'>Privacy Policy</a> and
+                        <a class='c-footer__link' href='http://www.jagex.com/g=runescape/terms/cookies.ws' target='_blank' rel='noopener'>Cookie Policy</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+<script>
+    var accountCreationUrl="https://secure.runescape.com/m=account-creation",
+        emailTakenError = false,
+        track = new Image();
+
+    track.src = 'https://tags.w55c.net/rs?id=2561062dd29e42c6ab5b81e46bdc23a4&t=cart&sku=RuneScape';
+</script>
+
+
+
+    <script>
+        window.cookieconsent_options = {
+            message: "We use cookies to make our site work correctly, to help understand how it is used and to provide more relevant ads on Jagex websites and others. By continuing to use the site you consent to the use of first and third-party cookies and other similar technologies. To learn more please visit our  <a href='https://www.jagex.com/g=runescape/terms/privacy' target='_blank'>privacy policy</a> and our <a href='https://www.jagex.com/g=runescape/terms/cookies' target='_blank'>cookie policy</a>.",
+            dismiss: "Got it",
+            link: 'https://www.jagex.com/g=runescape/terms/cookies',
+            showLink: true,
+            theme: false,
+            markup: '<div class="c-cookie-consent"><p class="c-cookie-consent__copy">[[options.message]]</p><div class="c-cookie-consent__options"><a href="#null" data-cc-event="click:dismiss" target="_blank" class="a-button c-cookie-consent__dismiss">[[options.dismiss]]</a></div></div>'
+        }
+    </script>
+
+ 
+            <script src='https://www.runescape.com/js/c/responsive/vendor-128.js'></script>
+
+	<script>
+        var gtmSite = 'dual';
+
+            var gtmUser = {
+                language: 0,
+                isLoggedIn: 0
+            };
+
+        if (typeof(dataLayer) !== 'undefined'){
+            dataLayer[0].user = gtmUser;
+        } else {
+            var dataLayer = [{
+                'user': gtmUser
+            }];
+        }
+
+        if (typeof(Cookies.get('JXFRONTUID')) !== 'undefined') {
+            if (typeof(dataLayer) !== 'undefined'){
+                dataLayer[0].JXFRONTUID = Cookies.get('JXFRONTUID');
+            } else {
+                var dataLayer = [{
+                    'JXFRONTUID': Cookies.get('JXFRONTUID')
+                }];
+            }
+        }
+
+        if (typeof(Cookies.get('bidalgouid')) !== 'undefined') {
+            if (typeof(dataLayer) !== 'undefined'){
+                dataLayer[0].bidalgouid = Cookies.get('bidalgouid');
+            } else {
+                var dataLayer = [{
+                    'bidalgouid': Cookies.get('bidalgouid')
+                }];
+            }
+        }
+
+		(function(w,d,s,l,i){
+			w[l]=w[l]||[];
+			w[l].push({
+				'gtm.start': new Date().getTime(),
+				event:'gtm.js',
+				site: gtmSite
+			});
+			var f=d.getElementsByTagName(s)[0],
+				j=d.createElement(s),
+				dl=l!='dataLayer'?'&l='+l:'';
+
+			j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+			f.parentNode.insertBefore(j,f);
+		})(window,document,'script','dataLayer','GTM-NRKJSQ');
+	</script>
+
+            <script src="https://www.runescape.com/js/rs3/cookie_consent-128.js"></script>
+            <script src="https://www.runescape.com/js/c/responsive/theme-dual-128.js"></script>
+</body>
+</html>
+
+CREATED BAD IP COOLDOWNMESS
+Exception in thread "main" java.lang.NullPointerException
+	at AccountCreatorHeadless.createIPCooldownMessage(AccountCreatorHeadless.java:237)
+	at AccountCreatorHeadless.createProxyPost(AccountCreatorHeadless.java:196)
+	at AccountCreatorHeadless.createProxyPost(AccountCreatorHeadless.java:193)
+	at AccountCreatorHeadless.createAccount(AccountCreatorHeadless.java:124)
+	at TestAccountCreatorHeadless.<init>(TestAccountCreatorHeadless.java:12)
+	at TestAccountCreatorHeadless.main(TestAccountCreatorHeadless.java:6)

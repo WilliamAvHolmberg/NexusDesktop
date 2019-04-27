@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
+import java.util.concurrent.TimeUnit;
 
 import org.medusa.Utils.Logger;
 
@@ -77,15 +78,7 @@ public class NexHelper implements Runnable {
 		}
 		Scanner sc = new Scanner(System.in);
 
-		if(System.getProperty("testfirefox", null) != null){
-			try {
-				PrivateProxy proxy = new PrivateProxy("oPob2V", "aabDVp", "195.158.194.77", "8000");
-//				if(!proxy.setSystemProxy())
-//					return;
-				AccountCreator.postForm(null, "", "", "", proxy, "http://ipchicken.com/");
-			}catch (Exception ex){ ex.printStackTrace(); }
-			return;
-		}
+	
 
 		String dir = AccountLauncher.curDir();
 		System.out.println(dir);
@@ -246,10 +239,11 @@ public class NexHelper implements Runnable {
 			//AccountCreator.createIPCooldownMessage("50.237.102.215", 300);
 			while (true) {
 				int tmp_interval = launchInterval;
-				if(getProcessCpuLoad() > 90) {
+				if(getProcessCpuLoad() > 80) {
 					Logger.log("HIGH CPU LOAD... wait 10 sec");
 					tmp_interval = 30000;
-				}else if (getProcessCpuLoad() > 70) {
+					
+				}else if (getProcessCpuLoad() > 60) {
 					tmp_interval = 15000;
 				}
 				if (!messageQueue.isEmpty() && System.currentTimeMillis() > lastStart + tmp_interval) {
@@ -300,7 +294,7 @@ public class NexHelper implements Runnable {
 				}
 				Logger.log("LOOP");
 				log(out, in);
-				Thread.sleep(1000);
+				TimeUnit.SECONDS.sleep(1);
 			}
 		}
 		catch (SocketTimeoutException e) {
@@ -311,10 +305,7 @@ public class NexHelper implements Runnable {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
-		catch (InterruptedException e){
-			e.printStackTrace();
-			return;
-		}
+	
 		catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();

@@ -1,8 +1,5 @@
-/.DS_Store
-/drivers/
-/item_defs.json
-/libs/
 /com/
+/libs/
 /manifest.mf
 /org/
 /rspeer-launcher.jar

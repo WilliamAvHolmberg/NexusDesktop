@@ -118,7 +118,7 @@ public class AccountCreatorHeadless {
 			Logger.log("Successfully connected");
 		}
 		Logger.log("Waiting for captcha code... This might take a while...");
-		String token = getCaptcha();
+		String token = "asdasdsad"; //getCaptcha();
 
 		if (token != null && token.length() > 5) {
 				createProxyPost(username, email, password,token, proxy, address);
@@ -137,7 +137,6 @@ public class AccountCreatorHeadless {
 
 				HttpPost httppost = new HttpPost("https://secure.runescape.com/m=account-creation/create_account");
 
-
 				
 				Random rand = new Random();
 				int day = (1 + rand.nextInt(29));
@@ -147,8 +146,10 @@ public class AccountCreatorHeadless {
 				// Request parameters and other properties.
 				List<NameValuePair> params = new ArrayList<NameValuePair>(2);
 				params.add(new BasicNameValuePair("email1", email));
+				System.out.println("Email: " + email);
 				params.add(new BasicNameValuePair("onlyOneEmail", "1"));
 				params.add(new BasicNameValuePair("password1", password));
+				System.out.println("Pass: " + password);
 				params.add(new BasicNameValuePair("onlyOnePassword", "1"));
 				params.add(new BasicNameValuePair("day", Integer.toString(day)));
 				System.out.println("Day: " + day);
@@ -172,11 +173,9 @@ public class AccountCreatorHeadless {
 				//Execute and get the response.
 				HttpResponse response = httpclient.execute(httppost);
 				HttpEntity entity = response.getEntity();
-
 				if (entity != null) {
 					InputStream instream = entity.getContent();
 					String getResponseString = readStream(instream);
-
 					completeNumber++;
 					try {
 						if(getResponseString.length() < 2) {
@@ -186,17 +185,18 @@ public class AccountCreatorHeadless {
 						}
 		
 						if (getResponseString.contains("Account Created") || getResponseString.length() < 2){
-							AccountRecover.createAccountUnlocked(email, password);
-							AccountLauncher.launchClient(email,address);						} 
+							AccountLauncher.launchClient(email,address);	
+							AccountRecover.createAccountUnlocked(email, password);					} 
 						else {
 							if(attempts < 1) {
-							Logger.log(getResponseString);
+							Logger.log("ATTEMPT: " + attempts);
 							Logger.log("Creation failed...lets try again. No error");
 							attempts += 1;
 							createProxyPost(username, email, password, gresponse, proxy, address);
 							return;
 							}else {
 								createIPCooldownMessage(proxy.host, 120);
+								Logger.log(getResponseString);
 								Logger.log("OUT OF ATTEMPTS. SEND COOLDOWN");
 							}
 						}
