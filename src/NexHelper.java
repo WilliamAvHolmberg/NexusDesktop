@@ -168,7 +168,8 @@ public class NexHelper implements Runnable {
 
 		if(System.getProperties().containsKey("watchdog")) {
 			System.out.println("Beginning Watchdog...");
-			NexWatchdog.begin(computerName, lowResourceOption, interval);
+			boolean ruby = System.getProperties().containsKey("ruby");
+			NexWatchdog.begin(computerName, lowResourceOption, interval, ruby);
 			return;
 		}
 
