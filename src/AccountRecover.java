@@ -167,12 +167,12 @@ public class AccountRecover {
 				TimeUnit.SECONDS.sleep(6);
 				Logger.log("Form filled");
 				try {
-					
+
 					TimeUnit.SECONDS.sleep(1);
 					//WebElement submitButton = driver.findElement(By.name("submit"));
 					//submitButton.click();
 					password.submit();
-				
+
 				}catch(Exception e) {
 					Logger.log("SUBMITBUTTON GOT FUCKED UP");
 					try {
@@ -182,7 +182,7 @@ public class AccountRecover {
 						Logger.log("OTHER SUBMITBUTTON GOT FUCKED UP ASWELL");
 					}
 				}
-				
+
 				Thread.sleep(4000);
 			} else {
 				Logger.log("Page failed to load..");
@@ -279,7 +279,7 @@ public class AccountRecover {
 			}
 			WebElement formUsername = driver.findElement(By.name("email"));
 			WebElement textarea = driver.findElement(By.id("g-recaptcha-response"));
-		
+
 			// send recovery
 			if (formUsername != null) {
 				formUsername.sendKeys(username);
@@ -339,7 +339,7 @@ public class AccountRecover {
 		}
 		if (failed) {
 			Logger.log("something went wrong");
-			
+
 		}
 
 		NexHelper.UNLOCK_IS_READY = true;

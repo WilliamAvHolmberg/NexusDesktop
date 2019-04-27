@@ -54,6 +54,7 @@ public class NexHelper implements Runnable {
 		return retVal;
 	}
 
+	public static String LOCAL_IP = null;
 	public static void main(String[] args) throws IOException, InterruptedException {
 
 		File[] files = new File(AccountLauncher.curDir()).listFiles((dir1, name) -> name.endsWith(".log"));
@@ -68,8 +69,8 @@ public class NexHelper implements Runnable {
 			whatismyip = new URL("http://checkip.amazonaws.com");
 			BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
 
-			String ip = in.readLine(); // you get the IP as a String
-			System.out.println("My IP: " + ip);
+			LOCAL_IP = in.readLine(); // you get the IP as a String
+			System.out.println("My IP: " + LOCAL_IP.trim());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -167,7 +168,7 @@ public class NexHelper implements Runnable {
 
 		if(System.getProperties().containsKey("watchdog")) {
 			System.out.println("Beginning Watchdog...");
-			//NexWatchdog.begin(computerName, lowResourceOption, interval);
+			NexWatchdog.begin(computerName, lowResourceOption, interval);
 			return;
 		}
 
@@ -310,6 +311,10 @@ public class NexHelper implements Runnable {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
+		catch (InterruptedException e){
+			e.printStackTrace();
+			return;
+		}
 		catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
@@ -319,6 +324,7 @@ public class NexHelper implements Runnable {
 			Thread.sleep(5000);
 		}catch (InterruptedException e) {
 			e.printStackTrace();
+			return;
 		}
 		Logger.log("NEX HELPER IS OUT");
 	}

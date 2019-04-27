@@ -1,5 +1,9 @@
 
 import com.google.common.collect.ObjectArrays;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import ui.ProcessLink;
+import ui.frmRunningAccounts;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
@@ -35,17 +39,16 @@ public final class AccountLauncher {
 		return detectedOS;
 	}
 
-	// static frmRunningAccounts ui;
+	static frmRunningAccounts ui;
 
-	//static HashMap<Process, Long> running_processes = new HashMap<>();
-	//static HashSet<Process> confirmed_running_rocesses = new HashSet<>();
-
+	static HashMap<Process, Long> running_processes = new HashMap<>();
+	static HashSet<Process> confirmed_running_rocesses = new HashSet<>();
 	public static void launchClient(String username, String address) {
 		OSType operatingSystem = AccountLauncher.getOperatingSystemType();
-		// if (ui == null && operatingSystem == OSType.Windows) {
-		// ui = new ui.frmRunningAccounts();
-		// ui.setVisible(true);
-		// }
+		if (ui == null && operatingSystem == OSType.Windows) {
+			ui = new ui.frmRunningAccounts();
+			ui.setVisible(true);
+		}
 
 		System.out.println(address);
 		if (!address.equals(lastName) || System.currentTimeMillis() > (lastStartup + 1000 * 120)) {
@@ -98,7 +101,7 @@ public final class AccountLauncher {
 				ex.printStackTrace();
 				if (p != null && p.isAlive()) {
 					System.out.println("DESTROYYYYYY");
-					p.destroy();
+					killProcess(p);
 				}
 				System.out.println(ex.getMessage());
 			}
@@ -110,8 +113,8 @@ public final class AccountLauncher {
 		running_processes.entrySet().removeIf(entry -> {
 			if (entry.getKey() == null || !entry.getKey().isAlive()) {
 				try {
-					// if (ui != null) ui.removeAccount(entry.getKey());
-					// confirmed_running_rocesses.remove(entry.getKey());
+					confirmed_running_rocesses.remove(entry.getKey());
+					if (ui != null) ui.removeAccount(entry.getKey());
 				} catch (Exception ex) {
 				}
 				return true;
@@ -119,18 +122,18 @@ public final class AccountLauncher {
 			return false;
 		});
 		for (Map.Entry<Process, Long> entry : running_processes.entrySet()) {
-			if (System.currentTimeMillis() - entry.getValue() > (8 * 60 * 1000)) {// 5 minutes
+			if (System.currentTimeMillis() - entry.getValue() > (6 * 60 * 1000)) {// 5 minutes
 				if (!confirmed_running_rocesses.contains(entry.getKey())) {
 					System.out.println("Killing process due to innactivity");
-					entry.getKey().destroy();
+					killProcess(entry.getKey());
 				}
 			}
 		}
 		}
 		*/
-	
 
-	
+
+
 	public static String curDir(){
 		try {
 			return new File(NexHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath();
