@@ -83,10 +83,11 @@ public class NexHelper implements Runnable {
 
 		if(System.getProperty("testfirefox", null) != null){
 			try {
-				PrivateProxy proxy = new PrivateProxy("NHTzq7", "mxxdZy", "195.158.193.81", "8000");
-				if(!proxy.setSystemProxy())
-					return;
-				//AccountCreator.postForm(null, "", "", "", proxy, "http://ipchicken.com/");
+				PrivateProxy proxy = new PrivateProxy("oPob2V", "aabDVp", "195.158.194.77", "8000");
+//				if(!proxy.setSystemProxy())
+//					return;
+				AccountCreator accountCreator = new AccountCreator();
+				accountCreator.postForm(null, "", "", "", proxy, "http://ipchicken.com/");
 			}catch (Exception ex){ ex.printStackTrace(); }
 			return;
 		}
@@ -172,7 +173,8 @@ public class NexHelper implements Runnable {
 
 		if(System.getProperties().containsKey("watchdog")) {
 			System.out.println("Beginning Watchdog...");
-			NexWatchdog.begin(computerName, lowResourceOption, interval);
+			boolean ruby = System.getProperties().containsKey("ruby");
+			NexWatchdog.begin(computerName, lowResourceOption, interval, ruby);
 			return;
 		}
 
@@ -247,7 +249,6 @@ public class NexHelper implements Runnable {
 			initializeContactToSocket(out, in);
 
 			String nextRequest;
-			//AccountCreator.createIPCooldownMessage("50.237.102.215", 300);
 			while (true) {
 				int tmp_interval = launchInterval;
 				if(getProcessCpuLoad() > 80) {

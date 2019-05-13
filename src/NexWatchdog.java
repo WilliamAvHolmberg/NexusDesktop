@@ -4,7 +4,7 @@ import java.util.List;
 
 
 public class NexWatchdog {
-    public static void begin(String computerName, int lowResourceOption, int interval){
+    public static void begin(String computerName, int lowResourceOption, int interval, boolean ruby){
 
         String bash = "bash.exe";
         if(AccountLauncher.getOperatingSystemType() == AccountLauncher.OSType.Linux)
@@ -29,18 +29,21 @@ public class NexWatchdog {
         int attempt = 0;
         while (true) {
             try {
-                if(nexus_jar_proc != null && !nexus_jar_proc.isAlive()){
-                    attempt++;
-                    if(attempt >= 10) {
-                        System.out.println("Killing Ruby");
-                        for(int i = 0; i < nexus_rb_proc.length; i++)
-                            if(nexus_rb_proc[i] != null)
-                                nexus_rb_proc[i].destroy();
-                        try {
-                            Thread.sleep(3000);
-                        } catch (InterruptedException e){break;}
+                if(ruby) {
+                    if (nexus_jar_proc != null && !nexus_jar_proc.isAlive()) {
+                        attempt++;
+                        if (attempt >= 10) {
+                            System.out.println("Killing Ruby");
+                            for (int i = 0; i < nexus_rb_proc.length; i++)
+                                if (nexus_rb_proc[i] != null)
+                                    nexus_rb_proc[i].destroy();
+                            try {
+                                Thread.sleep(3000);
+                            } catch (InterruptedException e) {
+                                break;
+                            }
+                        }
                     }
-                }
 
 //                if (rails_server_proc == null || !rails_server_proc.isAlive()) {
 //                    System.out.println("Starting Rails Server");
@@ -48,29 +51,34 @@ public class NexWatchdog {
 //                    sleep(5000);
 //                }
 
-                boolean wait = false;
-                for(int i = 0; i < nexus_rb_proc.length; i++) {
-                    Process process = nexus_rb_proc[i];
-                    if (process == null || !process.isAlive()) {
+                    boolean wait = false;
+                    for (int i = 0; i < nexus_rb_proc.length; i++) {
+                        Process process = nexus_rb_proc[i];
+                        if (process == null || !process.isAlive()) {
 
-                        ProcessBuilder pb;
-                        pb = new ProcessBuilder(bash, "-i", "-c", "ruby app/nexus.rb -port " + i);
-                        pb.inheritIO();
+                            ProcessBuilder pb;
+                            pb = new ProcessBuilder(bash, "-i", "-c", "ruby app/nexus.rb -port " + i);
+                            pb.inheritIO();
 
-                        System.out.println("Starting Nexus Ruby " + i);
-                        process = pb.start();
-                        nexus_rb_proc[i] = process;
-                        attempt = 0;
-                        wait = true;
-                        try {
-                            Thread.sleep(1000);
-                        }catch (InterruptedException e){break;}
+                            System.out.println("Starting Nexus Ruby " + i);
+                            process = pb.start();
+                            nexus_rb_proc[i] = process;
+                            attempt = 0;
+                            wait = true;
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                break;
+                            }
+                        }
                     }
-                }
-                if (wait) {
-                    try {
-                        Thread.sleep(12000);
-                    }catch (InterruptedException e){break;}
+                    if (wait) {
+                        try {
+                            Thread.sleep(12000);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                    }
                 }
 
                 if (nexus_jar_proc == null || !nexus_jar_proc.isAlive()) {

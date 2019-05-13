@@ -219,9 +219,9 @@ public class AccountCreator {
 	}
 
 	static int activeAccountCreators = 0;
-
-	public void postForm(String gresponse, String username, String loginEmail, String loginPassword, PrivateProxy proxy,
-			String address) throws Exception {
+	public void postForm(String gresponse, String username, String loginEmail, String loginPassword,
+			PrivateProxy proxy, String address) throws Exception {
+		killLeftoverProcesses();
 
 		activeAccountCreators++;
 		setFirefoxDriver();
