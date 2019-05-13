@@ -10,6 +10,9 @@ import java.util.Scanner;
 import java.util.Stack;
 
 import org.medusa.Utils.Logger;
+import org.nex.unlocker.proxy.SocksProxy;
+
+import com.twocaptcha.api.ProxyType;
 
 import javax.management.*;
 
@@ -448,7 +451,7 @@ public class NexHelper implements Runnable {
 		String proxyUsername = respond[6];
 		String proxyPassword = respond[7];
 		String address = res.substring(res.indexOf("http"), res.length());
-		PrivateProxy proxy = new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort);
+		SocksProxy proxy = new SocksProxy(proxyUsername, proxyPassword, proxyIP, proxyPort, ProxyType.SOCKS5);
 		RecoverThread accThread = new RecoverThread(username, login, password, new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort), address);
 		Thread thread = new Thread(accThread);
 		thread.start();

@@ -1,0 +1,5 @@
+package org.nex.unlocker;
+
+public enum StatusMessage {
+	DOMAIN_NOT_FOUND, RECOVERY_BLOCKED, PASSWORD_BLOCKED, PROXY_FAILED, MAIL_NOT_FOUND, COMPLETED
+}
