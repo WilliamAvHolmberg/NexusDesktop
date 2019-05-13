@@ -1,6 +1,5 @@
 
 import com.google.common.collect.ObjectArrays;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import ui.ProcessLink;
 import ui.frmRunningAccounts;
 
@@ -77,12 +76,14 @@ public final class AccountLauncher {
 					int i = 1;
 					System.out.println("Start windows");
 					p = windowsBuilder.start();
-					// if (ui != null && username.length() > 0)
-					// ui.addAccount(p, username);
+					if (ui != null && username.length() > 0)
+						ui.addAccount(p, username);
+					setOutputStream(p);
 					break;
 				case MacOS:
 					// Process p2 = macBuilder.start();
 					p = Runtime.getRuntime().exec("java -jar rspeer-launcher.jar " + address);
+					setOutputStream(p);
 					break;
 				case Linux:
 					System.out.println("lets go linux");
@@ -95,6 +96,7 @@ public final class AccountLauncher {
 						} catch (Exception ex) {
 						}
 					}
+					setOutputStream(p);
 					break;
 				}
 			} catch (Exception ex) {
@@ -109,12 +111,13 @@ public final class AccountLauncher {
 
 	}
 
-	/*static void cleanupExistingClients() {
+	static void cleanupExistingClients() {
 		running_processes.entrySet().removeIf(entry -> {
 			if (entry.getKey() == null || !entry.getKey().isAlive()) {
 				try {
 					confirmed_running_rocesses.remove(entry.getKey());
-					if (ui != null) ui.removeAccount(entry.getKey());
+					if (ui != null)
+						ui.removeAccount(entry.getKey());
 				} catch (Exception ex) {
 				}
 				return true;
@@ -136,22 +139,23 @@ public final class AccountLauncher {
 
 	public static String curDir(){
 		try {
-			return new File(NexHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath();
-		}catch (URISyntaxException e){
+			return new File(NexHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile()
+					.getPath();
+		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
 		return "";
 	}
 
-	public static String getRSPeerJar(){
-		if(firstRun) {
+	public static String getRSPeerJar() {
+		if (firstRun) {
 			firstRun = false;
 			return "./rspeer-launcher.jar";
 		}
 		JFileChooser fr = new JFileChooser();
 		FileSystemView fw = fr.getFileSystemView();
-		return "-Xmx384m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -Xss2m -Dsun.java2d.noddraw=true -Xincgc " +
-				Paths.get(fw.getDefaultDirectory().toString(), "RSPeer", "cache", "rspeer.jar").toString();
+		return "-Xmx384m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -Xss2m -Dsun.java2d.noddraw=true -Xincgc "
+				+ Paths.get(fw.getDefaultDirectory().toString(), "RSPeer", "cache", "rspeer.jar").toString();
 	}
 
 
