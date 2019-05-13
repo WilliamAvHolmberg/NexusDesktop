@@ -245,7 +245,6 @@ public class NexHelper implements Runnable {
 			initializeContactToSocket(out, in);
 
 			String nextRequest;
-			//AccountCreator.createIPCooldownMessage("50.237.102.215", 300);
 			while (true) {
 				int tmp_interval = launchInterval;
 				if(getProcessCpuLoad() > 90) {
