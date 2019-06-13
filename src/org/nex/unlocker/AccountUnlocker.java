@@ -60,18 +60,19 @@ public class AccountUnlocker {
 	
 	
 	public StatusMessage unlockAccount(String email) {
-		System.out.println("Making sure email is available");
-		if(!mailHandler.isEmailAvailable(email)) return StatusMessage.DOMAIN_NOT_FOUND;
-		System.out.println("Email is available.");
-		
-		
-		
 		System.out.println("Activating proxy.");
 		if(!proxy.setSystemProxy()) {
 			System.out.println("Failed to activate proxy.");
 			return StatusMessage.PROXY_FAILED;
 		}
 		System.out.println("Successfully set proxy.");
+		System.out.println("Making sure email is available");
+		if(!mailHandler.isEmailAvailable(email)) return StatusMessage.DOMAIN_NOT_FOUND;
+		System.out.println("Email is available.");
+		
+		
+		
+	
 		
 		
 		System.out.println("Checking if we have received email");

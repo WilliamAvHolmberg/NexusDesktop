@@ -98,7 +98,7 @@ public class NexHelper implements Runnable {
 		String serverData = readFile("server.txt");
 		if (serverData == null){
 			System.out.println("server.txt was missing. Lets create it");
-			serverData = "oxnetserver.ddns.net\r\n1:William\r\n2:Brandon\r\n3:Suicide\r\n4:VPS\r\n5:MINIMAC\r\n6:ACCOUNT\r\n7:BATCH1\r\n8:BATCH2\r\n9:BATCH3\r\n10:BATCH4r\\n10:BATCH5";
+			serverData = "nexus.myftp.biz\r\n1:William\r\n2:Brandon\r\n3:Suicide\r\n4:VPS\r\n5:MINIMAC\r\n6:ACCOUNT\r\n7:BATCH1\r\n8:BATCH2\r\n9:BATCH3\r\n10:BATCH4r\\n10:BATCH5";
 			writeFile("server.txt", serverData);
 		}
 
@@ -452,7 +452,7 @@ public class NexHelper implements Runnable {
 		String proxyPassword = respond[7];
 		String address = res.substring(res.indexOf("http"), res.length());
 		SocksProxy proxy = new SocksProxy(proxyUsername, proxyPassword, proxyIP, proxyPort, ProxyType.SOCKS5);
-		RecoverThread accThread = new RecoverThread(username, login, password, new PrivateProxy(proxyUsername, proxyPassword, proxyIP, proxyPort), address);
+		RecoverThread accThread = new RecoverThread(username, login, password, new SocksProxy(proxyIP, proxyPort,proxyUsername, proxyPassword, ProxyType.SOCKS5), address);
 		Thread thread = new Thread(accThread);
 		thread.start();
 		System.out.println("Started new recover thread");

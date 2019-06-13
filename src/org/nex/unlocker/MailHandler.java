@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -17,6 +18,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.nex.unlocker.proxy.SocksProxy;
@@ -90,11 +92,16 @@ public class MailHandler {
 			}
 			rd.close();
 		
-			if (fullResponse.toString().contains("mail_id")) {
-				JSONObject obj = new JSONObject(fullResponse.toString().replace("[", "").replace("]", ""));
-				String mailID = (String) obj.get("mail_id");
-				System.out.println("Mail ID:" + mailID);
-				return mailID;
+			if (fullResponse.toString().contains("mail_id") && fullResponse.toString().toLowerCase().contains("Reset".toLowerCase())) {
+				JSONArray array = new JSONArray(fullResponse.toString());
+				for(int i = 0; i< array.length(); i++) {
+					JSONObject object = array.getJSONObject(i);
+					String subject = (String) object.get("mail_subject");
+					String email_id = (String) object.get("mail_id");
+					if(subject.toLowerCase().contains("reset")) {
+						return email_id;
+					}
+				}
 			}
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
@@ -119,7 +126,7 @@ public class MailHandler {
 
 	public List<String> getMailDomains() {
 		HttpClient client = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
-		HttpGet get = new HttpGet("http://oxnetserver.ddns.net:3000/accounts/available_mail_domains");
+		HttpGet get = new HttpGet("http://nexus.myftp.biz:3000/accounts/available_mail_domains");
 
 		// add header
 

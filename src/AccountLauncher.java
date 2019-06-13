@@ -153,9 +153,8 @@ public final class AccountLauncher {
 
 	public static String curDir(){
 		try {
-			return new File(NexHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile()
-					.getPath();
-		} catch (URISyntaxException e) {
+			return new File(NexHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getPath();
+		}catch (URISyntaxException e){
 			e.printStackTrace();
 		}
 		return "";
